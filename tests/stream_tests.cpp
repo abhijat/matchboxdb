@@ -5,7 +5,6 @@
 TEST(Strings, StringSerializeAndDeserialize) {
     auto s = stream_utils::build_binary_stream();
     stream_utils::write_string_to_stream(s, "abhijat");
-    s.seekg(0, std::ios::beg);
     auto read_back = stream_utils::read_string_from_stream(s);
     ASSERT_EQ(read_back, "abhijat");
 }
