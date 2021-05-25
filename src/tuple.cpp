@@ -1,5 +1,6 @@
 #include "tuple.h"
 #include "metadata.h"
+#include "streamutils.h"
 
 #include <utility>
 #include <sstream>
@@ -16,14 +17,13 @@ tuple::Tuple::Tuple(std::vector<metadata::DataType> attrs) : _attributes(std::mo
         std::visit(visitor, attribute);
     }
 
-    auto buffer = s.str();
-    _data = std::vector<unsigned char>{buffer.data(), buffer.data() + buffer.size()};
+    _data = stream_utils::buffer_from_stream(s);
 }
 
 tuple::Tuple::Tuple(const std::vector<unsigned char> &buffer, const metadata::Metadata &metadata) {
     _data = buffer;
-    std::stringstream s{std::ios::binary | std::ios::in | std::ios::out};
-    s.write(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+    auto s = stream_utils::build_binary_stream();
+    stream_utils::load_stream_from_buffer(s, buffer);
 
     for (const auto &type: metadata.types) {
         _attributes.push_back(deserialize(s, type));
@@ -42,25 +42,22 @@ uint32_t tuple::Tuple::size() const {
     return _data.size();
 }
 
+const std::vector<metadata::DataType> &tuple::Tuple::attributes() const {
+    return _attributes;
+}
+
 metadata::DataType tuple::deserialize(std::stringstream &s, metadata::Kind kind) {
     switch (kind) {
         case metadata::Kind::String: {
-            uint32_t size;
-            s.read(reinterpret_cast<char *>(&size), sizeof(size));
-            char buf[size];
-            s.read(buf, size);
-            return std::string{buf, size};
+            return stream_utils::read_string_from_stream(s);
         }
 
         case metadata::Kind::UnsignedInt: {
-            uint32_t data;
-            s.read(reinterpret_cast<char *>(&data), sizeof(data));
-            return data;
+            return stream_utils::read_data_from_stream<uint32_t>(s);
         }
 
         case metadata::Kind::Boolean: {
-            unsigned char data;
-            s.read(reinterpret_cast<char *>(&data), sizeof(data));
+            auto data = stream_utils::read_data_from_stream<unsigned char>(s);
             return data != 0;
         }
 
@@ -72,18 +69,16 @@ metadata::DataType tuple::deserialize(std::stringstream &s, metadata::Kind kind)
 tuple::SerializationVisitor::SerializationVisitor(std::stringstream &s) : s(s) {}
 
 void tuple::SerializationVisitor::operator()(const std::string &data) {
-    uint32_t data_len = data.size();
-    s.write(reinterpret_cast<const char *>(&data_len), sizeof(data_len));
-    s.write(data.c_str(), data_len);
+    stream_utils::write_string_to_stream(s, data);
 }
 
 void tuple::SerializationVisitor::operator()(uint32_t data) {
-    s.write(reinterpret_cast<const char *>(&data), sizeof(data));
+    stream_utils::write_data_to_stream(s, data);
 }
 
 void tuple::SerializationVisitor::operator()(bool data) {
     unsigned char bool_as_int = data ? 1 : 0;
-    s.write(reinterpret_cast<const char *>(&bool_as_int), sizeof(bool_as_int));
+    stream_utils::write_data_to_stream(s, bool_as_int);
 }
 
 tuple::OstreamVisitor::OstreamVisitor(std::ostream &s) : s{s} {

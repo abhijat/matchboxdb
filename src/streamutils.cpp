@@ -11,6 +11,9 @@ std::string stream_utils::read_string_from_stream(std::stringstream &s) {
 
     char buf[size];
     s.read(buf, size);
+    if (!s) {
+        throw std::ios::failure("failed to read_string_from_stream");
+    }
     return std::string{buf, size};
 }
 

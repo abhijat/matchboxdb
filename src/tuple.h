@@ -22,6 +22,8 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Tuple &t);
 
+    const std::vector<metadata::DataType> &attributes() const;
+
 protected:
     std::vector<metadata::DataType> _attributes;
     std::vector<unsigned char> _data;

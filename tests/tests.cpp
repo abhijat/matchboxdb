@@ -45,3 +45,20 @@ TEST(SlottedDataPageTests, EmptyPage) {
     ASSERT_EQ(new_page.slot_end_marker(), new_page.header_size() + sizeof(uint32_t) + sizeof(uint32_t));
     ASSERT_EQ(new_page.tuple_begin_marker(), page::k_page_size);
 }
+
+TEST(TupleTests, Serialization) {
+    std::vector<std::string> names{"name", "age", "is_employed"};
+    std::vector<metadata::Kind> types{metadata::Kind::String, metadata::Kind::UnsignedInt, metadata::Kind::Boolean};
+    metadata::Metadata m{names, types};
+
+    std::vector<metadata::DataType> attributes{std::string{"abhijat"}, uint32_t{38}, true};
+    tuple::Tuple t{attributes};
+
+    auto buffer = t.data();
+
+    tuple::Tuple a{buffer, m};
+    const auto &attrs = a.attributes();
+    ASSERT_THAT(attrs[0], ::testing::VariantWith<std::string>("abhijat"));
+    ASSERT_THAT(attrs[1], ::testing::VariantWith<uint32_t>(38));
+    ASSERT_THAT(attrs[2], ::testing::VariantWith<bool>(true));
+}
