@@ -44,5 +44,25 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(test tests/tests.cpp)
+add_executable(test tests/tests.cpp
+        src/page.cpp
+        src/page.h
+        src/row_mapping_page.cpp
+        src/row_mapping_page.h
+        src/slotted_data_page.cpp
+        src/slotted_data_page.h
+        src/test_utils.h
+        src/tuple.cpp
+        src/tuple.h
+        src/metadata_page.cpp
+        src/metadata_page.h
+        src/streamutils.h
+        src/metadata.h
+        src/streamutils.cpp
+        src/page_cache.cpp
+        src/page_cache.h
+        src/table_initializer.cpp
+        src/table_initializer.h
+        src/metadata.cpp
+        )
 target_link_libraries(test gtest gmock gtest_main)
