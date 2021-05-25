@@ -132,3 +132,7 @@ uint32_t page::MetadataPage::next_row_id() {
     _max_row_id += 1;
     return _max_row_id;
 }
+
+uint32_t page::MetadataPage::max_row_id() const {
+    return _max_row_id;
+}

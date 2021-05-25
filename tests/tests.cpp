@@ -1,4 +1,6 @@
-#include "gtest/gtest.h"
+#include <gmock/gmock-matchers.h>
+#include <gtest/gtest.h>
+
 #include "../src/page_cache.h"
 
 TEST(PageCacheTests, FileNameFromTableName) {
@@ -15,3 +17,20 @@ TEST(PageCacheTests, CacheKeyGen) {
     ASSERT_EQ("md::foobar::100", key);
 }
 
+TEST(MetadataPageTests, PageToBufferToPage) {
+    std::vector<std::string> columns{"name", "age"};
+    std::vector<metadata::Kind> kinds{metadata::Kind::String, metadata::Kind::UnsignedInt};
+    page::MetadataPage m{"foobar", columns, kinds, 100, 10, 22};
+
+    auto buffer = m.buffer();
+    ASSERT_EQ(buffer.size(), page::k_page_size);
+
+    page::MetadataPage n{buffer};
+
+    ASSERT_EQ(n.n_rowmap_pages(), 10);
+    ASSERT_EQ(n.n_data_pages(), 100);
+    ASSERT_EQ(n.max_row_id(), 22);
+    ASSERT_EQ(n.table_name(), "foobar");
+    ASSERT_THAT(n.column_names(), ::testing::ContainerEq(columns));
+    ASSERT_THAT(n.column_kinds(), ::testing::ContainerEq(kinds));
+}

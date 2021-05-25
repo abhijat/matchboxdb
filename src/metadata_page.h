@@ -34,6 +34,8 @@ public:
 
     const std::vector<metadata::Kind> &column_kinds() const;
 
+    uint32_t max_row_id() const;
+
     uint32_t next_row_id();
 
 protected:
