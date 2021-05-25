@@ -24,6 +24,10 @@ public:
 
     stream_utils::ByteBuffer empty_page();
 
+    uint32_t slot_end_marker() const;
+
+    uint32_t tuple_begin_marker() const;
+
 protected:
     uint32_t _slot_end_marker{};
     uint32_t _tuple_begin_marker{};

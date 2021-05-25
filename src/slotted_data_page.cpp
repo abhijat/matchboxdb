@@ -118,3 +118,11 @@ stream_utils::ByteBuffer page::SlottedDataPage::empty_page() {
     buffer.insert(buffer.end(), _free_space, '\0');
     return buffer;
 }
+
+uint32_t page::SlottedDataPage::slot_end_marker() const {
+    return _slot_end_marker;
+}
+
+uint32_t page::SlottedDataPage::tuple_begin_marker() const {
+    return _tuple_begin_marker;
+}
