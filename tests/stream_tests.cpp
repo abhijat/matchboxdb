@@ -34,6 +34,13 @@ TEST(Streams, BufferAndStream) {
     }
 }
 
+TEST(Streams, WriteBufferToStream) {
+    auto s = stream_utils::build_binary_stream();
+    stream_utils::ByteBuffer buffer(100, '\0');
+    stream_utils::write_byte_buffer_to_stream(s, buffer);
+    ASSERT_EQ(s.str().size(), 100 + sizeof(uint32_t));
+}
+
 TEST(Sizes, SizeOfString) {
     std::string s{"angry birds"};
     auto size = stream_utils::size_of_string(s);
