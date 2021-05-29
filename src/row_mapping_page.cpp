@@ -24,7 +24,7 @@ page::RowMappingPage::RowMappingPage(const std::vector<unsigned char> &buffer) :
 
 std::string page::RowMappingPage::to_string() const {
     std::stringstream ss;
-    ss << "page id " << _page_id << " header size " << _base_header_size << " next page " << _next_page_id
+    ss << "page id " << _page_id << " header size " << header_size() << " next page " << _next_page_id
        << " previous page "
        << _prev_page_id;
 

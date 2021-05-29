@@ -32,7 +32,7 @@ uint32_t page::SlottedDataPage::store_tuple(const tuple::Tuple &tuple) {
 std::string page::SlottedDataPage::to_string() const {
     std::stringstream ss;
     ss << "page id " << _page_id
-       << " header size " << _base_header_size
+       << " header size " << header_size()
        << " next page " << _next_page_id
        << " previous page " << _prev_page_id
        << " slot end " << _slot_end_marker
