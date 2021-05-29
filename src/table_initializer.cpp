@@ -39,8 +39,6 @@ std::ofstream &initializers::TableInitializer::write_metadata_page(std::ofstream
     };
     auto buffer = metadata_page.buffer();
 
-    std::cout << "metadata buffer size: " << buffer.size() << "\n";
-
     ofs.seekp(0, std::ios::beg);
     ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
     return ofs;
@@ -55,7 +53,6 @@ std::ofstream &initializers::TableInitializer::write_data_pages(std::ofstream &o
         ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
     }
 
-    std::cout << "wrote " << page_count << " data pages\n";
     return ofs;
 }
 

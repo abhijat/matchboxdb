@@ -8,6 +8,14 @@
 
 #include "metadata.h"
 
+namespace page {
+class MetadataPage;
+
+class SlottedDataPage;
+
+class RowMappingPage;
+}
+
 namespace stream_utils {
 
 using ByteBuffer = std::vector<unsigned char>;
@@ -62,6 +70,14 @@ uint32_t size_of_strings(const std::vector<std::string> &strings);
 uint32_t size_of_kind(metadata::Kind kind);
 
 uint32_t size_of_kinds(const std::vector<metadata::Kind> &kinds);
+
+ByteBuffer read_page_from_stream(std::istream &is);
+
+page::MetadataPage read_nth_metadata_page(std::istream &is, uint32_t n = 0);
+
+page::SlottedDataPage read_nth_data_page(std::istream &is, uint32_t n = 0);
+
+page::RowMappingPage read_nth_row_mapping_page(std::istream &is, uint32_t n = 0);
 
 }
 

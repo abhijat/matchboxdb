@@ -1,6 +1,10 @@
 #include <iostream>
 #include <numeric>
+
 #include "streamutils.h"
+#include "metadata_page.h"
+#include "slotted_data_page.h"
+#include "row_mapping_page.h"
 
 std::stringstream stream_utils::build_binary_stream() {
     return std::stringstream{std::ios::binary | std::ios::in | std::ios::out};
@@ -128,5 +132,35 @@ uint32_t stream_utils::size_of_kind(metadata::Kind kind) {
 
 uint32_t stream_utils::size_of_kinds(const std::vector<metadata::Kind> &kinds) {
     return sizeof(uint32_t) + sizeof(unsigned char) * kinds.size();
+}
+
+page::MetadataPage stream_utils::read_nth_metadata_page(std::istream &is, uint32_t n) {
+    is.seekg(0, std::ios::beg);
+    return page::MetadataPage(read_page_from_stream(is));
+}
+
+page::SlottedDataPage stream_utils::read_nth_data_page(std::istream &is, uint32_t n) {
+    uint32_t offset{page::k_page_size};
+
+    offset += n * page::k_page_size;
+    is.seekg(offset, std::ios::beg);
+
+    return page::SlottedDataPage(read_page_from_stream(is));
+}
+
+page::RowMappingPage stream_utils::read_nth_row_mapping_page(std::istream &is, uint32_t n) {
+    is.seekg(0, std::ios::end);
+    uint32_t end_marker = is.tellg();
+
+    uint32_t offset = end_marker - (page::k_page_size * (n + 1));
+    is.seekg(offset, std::ios::beg);
+
+    return page::RowMappingPage(read_page_from_stream(is));
+}
+
+stream_utils::ByteBuffer stream_utils::read_page_from_stream(std::istream &is) {
+    ByteBuffer buffer(page::k_page_size);
+    is.read(reinterpret_cast<char *>(buffer.data()), page::k_page_size);
+    return buffer;
 }
 
