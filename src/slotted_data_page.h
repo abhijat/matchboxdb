@@ -22,15 +22,18 @@ public:
 
     uint32_t free_space() const override;
 
-    stream_utils::ByteBuffer empty_page();
+    stream_utils::ByteBuffer empty_page() override;
 
     uint32_t slot_end_marker() const;
 
     uint32_t tuple_begin_marker() const;
 
-    constexpr uint32_t header_size() const;
+    static constexpr uint32_t header_size() {
+        return k_base_header_size + sizeof(_slot_end_marker) + sizeof(_tuple_begin_marker);
+    }
 
 protected:
+
     uint32_t _slot_end_marker{};
     uint32_t _tuple_begin_marker{};
 };

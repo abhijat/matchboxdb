@@ -111,10 +111,8 @@ stream_utils::ByteBuffer page::SlottedDataPage::empty_page() {
     stream_utils::write_data_to_stream(_stream, _slot_end_marker);
     stream_utils::write_data_to_stream(_stream, _tuple_begin_marker);
     uint32_t data_written = _stream.tellp();
-    _free_space = k_page_size - data_written;
-
     auto buffer = stream_utils::buffer_from_stream(_stream);
-    buffer.insert(buffer.end(), _free_space, '\0');
+    buffer.insert(buffer.end(), k_page_size - data_written, '\0');
     return buffer;
 }
 
@@ -124,8 +122,4 @@ uint32_t page::SlottedDataPage::slot_end_marker() const {
 
 uint32_t page::SlottedDataPage::tuple_begin_marker() const {
     return _tuple_begin_marker;
-}
-
-constexpr uint32_t page::SlottedDataPage::header_size() const {
-    return _base_header_size + sizeof(_slot_end_marker) + sizeof(_tuple_begin_marker);
 }

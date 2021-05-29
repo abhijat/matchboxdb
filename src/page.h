@@ -65,6 +65,12 @@ public:
 
     uint32_t page_size() const;
 
+    /**
+     * Returns a buffer from the page, with the understanding that the buffer does not contain anything other than
+     * the header fields. The remaining page is filled with null bytes. Useful when initializing the table file.
+     */
+    virtual stream_utils::ByteBuffer empty_page() = 0;
+
 protected:
     void write_header_to_stream();
 

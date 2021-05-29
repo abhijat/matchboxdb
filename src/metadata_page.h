@@ -38,6 +38,8 @@ public:
 
     uint32_t next_row_id();
 
+    stream_utils::ByteBuffer empty_page() override;
+
 protected:
     uint32_t _max_row_id{};
     uint32_t _n_data_pages{};

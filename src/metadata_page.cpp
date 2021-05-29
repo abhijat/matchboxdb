@@ -135,3 +135,7 @@ uint32_t page::MetadataPage::next_row_id() {
 uint32_t page::MetadataPage::max_row_id() const {
     return _max_row_id;
 }
+
+stream_utils::ByteBuffer page::MetadataPage::empty_page() {
+    return stream_utils::ByteBuffer();
+}

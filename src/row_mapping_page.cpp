@@ -101,10 +101,6 @@ page::Record page::RowMappingPage::record_for_row_id(uint32_t row_id) {
     throw std::out_of_range{"record not found for row id " + std::to_string(row_id)};
 }
 
-constexpr uint32_t page::RowMappingPage::header_size() {
-    return page::k_base_header_size + sizeof(_n_records) + sizeof(_max_row_id);
-}
-
 uint32_t page::RowMappingPage::record_size() const {
     return _n_records * k_record_width;
 }

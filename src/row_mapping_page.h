@@ -21,15 +21,17 @@ public:
 
     stream_utils::ByteBuffer buffer() override;
 
-    stream_utils::ByteBuffer empty_page();
+    stream_utils::ByteBuffer empty_page() override;
 
     void store_record(const Record &record);
 
     Record record_for_row_id(uint32_t row_id);
 
+    static constexpr uint32_t header_size() {
+        return k_base_header_size + sizeof(_n_records) + sizeof(_max_row_id);
+    }
 
 protected:
-    static constexpr uint32_t header_size();
     uint32_t record_size() const;
 
     uint32_t _max_row_id{};
