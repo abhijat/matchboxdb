@@ -20,7 +20,7 @@ TEST(PageCacheTests, CacheKeyGen) {
 TEST(MetadataPageTests, PageToBufferToPage) {
     std::vector<std::string> columns{"name", "age"};
     std::vector<metadata::Kind> kinds{metadata::Kind::String, metadata::Kind::UnsignedInt};
-    page::MetadataPage m{"foobar", columns, kinds, 100, 10, 22};
+    page::MetadataPage m{"foobar", columns, kinds, 100, 10, 22, 0};
 
     auto buffer = m.buffer();
     ASSERT_EQ(buffer.size(), page::k_page_size);
@@ -50,4 +50,15 @@ TEST(TupleTests, Serialization) {
     ASSERT_THAT(attrs[0], ::testing::VariantWith<std::string>("abhijat"));
     ASSERT_THAT(attrs[1], ::testing::VariantWith<uint32_t>(38));
     ASSERT_THAT(attrs[2], ::testing::VariantWith<bool>(true));
+}
+
+TEST(PageTests, PageTypeFromBuffer) {
+    page::SlottedDataPage slotted_data_page{0, page::k_page_size};
+    ASSERT_EQ(page::PageType::Data, page::page_type_from_buffer(slotted_data_page.empty_page()));
+
+    page::MetadataPage metadata_page{"", {}, {}, 0, 0, 0, 0};
+    ASSERT_EQ(page::PageType::Metadata, page::page_type_from_buffer(metadata_page.buffer()));
+
+    page::RowMappingPage row_mapping_page{0, 0};
+    ASSERT_EQ(page::PageType::RowMap, page::page_type_from_buffer(row_mapping_page.buffer()));
 }

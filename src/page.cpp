@@ -147,3 +147,17 @@ std::ostream &page::operator<<(std::ostream &os, page::PageType page_type) {
     }
     return os;
 }
+
+page::PageType page::page_type_from_buffer(const stream_utils::ByteBuffer &buffer) {
+    auto *p = reinterpret_cast<const uint32_t *>(buffer.data()) + 4;
+    switch (*p) {
+        case 0:
+            return PageType::RowMap;
+        case 1:
+            return PageType::Data;
+        case 2:
+            return PageType::Metadata;
+        default:
+            throw std::invalid_argument{"bad PageType: " + std::to_string(*p)};
+    }
+}

@@ -93,6 +93,8 @@ protected:
     uint32_t _free_space{};
 };
 
+PageType page_type_from_buffer(const stream_utils::ByteBuffer& buffer);
+
 }
 
 #endif //MATCHBOXDB_PAGE_H
