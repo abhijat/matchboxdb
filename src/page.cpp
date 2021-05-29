@@ -12,7 +12,7 @@ page::Page::Page(std::vector<unsigned char> buf) : _buffer{std::move(buf)},
 }
 
 void page::Page::read_header() {
-    _header_size = stream_utils::read_data_from_stream<decltype(_header_size)>(_stream);
+    _base_header_size = stream_utils::read_data_from_stream<decltype(_base_header_size)>(_stream);
     _page_id = stream_utils::read_data_from_stream<decltype(_page_id)>(_stream);
     _next_page_id = stream_utils::read_data_from_stream<decltype(_next_page_id)>(_stream);
     _prev_page_id = stream_utils::read_data_from_stream<decltype(_prev_page_id)>(_stream);
@@ -37,9 +37,9 @@ page::PageType page::Page::read_page_type() {
 
 page::Page::Page() : _stream{stream_utils::build_binary_stream()} {}
 
-page::Page::Page(uint32_t header_size, uint32_t page_id, uint32_t next_page_id, uint32_t prev_page_id,
-                 page::PageType page_type, uint32_t page_size, uint32_t free_space)
-    : _header_size(header_size),
+page::Page::Page(uint32_t page_id, uint32_t next_page_id, uint32_t prev_page_id, page::PageType page_type,
+                 uint32_t page_size, uint32_t free_space)
+    : _base_header_size(k_base_header_size),
       _page_id(page_id),
       _next_page_id(next_page_id),
       _prev_page_id(prev_page_id),
@@ -51,7 +51,7 @@ page::Page::Page(uint32_t header_size, uint32_t page_id, uint32_t next_page_id, 
 
 void page::Page::write_header_to_stream() {
     _stream.seekp(0, std::ios::beg);
-    stream_utils::write_data_to_stream(_stream, _header_size);
+    stream_utils::write_data_to_stream(_stream, _base_header_size);
     stream_utils::write_data_to_stream(_stream, _page_id);
     stream_utils::write_data_to_stream(_stream, _next_page_id);
     stream_utils::write_data_to_stream(_stream, _prev_page_id);
@@ -73,8 +73,8 @@ void page::Page::write_page_type() {
     }
 }
 
-uint32_t page::Page::header_size() const {
-    return _header_size;
+uint32_t page::Page::header_size() {
+    return page::k_page_size;
 }
 
 uint32_t page::Page::page_id() const {
@@ -100,7 +100,7 @@ uint32_t page::Page::page_size() const {
 page::Page::Page(page::Page &&p) noexcept {
     _buffer = std::move(p._buffer);
     _stream = std::move(p._stream);
-    _header_size = p._header_size;
+    _base_header_size = p._base_header_size;
     _page_id = p._page_id;
     _next_page_id = p._next_page_id;
     _prev_page_id = p._prev_page_id;

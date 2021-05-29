@@ -14,7 +14,7 @@
 namespace page {
 
 const uint32_t k_page_size{4096};
-const uint32_t k_header_size{sizeof(uint32_t) * 6};
+const uint32_t k_base_header_size{sizeof(uint32_t) * 6};
 
 enum class PageType {
     Data,
@@ -42,7 +42,7 @@ class Page {
 public:
     explicit Page(std::vector<unsigned char> buffer);
 
-    Page(uint32_t header_size, uint32_t page_id, uint32_t next_page_id, uint32_t prev_page_id, PageType page_type,
+    Page(uint32_t page_id, uint32_t next_page_id, uint32_t prev_page_id, page::PageType page_type,
          uint32_t page_size, uint32_t free_space);
 
     Page();
@@ -55,7 +55,7 @@ public:
 
     virtual stream_utils::ByteBuffer buffer() = 0;
 
-    uint32_t header_size() const;
+    static uint32_t header_size();
 
     uint32_t page_id() const;
 
@@ -80,7 +80,7 @@ protected:
     stream_utils::ByteBuffer _buffer;
     std::stringstream _stream;
 
-    uint32_t _header_size{};
+    uint32_t _base_header_size{};
     uint32_t _page_id{};
     uint32_t _next_page_id{};
     uint32_t _prev_page_id{};

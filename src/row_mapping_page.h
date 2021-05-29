@@ -11,7 +11,7 @@ class RowMappingPage : public Page {
 public:
     explicit RowMappingPage(const std::vector<unsigned char> &buffer);
 
-    RowMappingPage(uint32_t header_size, uint32_t page_id, uint32_t page_size);
+    RowMappingPage(uint32_t page_id, uint32_t page_size);
 
     std::vector<Record> enumerate_records();
 
@@ -27,7 +27,11 @@ public:
 
     Record record_for_row_id(uint32_t row_id);
 
+
 protected:
+    static constexpr uint32_t header_size();
+    uint32_t record_size() const;
+
     uint32_t _max_row_id{};
     uint32_t _n_records{};
 };

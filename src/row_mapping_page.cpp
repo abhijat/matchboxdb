@@ -5,7 +5,7 @@ std::vector<page::Record> page::RowMappingPage::enumerate_records() {
         throw std::invalid_argument("Page is not rowmap");
     }
 
-    _stream.seekg(sizeof(uint32_t) * 5, std::ios::beg);
+    _stream.seekg(header_size(), std::ios::beg);
 
     std::vector<Record> records;
     auto records_read = 0;
@@ -18,14 +18,13 @@ std::vector<page::Record> page::RowMappingPage::enumerate_records() {
 }
 
 page::RowMappingPage::RowMappingPage(const std::vector<unsigned char> &buffer) : Page(buffer) {
-    _stream.seekg(page::k_header_size, std::ios::beg);
     _n_records = stream_utils::read_data_from_stream<decltype(_n_records)>(_stream);
     _max_row_id = stream_utils::read_data_from_stream<decltype(_max_row_id)>(_stream);
 }
 
 std::string page::RowMappingPage::to_string() const {
     std::stringstream ss;
-    ss << "page id " << _page_id << " header size " << _header_size << " next page " << _next_page_id
+    ss << "page id " << _page_id << " header size " << _base_header_size << " next page " << _next_page_id
        << " previous page "
        << _prev_page_id;
 
@@ -68,23 +67,27 @@ stream_utils::ByteBuffer page::RowMappingPage::empty_page() {
     return buffer;
 }
 
-page::RowMappingPage::RowMappingPage(uint32_t header_size, uint32_t page_id, uint32_t page_size) :
-    Page(header_size, page_id, 0, 0, PageType::RowMap, page_size,
-         page_size - (header_size + 2 * sizeof(uint32_t))) {
+page::RowMappingPage::RowMappingPage(uint32_t page_id, uint32_t page_size) : Page(
+    page_id,
+    0,
+    0,
+    PageType::RowMap,
+    page_size,
+    page_size - header_size()) {
 }
 
 void page::RowMappingPage::store_record(const page::Record &record) {
-    uint32_t offset = _header_size + (2 * sizeof(uint32_t)) + (_n_records * k_record_width);
+    uint32_t offset = header_size() + record_size();
     _stream.seekp(offset, std::ios::beg);
 
     record.write_to_stream(_stream);
 
     _n_records += 1;
-    _free_space = k_page_size - (_header_size + (2 * sizeof(uint32_t)) + (_n_records * k_record_width));
+    _free_space = k_page_size - (header_size() + record_size());
 }
 
 page::Record page::RowMappingPage::record_for_row_id(uint32_t row_id) {
-    _stream.seekg(k_header_size + (2 * sizeof(uint32_t)), std::ios::beg);
+    _stream.seekg(header_size(), std::ios::beg);
     auto records_read = 0;
     while (records_read <= _n_records) {
         auto record = Record::read_from_stream(_stream);
@@ -96,4 +99,12 @@ page::Record page::RowMappingPage::record_for_row_id(uint32_t row_id) {
     }
 
     throw std::out_of_range{"record not found for row id " + std::to_string(row_id)};
+}
+
+constexpr uint32_t page::RowMappingPage::header_size() {
+    return page::k_base_header_size + sizeof(_n_records) + sizeof(_max_row_id);
+}
+
+uint32_t page::RowMappingPage::record_size() const {
+    return _n_records * k_record_width;
 }

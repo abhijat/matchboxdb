@@ -3,7 +3,6 @@
 #include "streamutils.h"
 
 page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer) : Page(buffer) {
-    _stream.seekg(sizeof(uint32_t) * 6, std::ios::beg);
     _slot_end_marker = stream_utils::read_data_from_stream<decltype(_slot_end_marker)>(_stream);
     _tuple_begin_marker = stream_utils::read_data_from_stream<decltype(_tuple_begin_marker)>(_stream);
 }
@@ -24,7 +23,7 @@ uint32_t page::SlottedDataPage::store_tuple(const tuple::Tuple &tuple) {
 
     _free_space = _tuple_begin_marker - _slot_end_marker;
 
-    auto total_slot_size = _slot_end_marker - (_header_size + 2 * sizeof(uint32_t));
+    auto total_slot_size = _slot_end_marker - header_size();
     auto total_slots = total_slot_size / sizeof(uint32_t);
 
     return total_slots - 1;
@@ -33,7 +32,7 @@ uint32_t page::SlottedDataPage::store_tuple(const tuple::Tuple &tuple) {
 std::string page::SlottedDataPage::to_string() const {
     std::stringstream ss;
     ss << "page id " << _page_id
-       << " header size " << _header_size
+       << " header size " << _base_header_size
        << " next page " << _next_page_id
        << " previous page " << _prev_page_id
        << " slot end " << _slot_end_marker
@@ -59,7 +58,7 @@ std::string page::SlottedDataPage::to_string() const {
 
 std::vector<unsigned char> page::SlottedDataPage::read_tuple_from_slot(uint32_t slot_id) {
     // seek to the slot id
-    uint32_t offset = _header_size + (2 * sizeof(uint32_t)) + (slot_id * sizeof(uint32_t));
+    uint32_t offset = header_size() + (slot_id * sizeof(uint32_t));
     _stream.seekg(offset, std::ios::beg);
 
     // read the tuple offset
@@ -84,9 +83,9 @@ std::vector<unsigned char> page::SlottedDataPage::read_tuple_from_slot(uint32_t 
     return std::vector<unsigned char>{buf, buf + tuple_size};
 }
 
-page::SlottedDataPage::SlottedDataPage(uint32_t header_size, uint32_t page_id, uint32_t page_size)
-    : Page(header_size, page_id, 0, 0, PageType::Data, page_size, page_size - header_size) {
-    _slot_end_marker = header_size + sizeof(_slot_end_marker) + sizeof(_tuple_begin_marker);
+page::SlottedDataPage::SlottedDataPage(uint32_t page_id, uint32_t page_size)
+    : Page(page_id, 0, 0, PageType::Data, page_size, page_size - header_size()) {
+    _slot_end_marker = header_size();
     _tuple_begin_marker = page_size;
     _buffer = stream_utils::ByteBuffer(_free_space);
 }
@@ -125,4 +124,8 @@ uint32_t page::SlottedDataPage::slot_end_marker() const {
 
 uint32_t page::SlottedDataPage::tuple_begin_marker() const {
     return _tuple_begin_marker;
+}
+
+constexpr uint32_t page::SlottedDataPage::header_size() const {
+    return _base_header_size + sizeof(_slot_end_marker) + sizeof(_tuple_begin_marker);
 }

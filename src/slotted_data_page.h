@@ -10,7 +10,7 @@ class SlottedDataPage : public Page {
 public:
     explicit SlottedDataPage(const std::vector<unsigned char> &buffer);
 
-    SlottedDataPage(uint32_t header_size, uint32_t page_id, uint32_t page_size);
+    SlottedDataPage(uint32_t page_id, uint32_t page_size);
 
     uint32_t store_tuple(const tuple::Tuple &tuple);
 
@@ -27,6 +27,8 @@ public:
     uint32_t slot_end_marker() const;
 
     uint32_t tuple_begin_marker() const;
+
+    constexpr uint32_t header_size() const;
 
 protected:
     uint32_t _slot_end_marker{};

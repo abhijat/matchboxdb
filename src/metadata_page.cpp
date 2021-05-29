@@ -18,7 +18,6 @@ page::MetadataPage::MetadataPage(std::string table_name, std::vector<std::string
     _n_rowmap_pages{n_rowmap_pages},
     _max_row_id{max_row_id},
     Page{
-        k_header_size,
         0,
         0,
         0,
@@ -33,7 +32,7 @@ page::MetadataPage::MetadataPage(std::string table_name, std::vector<std::string
     data_size += sizeof(_n_data_pages);
     data_size += sizeof(_n_rowmap_pages);
     data_size += sizeof(_max_row_id);
-    _free_space = k_page_size - (data_size + _header_size);
+    _free_space = k_page_size - (data_size + _base_header_size);
 }
 
 page::MetadataPage::MetadataPage(const stream_utils::ByteBuffer &buffer) : Page{buffer} {

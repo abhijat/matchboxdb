@@ -36,13 +36,13 @@ TEST(MetadataPageTests, PageToBufferToPage) {
 }
 
 TEST(SlottedDataPageTests, EmptyPage) {
-    page::SlottedDataPage slotted_data_page{page::k_header_size, 0, page::k_page_size};
+    page::SlottedDataPage slotted_data_page{0, page::k_page_size};
     auto buffer = slotted_data_page.empty_page();
 
     page::SlottedDataPage new_page{buffer};
     ASSERT_EQ(new_page.page_id(), slotted_data_page.page_id());
     ASSERT_EQ(new_page.header_size(), slotted_data_page.header_size());
-    ASSERT_EQ(new_page.slot_end_marker(), new_page.header_size() + sizeof(uint32_t) + sizeof(uint32_t));
+    ASSERT_EQ(new_page.slot_end_marker(), new_page.header_size());
     ASSERT_EQ(new_page.tuple_begin_marker(), page::k_page_size);
 }
 

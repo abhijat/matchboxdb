@@ -48,7 +48,7 @@ std::ofstream &initializers::TableInitializer::write_data_pages(std::ofstream &o
     ofs.seekp(page::k_page_size, std::ios::beg);
 
     for (auto i = 0; i < page_count; ++i) {
-        page::SlottedDataPage slotted_data_page{page::k_header_size, static_cast<uint32_t>(i), page::k_page_size};
+        page::SlottedDataPage slotted_data_page{static_cast<uint32_t>(i), page::k_page_size};
         auto buffer = slotted_data_page.empty_page();
         ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
     }
@@ -63,7 +63,7 @@ std::ofstream &initializers::TableInitializer::write_rowmap_pages(std::ofstream 
 
     for (auto i = 0; i < page_count; ++i) {
         ofs.seekp(end - page::k_page_size * (i + 1), std::ios::beg);
-        page::RowMappingPage row_mapping_page{page::k_header_size, static_cast<uint32_t>(i), page::k_page_size};
+        page::RowMappingPage row_mapping_page{static_cast<uint32_t>(i), page::k_page_size};
         auto buffer = row_mapping_page.empty_page();
         ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
     }
