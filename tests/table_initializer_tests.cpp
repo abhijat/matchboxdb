@@ -9,29 +9,29 @@
 #include "../src/slotted_data_page.h"
 #include "../src/row_mapping_page.h"
 
-
 class TableInitializationTests : public ::testing::Test {
-public:
-    TableInitializationTests() : md{{"name",                 "age"},
-                                    {metadata::Kind::String, metadata::Kind::UnsignedInt}},
-                                 table_initializer{"foobar", path_to_file, file_size, md} {}
-
 protected:
-    void SetUp() override {
-        table_initializer.initialize();
+    static void SetUpTestSuite() {
+        path_to_file = "foobar.mbx";
+        file_size = 32;
+        metadata::Metadata md{{"name",                 "age"},
+                              {metadata::Kind::String, metadata::Kind::UnsignedInt}};
+        initializers::TableInitializer{"foobar", path_to_file, file_size, md}.initialize();
     }
 
-    void TearDown() override {
+    static void TearDownTestSuite() {
         if (std::filesystem::exists(path_to_file)) {
             std::filesystem::remove(path_to_file);
         }
     }
 
-    std::string path_to_file{"foobar.mbx"};
-    uint32_t file_size{32};
-    metadata::Metadata md;
-    initializers::TableInitializer table_initializer;
+    static std::string path_to_file;
+    static uint32_t file_size;
 };
+
+std::string TableInitializationTests::path_to_file{};
+uint32_t TableInitializationTests::file_size{};
+
 
 TEST_F(TableInitializationTests, FileIsCreated) {
     ASSERT_TRUE(std::filesystem::exists(path_to_file));

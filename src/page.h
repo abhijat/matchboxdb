@@ -55,8 +55,6 @@ public:
 
     virtual stream_utils::ByteBuffer buffer() = 0;
 
-    static uint32_t header_size();
-
     uint32_t page_id() const;
 
     uint32_t next_page_id() const;

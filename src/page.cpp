@@ -73,10 +73,6 @@ void page::Page::write_page_type() {
     }
 }
 
-uint32_t page::Page::header_size() {
-    return page::k_page_size;
-}
-
 uint32_t page::Page::page_id() const {
     return _page_id;
 }
