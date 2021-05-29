@@ -46,6 +46,15 @@ const std::vector<metadata::DataType> &tuple::Tuple::attributes() const {
     return _attributes;
 }
 
+bool tuple::Tuple::operator==(const tuple::Tuple &rhs) const {
+    return _attributes == rhs._attributes &&
+           _data == rhs._data;
+}
+
+bool tuple::Tuple::operator!=(const tuple::Tuple &rhs) const {
+    return !(rhs == *this);
+}
+
 metadata::DataType tuple::deserialize(std::stringstream &s, metadata::Kind kind) {
     switch (kind) {
         case metadata::Kind::String: {

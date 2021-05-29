@@ -62,7 +62,7 @@ add_executable(alltests tests/tests.cpp
         src/table_initializer.cpp
         src/table_initializer.h
         src/metadata.cpp
-        tests/stream_tests.cpp tests/table_initializer_tests.cpp)
+        tests/stream_tests.cpp tests/table_initializer_tests.cpp tests/slotted_data_page_tests.cpp)
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)

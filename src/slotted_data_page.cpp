@@ -3,6 +3,7 @@
 #include "streamutils.h"
 
 page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer) : Page(buffer) {
+    // since the parent constructor has run, we should be at the right offset in the stream to read our fields.
     _slot_end_marker = stream_utils::read_data_from_stream<decltype(_slot_end_marker)>(_stream);
     _tuple_begin_marker = stream_utils::read_data_from_stream<decltype(_tuple_begin_marker)>(_stream);
 }
@@ -87,7 +88,6 @@ page::SlottedDataPage::SlottedDataPage(uint32_t page_id, uint32_t page_size)
     : Page(page_id, 0, 0, PageType::Data, page_size, page_size - header_size()) {
     _slot_end_marker = header_size();
     _tuple_begin_marker = page_size;
-    _buffer = stream_utils::ByteBuffer(_free_space);
 }
 
 /**

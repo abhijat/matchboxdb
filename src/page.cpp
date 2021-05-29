@@ -47,6 +47,9 @@ page::Page::Page(uint32_t page_id, uint32_t next_page_id, uint32_t prev_page_id,
       _page_size(page_size),
       _free_space(free_space),
       _stream{stream_utils::build_binary_stream()} {
+    if (!_stream) {
+        throw std::ios::failure("unable to initialize binary stream for page");
+    }
 }
 
 void page::Page::write_header_to_stream() {

@@ -20,9 +20,13 @@ public:
 
     [[nodiscard]] uint32_t size() const;
 
+    bool operator==(const Tuple &rhs) const;
+
+    bool operator!=(const Tuple &rhs) const;
+
     friend std::ostream &operator<<(std::ostream &os, const Tuple &t);
 
-    const std::vector<metadata::DataType> &attributes() const;
+    [[nodiscard]] const std::vector<metadata::DataType> &attributes() const;
 
 protected:
     std::vector<metadata::DataType> _attributes;
