@@ -34,8 +34,6 @@ protected:
     uint32_t _file_size;
 };
 
-void scan_table_file(const std::string& _file_name);
-
 }
 
 

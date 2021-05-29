@@ -91,32 +91,3 @@ void initializers::TableInitializer::initialize() {
     write_data_pages(ofs, calculate_data_pages());
     write_rowmap_pages(ofs, calculate_rowmap_pages());
 }
-
-void initializers::scan_table_file(const std::string &_file_name) {
-    std::ifstream ifs{_file_name, std::ios::binary};
-    stream_utils::ByteBuffer buffer(page::k_page_size);
-    ifs.read(reinterpret_cast<char *>(buffer.data()), page::k_page_size);
-    page::MetadataPage m{buffer};
-    std::cout << m.to_string() << "\n";
-
-    for (auto i = 0; i < 1; ++i) {
-        stream_utils::ByteBuffer buf(page::k_page_size);
-        ifs.read(reinterpret_cast<char *>(buf.data()), page::k_page_size);
-        page::SlottedDataPage slotted_data_page{buf};
-        std::cout << slotted_data_page.to_string() << "\n";
-    }
-
-    ifs.seekg(0, std::ios::end);
-    uint32_t end = ifs.tellg();
-
-    for (auto i = 0; i < 1; ++i) {
-        ifs.seekg(end - page::k_page_size * (i + 1), std::ios::beg);
-
-        stream_utils::ByteBuffer buf(page::k_page_size);
-        ifs.read(reinterpret_cast<char *>(buf.data()), page::k_page_size);
-
-        page::RowMappingPage r{buf};
-        std::cout << r.to_string() << "\n";
-    }
-
-}
