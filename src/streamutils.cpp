@@ -126,7 +126,7 @@ uint32_t stream_utils::size_of_strings(const std::vector<std::string> &strings) 
     return sizeof(uint32_t) + component_sizes;
 }
 
-uint32_t stream_utils::size_of_kind(metadata::Kind kind) {
+uint32_t stream_utils::size_of_kind() {
     return sizeof(unsigned char);
 }
 

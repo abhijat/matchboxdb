@@ -55,7 +55,7 @@ TEST(Sizes, SizeOfStringVector) {
 
 TEST(Sizes, SizeOfKind) {
     metadata::Kind k{metadata::Kind::Boolean};
-    auto size = stream_utils::size_of_kind(k);
+    auto size = stream_utils::size_of_kind();
     ASSERT_EQ(size, sizeof(unsigned char));
 }
 

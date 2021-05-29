@@ -67,7 +67,7 @@ uint32_t size_of_string(const std::string &s);
 
 uint32_t size_of_strings(const std::vector<std::string> &strings);
 
-uint32_t size_of_kind(metadata::Kind kind);
+uint32_t size_of_kind();
 
 uint32_t size_of_kinds(const std::vector<metadata::Kind> &kinds);
 
