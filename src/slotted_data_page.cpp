@@ -11,6 +11,14 @@ page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer)
 uint32_t page::SlottedDataPage::store_tuple(const tuple::Tuple &tuple) {
     uint32_t effective_tuple_width = tuple.size() + sizeof(uint32_t);
 
+    uint32_t space_required = effective_tuple_width + sizeof(uint32_t);
+
+    if (_free_space < space_required) {
+        std::stringstream err;
+        err << "not enough free space, required: (" << space_required << "), have (" << _free_space << ")";
+        throw std::out_of_range(err.str());
+    }
+
     uint32_t write_begins_at = _tuple_begin_marker - effective_tuple_width;
     _stream.seekp(write_begins_at, std::ios::beg);
 

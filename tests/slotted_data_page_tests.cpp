@@ -12,8 +12,8 @@ tuple::Tuple make_tuple_from_buffer(const stream_utils::ByteBuffer &buf) {
     return tuple::Tuple{buf, m};
 }
 
-page::SlottedDataPage make_empty_page() {
-    page::SlottedDataPage slotted_data_page{0, page::k_page_size};
+page::SlottedDataPage make_empty_page(uint32_t page_size = page::k_page_size) {
+    page::SlottedDataPage slotted_data_page{0, page_size};
     auto buffer = slotted_data_page.empty_page();
     return page::SlottedDataPage{buffer};
 }
@@ -44,4 +44,10 @@ TEST(SlottedDataPageTests, ReadStoredTuple) {
     auto tuple = make_test_tuple();
     auto buf = p.read_tuple_from_slot(p.store_tuple(tuple));
     ASSERT_EQ(make_tuple_from_buffer(buf), tuple);
+}
+
+TEST(SlottedDataPageTests, FailWhenNoSpace) {
+    auto p = make_empty_page(page::SlottedDataPage::header_size());
+    auto tuple = make_test_tuple();
+    EXPECT_THROW(p.store_tuple(tuple), std::out_of_range);
 }
