@@ -6,10 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 add_executable(
         matchboxdb
         src/main.cpp
-        src/file_write.h
-        src/file_write.cpp
-        src/file_read.h
-        src/file_read.cpp
         src/page.cpp
         src/page.h
         src/row_mapping_page.cpp
