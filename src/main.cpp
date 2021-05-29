@@ -1,21 +1,8 @@
 #include <vector>
 #include <iostream>
-#include "file_read.h"
-#include "file_write.h"
 #include "test_utils.h"
 #include "tuple.h"
 #include "metadata.h"
-
-void build_db() {
-    storage::create_empty_file_of_size("mbx.db", 1);
-    storage::initialize_database("mbx.db");
-}
-
-void read_db() {
-    std::ifstream ifs;
-    ifs.open("mbx.db", std::ios::binary);
-    storage::read_page_directory(ifs);
-}
 
 uint32_t write_tuple_to_page(page::SlottedDataPage &page, tuple::Tuple &&tuple) {
     auto slot_id = page.store_tuple(tuple);
@@ -63,21 +50,7 @@ void test_data_page() {
 
 }
 
-void make_test_tuple() {
-    metadata::Metadata m{
-        {"name",                 "is_short",              "age"},
-        {metadata::Kind::String, metadata::Kind::Boolean, metadata::Kind::UnsignedInt},
-    };
-
-    tuple::Tuple t{{std::string{"abhijat"}, false, uint32_t{38}}};
-    auto buf = t.data();
-
-    tuple::Tuple foo{buf, m};
-    std::cout << foo << "\n";
-}
-
 int main() {
-//    pagetest::test_table_init();
-//    pagetest::store_tuple_to_disk();
+    pagetest::store_tuple_to_disk();
     pagetest::select_row();
 }

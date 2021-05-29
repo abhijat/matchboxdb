@@ -112,33 +112,6 @@ stream_utils::ByteBuffer build_metadata_page() {
     return m.buffer();
 }
 
-void test_write_string_vector() {
-    auto s = stream_utils::build_binary_stream();
-    std::vector<std::string> testdata{"abhijat", "was", "here"};
-    stream_utils::write_strings_to_stream(s, testdata);
-
-    auto buf = stream_utils::buffer_from_stream(s);
-
-    auto a = stream_utils::build_binary_stream();
-    stream_utils::load_stream_from_buffer(a, buf);
-    auto data = stream_utils::read_strings_from_stream(a);
-
-    std::cout << "data size " << data.size() << "\n";
-    for (const auto &d: data) {
-        std::cout << "+" << d << "\n";
-    }
-}
-
-void test_table_init() {
-    metadata::Metadata m{
-        {"firstname",            "lastname",             "age",                       "is_employed"},
-        {metadata::Kind::String, metadata::Kind::String, metadata::Kind::UnsignedInt, metadata::Kind::Boolean},
-    };
-
-    initializers::TableInitializer t{"employee", "employee.mbx", 64, m};
-    t.initialize();
-}
-
 void test_metadata_page() {
     auto m = pagetest::build_metadata_page();
     auto r = page::MetadataPage{m};
