@@ -261,6 +261,19 @@ page::MetadataPage *page_cache::PageCache::metadata_page_for_table(const std::st
     return dynamic_cast<page::MetadataPage *>(get_page_id(0, table_name, page::PageType::Metadata));
 }
 
+void page_cache::PageCache::scan_free_pages_in_table_stream(std::istream &is, uint32_t n_pages_to_scan) {
+    // skip ahead of the metadata page
+    is.seekg(page::k_page_size, std::ios::beg);
+
+    std::vector<FreePageInfo> free_data_pages{};
+    std::vector<FreePageInfo> free_row_map_pages{};
+
+    for (auto i = 0; i < n_pages_to_scan; ++i) {
+        auto buffer = stream_utils::read_page_from_stream(is);
+        auto page_type = page::page_type_from_buffer(buffer);
+    }
+}
+
 std::ifstream &page_cache::seek_to_rowmap_page_offset(page_cache::PageId page_id, std::ifstream &ifs) {
     ifs.seekg(0, std::ios::end);
     uint32_t end = ifs.tellg();

@@ -10,13 +10,16 @@
  */
 page::MetadataPage::MetadataPage(std::string table_name, std::vector<std::string> column_names,
                                  std::vector<metadata::Kind> column_kinds, uint32_t n_data_pages,
-                                 uint32_t n_rowmap_pages, uint32_t max_row_id) :
+                                 uint32_t n_rowmap_pages, uint32_t max_row_id, uint32_t total_pages) :
     _table_name(std::move(table_name)),
     _column_names(std::move(column_names)),
     _column_kinds(std::move(column_kinds)),
     _n_data_pages{n_data_pages},
     _n_rowmap_pages{n_rowmap_pages},
     _max_row_id{max_row_id},
+    _n_total_pages{total_pages},
+    _n_marked_pages{0},
+    _n_unmarked_pages{total_pages},
     Page{
         0,
         0,
@@ -32,6 +35,9 @@ page::MetadataPage::MetadataPage(std::string table_name, std::vector<std::string
     data_size += sizeof(_n_data_pages);
     data_size += sizeof(_n_rowmap_pages);
     data_size += sizeof(_max_row_id);
+    data_size += sizeof(_n_total_pages);
+    data_size += sizeof(_n_marked_pages);
+    data_size += sizeof(_n_unmarked_pages);
     _free_space = k_page_size - (data_size + _base_header_size);
 }
 
@@ -42,6 +48,9 @@ page::MetadataPage::MetadataPage(const stream_utils::ByteBuffer &buffer) : Page{
     _n_data_pages = stream_utils::read_data_from_stream<decltype(_n_data_pages)>(_stream);
     _n_rowmap_pages = stream_utils::read_data_from_stream<decltype(_n_rowmap_pages)>(_stream);
     _max_row_id = stream_utils::read_data_from_stream<decltype(_max_row_id)>(_stream);
+    _n_total_pages = stream_utils::read_data_from_stream<decltype(_n_total_pages)>(_stream);
+    _n_marked_pages = stream_utils::read_data_from_stream<decltype(_n_marked_pages)>(_stream);
+    _n_unmarked_pages = stream_utils::read_data_from_stream<decltype(_n_unmarked_pages)>(_stream);
 }
 
 std::string page::MetadataPage::to_string() const {
@@ -69,8 +78,12 @@ std::string page::MetadataPage::to_string() const {
     }
 
     ss << "\n";
-    ss << " _n_data_pages " << _n_data_pages << " _n_rowmap_pages " << _n_rowmap_pages
-       << " _max_row_id " << _max_row_id;
+    ss << " _n_data_pages " << _n_data_pages
+       << " _n_rowmap_pages " << _n_rowmap_pages
+       << " _max_row_id " << _max_row_id
+       << " _n_total_pages " << _n_total_pages
+       << " _n_marked_pages " << _n_marked_pages
+       << " _n_unmarked_pages " << _n_unmarked_pages;
 
     return ss.str();
 }
@@ -86,6 +99,9 @@ stream_utils::ByteBuffer page::MetadataPage::buffer() {
     stream_utils::write_data_to_stream(_stream, _n_data_pages);
     stream_utils::write_data_to_stream(_stream, _n_rowmap_pages);
     stream_utils::write_data_to_stream(_stream, _max_row_id);
+    stream_utils::write_data_to_stream(_stream, _n_total_pages);
+    stream_utils::write_data_to_stream(_stream, _n_marked_pages);
+    stream_utils::write_data_to_stream(_stream, _n_unmarked_pages);
     auto buffer = stream_utils::buffer_from_stream(_stream);
     auto buffer_size = buffer.size();
 
@@ -124,6 +140,9 @@ page::MetadataPage::MetadataPage(page::MetadataPage &&m) noexcept: Page(std::mov
     _column_names = std::move(m._column_names);
     _column_kinds = std::move(m._column_kinds);
     _max_row_id = m._max_row_id;
+    _n_total_pages = m._n_total_pages;
+    _n_marked_pages = m._n_marked_pages;
+    _n_unmarked_pages = m._n_unmarked_pages;
     _free_space = m._free_space;
 }
 
@@ -138,4 +157,16 @@ uint32_t page::MetadataPage::max_row_id() const {
 
 stream_utils::ByteBuffer page::MetadataPage::empty_page() {
     return stream_utils::ByteBuffer();
+}
+
+uint32_t page::MetadataPage::n_total_pages() const {
+    return _n_total_pages;
+}
+
+uint32_t page::MetadataPage::n_marked_pages() const {
+    return _n_marked_pages;
+}
+
+uint32_t page::MetadataPage::n_unmarked_pages() const {
+    return _n_unmarked_pages;
 }

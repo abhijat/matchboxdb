@@ -54,6 +54,8 @@ protected:
     std::list<std::pair<std::string, std::unique_ptr<page::Page>>> _page_ids{};
     std::unordered_map<std::string, decltype(_page_ids.begin())> _pages{};
 
+    void scan_free_pages_in_table_stream(std::istream& is, uint32_t n_pages_to_scan);
+
     static std::vector<page_cache::FreePageInfo>
     scan_data_pages_from_tablestream(std::ifstream &ifs, const page::MetadataPage &m);
 

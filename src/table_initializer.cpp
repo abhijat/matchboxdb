@@ -33,52 +33,16 @@ std::ofstream &initializers::TableInitializer::write_metadata_page(std::ofstream
         _table_name,
         _metadata.names,
         _metadata.types,
-        calculate_data_pages(),
-        calculate_rowmap_pages(),
         0,
+        0,
+        0,
+        calculate_total_pages(),
     };
-    auto buffer = metadata_page.buffer();
 
+    auto buffer = metadata_page.buffer();
     ofs.seekp(0, std::ios::beg);
     ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
     return ofs;
-}
-
-std::ofstream &initializers::TableInitializer::write_data_pages(std::ofstream &ofs, uint32_t page_count) {
-    ofs.seekp(page::k_page_size, std::ios::beg);
-
-    for (auto i = 0; i < page_count; ++i) {
-        page::SlottedDataPage slotted_data_page{static_cast<uint32_t>(i), page::k_page_size};
-        auto buffer = slotted_data_page.empty_page();
-        ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
-    }
-
-    return ofs;
-}
-
-std::ofstream &initializers::TableInitializer::write_rowmap_pages(std::ofstream &ofs, uint32_t page_count) {
-    ofs.seekp(0, std::ios::end);
-
-    uint32_t end = ofs.tellp();
-
-    for (auto i = 0; i < page_count; ++i) {
-        ofs.seekp(end - page::k_page_size * (i + 1), std::ios::beg);
-        page::RowMappingPage row_mapping_page{static_cast<uint32_t>(i), page::k_page_size};
-        auto buffer = row_mapping_page.empty_page();
-        ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
-    }
-
-    return ofs;
-}
-
-uint32_t initializers::TableInitializer::calculate_rowmap_pages() const {
-    auto page_count = calculate_total_pages();
-    return static_cast<uint32_t>(std::ceil2(page_count / 100));
-}
-
-uint32_t initializers::TableInitializer::calculate_data_pages() const {
-    auto page_count = calculate_total_pages();
-    return static_cast<uint32_t>(std::ceil2(page_count / 5));
 }
 
 uint32_t initializers::TableInitializer::calculate_total_pages() const {
@@ -88,6 +52,4 @@ uint32_t initializers::TableInitializer::calculate_total_pages() const {
 void initializers::TableInitializer::initialize() {
     auto ofs = initialize_file();
     write_metadata_page(ofs);
-    write_data_pages(ofs, calculate_data_pages());
-    write_rowmap_pages(ofs, calculate_rowmap_pages());
 }

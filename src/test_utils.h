@@ -106,6 +106,7 @@ stream_utils::ByteBuffer build_metadata_page() {
         {metadata::Kind::String, metadata::Kind::String, metadata::Kind::UnsignedInt, metadata::Kind::Boolean},
         0,
         0,
+        0,
         0
     };
 

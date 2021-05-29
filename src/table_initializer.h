@@ -17,14 +17,6 @@ protected:
 
     std::ofstream &write_metadata_page(std::ofstream &ofs);
 
-    static std::ofstream &write_data_pages(std::ofstream &ofs, uint32_t page_count);
-
-    static std::ofstream &write_rowmap_pages(std::ofstream &ofs, uint32_t page_count);
-
-    [[nodiscard]] uint32_t calculate_data_pages() const;
-
-    [[nodiscard]] uint32_t calculate_rowmap_pages() const;
-
     [[nodiscard]] uint32_t calculate_total_pages() const;
 
 protected:

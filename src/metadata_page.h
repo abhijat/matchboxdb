@@ -12,7 +12,7 @@ class MetadataPage : public Page {
 public:
     MetadataPage(std::string table_name, std::vector<std::string> column_names,
                  std::vector<metadata::Kind> column_kinds, uint32_t n_data_pages,
-                 uint32_t n_rowmap_pages, uint32_t max_row_id);
+                 uint32_t n_rowmap_pages, uint32_t max_row_id, uint32_t total_pages);
 
     explicit MetadataPage(const stream_utils::ByteBuffer &buffer);
 
@@ -38,12 +38,21 @@ public:
 
     uint32_t next_row_id();
 
+    uint32_t n_total_pages() const;
+
+    uint32_t n_marked_pages() const;
+
+    uint32_t n_unmarked_pages() const;
+
     stream_utils::ByteBuffer empty_page() override;
 
 protected:
     uint32_t _max_row_id{};
     uint32_t _n_data_pages{};
     uint32_t _n_rowmap_pages{};
+    uint32_t _n_total_pages{};
+    uint32_t _n_marked_pages{};
+    uint32_t _n_unmarked_pages{};
     std::string _table_name{};
     std::vector<std::string> _column_names{};
     std::vector<metadata::Kind> _column_kinds{};
