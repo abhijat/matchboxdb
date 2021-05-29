@@ -31,7 +31,7 @@ public:
 
     page::RowMappingPage *rowmap_page_for_row_id(const std::string &table_name, uint32_t row_id);
 
-    page::MetadataPage *metadata_page_for_table(const std::string& table_name);
+    page::MetadataPage *metadata_page_for_table(const std::string &table_name);
 
     void write_dirty_pages(const std::string &table_name);
 
@@ -54,13 +54,8 @@ protected:
     std::list<std::pair<std::string, std::unique_ptr<page::Page>>> _page_ids{};
     std::unordered_map<std::string, decltype(_page_ids.begin())> _pages{};
 
-    void scan_free_pages_in_table_stream(std::istream& is, uint32_t n_pages_to_scan);
-
-    static std::vector<page_cache::FreePageInfo>
-    scan_data_pages_from_tablestream(std::ifstream &ifs, const page::MetadataPage &m);
-
-    static std::vector<page_cache::FreePageInfo>
-    scan_rowmap_pages_from_tablestream(std::ifstream &ifs, const page::MetadataPage &m);
+    std::pair<std::vector<FreePageInfo>, std::vector<FreePageInfo>>
+    scan_free_pages_in_table_stream(std::istream &is, uint32_t n_pages_to_scan);
 
     void handle_missing_cache_entry(unsigned int page_id, const std::string &table_name, page::PageType &page_type,
                                     const std::string &key);

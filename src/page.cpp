@@ -161,3 +161,9 @@ page::PageType page::page_type_from_buffer(const stream_utils::ByteBuffer &buffe
             throw std::invalid_argument{"bad PageType: " + std::to_string(*p)};
     }
 }
+
+uint32_t page::free_space_from_buffer(const stream_utils::ByteBuffer &buffer) {
+    auto *p = reinterpret_cast<const uint32_t *>(buffer.data()) + 6;
+    uint32_t free_space{*p};
+    return free_space;
+}

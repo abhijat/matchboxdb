@@ -93,7 +93,9 @@ protected:
     uint32_t _free_space{};
 };
 
-PageType page_type_from_buffer(const stream_utils::ByteBuffer& buffer);
+PageType page_type_from_buffer(const stream_utils::ByteBuffer &buffer);
+
+uint32_t free_space_from_buffer(const stream_utils::ByteBuffer &buffer);
 
 }
 
