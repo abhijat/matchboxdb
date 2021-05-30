@@ -124,52 +124,38 @@ void page_cache::PageCache::scan_table_file(const std::string &table_name, const
 
 std::pair<page::RowMappingPage *, page::SlottedDataPage *>
 page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, uint32_t data_size) {
-    const auto &free_data_pages = _free_data_pages[table_name];
-    auto data_page_id = std::find_if(
-        free_data_pages.begin(),
-        free_data_pages.end(),
-        [&](const auto &kv) {
-            const auto&[page_id, free_space] = kv;
-            return free_space >= data_size;
-        }
-    );
-    const auto &free_rowmap_pages = _free_rowmap_pages[table_name];
-    auto rowmap_page_id = std::find_if(
-        free_rowmap_pages.begin(),
-        free_rowmap_pages.end(),
-        [&](const auto &kv) {
-            const auto&[page_id, free_space] = kv;
-            return free_space >= page::k_record_width;
-        }
-    );
+    auto data_page_id_maybe = get_page_id_for_size(table_name, data_size, page::PageType::Data);
+    auto row_map_page_id_maybe = get_page_id_for_size(table_name, page::k_record_width, page::PageType::RowMap);
+    auto *metadata_page = metadata_page_for_table(table_name);
 
-    if (data_page_id == free_data_pages.end() || rowmap_page_id == free_rowmap_pages.end()) {
-        std::cout << "Uh oh. We have a lot of work to do now!";
-        throw std::out_of_range("table space is full!");
+    uint32_t data_page_id{};
+    if (!data_page_id_maybe) {
+        // create new data page, use its id...
+    } else {
+        data_page_id = *data_page_id_maybe;
     }
 
-    auto *data_page = dynamic_cast<page::SlottedDataPage *>(get_page_id(
-        data_page_id->first,
-        table_name,
-        page::PageType::Data
-    ));
+    uint32_t row_map_page_id{};
+    if (!row_map_page_id_maybe) {
+        // create new row map page, use its id...
+    } else {
+        row_map_page_id = *row_map_page_id_maybe;
+    }
 
-    auto *rowmap_page = dynamic_cast<page::RowMappingPage *>(get_page_id(
-        rowmap_page_id->first,
-        table_name,
-        page::PageType::RowMap
-    ));
+    auto *data_page = dynamic_cast<page::SlottedDataPage *>(get_page_id(data_page_id, table_name,
+                                                                        page::PageType::Data));
 
-    auto *metadata_page = get_page_id(0, table_name, page::PageType::Metadata);
+    auto *row_map_page = dynamic_cast<page::RowMappingPage *>(get_page_id(row_map_page_id, table_name,
+                                                                          page::PageType::RowMap));
 
     auto pos = _dirty_pages.find(table_name);
     if (pos == _dirty_pages.end()) {
-        _dirty_pages[table_name] = {{rowmap_page, data_page, metadata_page}};
+        _dirty_pages[table_name] = {{row_map_page, data_page, metadata_page}};
     } else {
-        pos->second.insert({rowmap_page, data_page, metadata_page});
+        pos->second.insert({row_map_page, data_page, metadata_page});
     }
 
-    return std::make_pair(rowmap_page, data_page);
+    return std::make_pair(row_map_page, data_page);
 }
 
 uint32_t page_cache::PageCache::row_id_for_table(const std::string &table_name) {
@@ -258,6 +244,46 @@ void page_cache::PageCache::scan_free_pages_in_table_stream(const std::string &t
 
     _free_data_pages.insert({table_name, free_data_pages});
     _free_rowmap_pages.insert({table_name, free_row_map_pages});
+}
+
+std::optional<page_cache::PageId>
+page_cache::PageCache::get_page_id_for_size(const std::string &table_name, uint32_t data_size,
+                                            page::PageType page_type) {
+    switch (page_type) {
+        case page::PageType::Data: {
+            const auto &free_data_pages = _free_data_pages[table_name];
+            auto data_page_id = std::find_if(
+                free_data_pages.begin(),
+                free_data_pages.end(),
+                [&](const auto &kv) {
+                    const auto&[page_id, free_space] = kv;
+                    return free_space >= data_size;
+                }
+            );
+
+            if (data_page_id != free_data_pages.end()) {
+                return data_page_id->first;
+            }
+        }
+        case page::PageType::RowMap: {
+            const auto &free_rowmap_pages = _free_rowmap_pages[table_name];
+            auto rowmap_page_id = std::find_if(
+                free_rowmap_pages.begin(),
+                free_rowmap_pages.end(),
+                [&](const auto &kv) {
+                    const auto&[page_id, free_space] = kv;
+                    return free_space >= data_size;
+                }
+            );
+            if (rowmap_page_id != free_rowmap_pages.end()) {
+                return rowmap_page_id->first;
+            }
+        }
+        case page::PageType::Metadata:
+            return {};
+    }
+
+    return {};
 }
 
 std::ifstream &page_cache::seek_to_rowmap_page_offset(page_cache::PageId page_id, std::ifstream &ifs) {

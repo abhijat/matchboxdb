@@ -61,6 +61,8 @@ protected:
 
     static std::unique_ptr<page::Page>
     make_page_from_buffer(const page::PageType &page_type, const stream_utils::ByteBuffer &buffer);
+
+    std::optional<PageId> get_page_id_for_size(const std::string& table_name, uint32_t data_size, page::PageType page_type);
 };
 
 std::ifstream &seek_to_data_page_offset(PageId page_id, std::ifstream &ifs);
