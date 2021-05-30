@@ -5,11 +5,11 @@
 
 class PageCacheTests : public ::testing::Test {
 protected:
-    static void SetUpTestSuite() {
+    void SetUp() override {
         testutils::create_test_table();
     }
 
-    static void TearDownTestSuite() {
+    void TearDown() override {
         testutils::cleanup_test_table();
     }
 };
@@ -38,16 +38,39 @@ TEST_F(PageCacheTests, FirstCallCreatesPages) {
 TEST_F(PageCacheTests, WriteDirtyPages) {
     page_cache::PageCache pc{5, {testutils::k_table_name}};
     const auto&[r, d] = pc.get_pages_for_data_size(testutils::k_table_name, 32);
-
     pc.write_dirty_pages(testutils::k_table_name);
 
     std::ifstream f{testutils::k_file_name, std::ios::binary};
-
     auto buffer = stream_utils::read_page_from_stream(f, d->page_id());
     ASSERT_EQ(page::page_type_from_buffer(buffer), page::PageType::Data);
 
     buffer = stream_utils::read_page_from_stream(f, r->page_id());
     ASSERT_EQ(page::page_type_from_buffer(buffer), page::PageType::RowMap);
+}
+
+TEST_F(PageCacheTests, WriteDirtyPagesUpdatesTableMetadata) {
+    page_cache::PageCache pc{5, {testutils::k_table_name}};
+    auto metadata_page = pc.metadata_page_for_table(testutils::k_table_name);
+    const auto&[r, d] = pc.get_pages_for_data_size(testutils::k_table_name, 32);
+
+    ASSERT_EQ(metadata_page->n_data_pages(), 1);
+    ASSERT_EQ(metadata_page->n_rowmap_pages(), 1);
+    {
+        std::ifstream f{testutils::k_file_name, std::ios::binary};
+        auto metadata_on_disk = page::MetadataPage{stream_utils::read_page_from_stream(f)};
+        ASSERT_EQ(metadata_on_disk.n_data_pages(), 0);
+        ASSERT_EQ(metadata_on_disk.n_rowmap_pages(), 0);
+        ASSERT_EQ(metadata_on_disk.n_marked_pages(), 0);
+    }
+
+    pc.write_dirty_pages(testutils::k_table_name);
+    {
+        std::ifstream f{testutils::k_file_name, std::ios::binary};
+        auto metadata_on_disk = page::MetadataPage{stream_utils::read_page_from_stream(f)};
+        ASSERT_EQ(metadata_on_disk.n_data_pages(), 1);
+        ASSERT_EQ(metadata_on_disk.n_rowmap_pages(), 1);
+        ASSERT_EQ(metadata_on_disk.n_marked_pages(), 2);
+    }
 }
 
 TEST(PageCacheUtilityTests, FileNameFromTableName) {
