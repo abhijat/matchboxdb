@@ -2,6 +2,7 @@
 #include "slotted_data_page.h"
 #include "page.h"
 #include "row_mapping_page.h"
+#include "page_creator.h"
 
 #include <utility>
 #include <fstream>
@@ -129,19 +130,10 @@ page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, ui
     auto row_map_page_id_maybe = get_page_id_for_size(table_name, page::k_record_width, page::PageType::RowMap);
     auto *metadata_page = metadata_page_for_table(table_name);
 
-    uint32_t data_page_id{};
-    if (!data_page_id_maybe) {
-        // create new data page, use its id...
-    } else {
-        data_page_id = *data_page_id_maybe;
-    }
-
-    uint32_t row_map_page_id{};
-    if (!row_map_page_id_maybe) {
-        // create new row map page, use its id...
-    } else {
-        row_map_page_id = *row_map_page_id_maybe;
-    }
+    page::PageCreator page_creator{table_name, metadata_page};
+    uint32_t data_page_id = data_page_id_maybe ? *data_page_id_maybe : page_creator.create_page(page::PageType::Data);
+    uint32_t row_map_page_id = row_map_page_id_maybe ? *row_map_page_id_maybe : page_creator.create_page(
+        page::PageType::RowMap);
 
     auto *data_page = dynamic_cast<page::SlottedDataPage *>(get_page_id(data_page_id, table_name,
                                                                         page::PageType::Data));
