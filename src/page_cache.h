@@ -16,7 +16,7 @@ namespace page_cache {
 
 class PageCache {
 public:
-    explicit PageCache(uint32_t max_size, const std::vector<std::string> &tables);
+    PageCache(uint32_t max_size, const std::vector<std::string> &tables);
 
     page::Page *get_page_id(page::PageId page_id, const std::string &table_name, page::PageType page_type);
 

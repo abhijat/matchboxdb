@@ -151,31 +151,8 @@ void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
     }
 
     for (const auto &page_ptr: _dirty_pages.at(table_name)) {
-        auto page_id = page_ptr->page_id();
-        auto buffer = page_ptr->buffer();
-
-        switch (page_ptr->page_type()) {
-            case page::PageType::Data: {
-                auto base_offset = page::k_page_size;
-                base_offset += (page_id * page::k_page_size);
-                ofs.seekp(base_offset, std::ios::beg);
-                break;
-            }
-            case page::PageType::RowMap: {
-                ofs.seekp(0, std::ios::end);
-                uint32_t end = ofs.tellp();
-
-                auto base_offset = end - ((page_id + 1) * page::k_page_size);
-                ofs.seekp(base_offset, std::ios::beg);
-                break;
-            }
-            case page::PageType::Metadata: {
-                ofs.seekp(0, std::ios::beg);
-                break;
-            }
-        }
-
-        ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
+        ofs.seekp(page_ptr->page_id() * page::k_page_size, std::ios::beg);
+        ofs.write(reinterpret_cast<const char *>(page_ptr->buffer().data()), page::k_page_size);
         if (!ofs) {
             throw std::ios::failure{"failed to write page to file"};
         }

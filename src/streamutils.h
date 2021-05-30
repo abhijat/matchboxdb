@@ -9,6 +9,9 @@
 #include "metadata.h"
 
 namespace page {
+
+using PageId = uint32_t;
+
 class MetadataPage;
 
 class SlottedDataPage;
@@ -72,6 +75,8 @@ uint32_t size_of_kind();
 uint32_t size_of_kinds(const std::vector<metadata::Kind> &kinds);
 
 ByteBuffer read_page_from_stream(std::istream &is);
+
+ByteBuffer read_page_from_stream(std::istream &is, page::PageId page_id);
 
 page::MetadataPage read_nth_metadata_page(std::istream &is, uint32_t n = 0);
 

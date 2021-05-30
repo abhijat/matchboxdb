@@ -159,12 +159,6 @@ page::RowMappingPage stream_utils::read_nth_row_mapping_page(std::istream &is, u
     return page::RowMappingPage(read_page_from_stream(is));
 }
 
-stream_utils::ByteBuffer stream_utils::read_page_from_stream(std::istream &is) {
-    ByteBuffer buffer(page::k_page_size);
-    is.read(reinterpret_cast<char *>(buffer.data()), page::k_page_size);
-    return buffer;
-}
-
 std::fstream stream_utils::open_db_file(const std::string &file_name) {
     std::fstream f{file_name, std::ios::binary | std::ios::out | std::ios::in};
     if (!f) {
@@ -177,5 +171,16 @@ std::fstream stream_utils::open_db_file(const std::string &file_name) {
 std::fstream &stream_utils::write_page_to_stream(std::fstream &f, const stream_utils::ByteBuffer &buffer) {
     f.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
     return f;
+}
+
+stream_utils::ByteBuffer stream_utils::read_page_from_stream(std::istream &is) {
+    ByteBuffer buffer(page::k_page_size);
+    is.read(reinterpret_cast<char *>(buffer.data()), page::k_page_size);
+    return buffer;
+}
+
+stream_utils::ByteBuffer stream_utils::read_page_from_stream(std::istream &is, page::PageId page_id) {
+    is.seekg(page::k_page_size * page_id, std::ios::beg);
+    return read_page_from_stream(is);
 }
 
