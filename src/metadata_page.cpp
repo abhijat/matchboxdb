@@ -170,3 +170,25 @@ uint32_t page::MetadataPage::n_marked_pages() const {
 uint32_t page::MetadataPage::n_unmarked_pages() const {
     return _n_unmarked_pages;
 }
+
+bool page::MetadataPage::has_pages_available() const {
+    return _n_total_pages > _n_marked_pages;
+}
+
+page::PageId page::MetadataPage::next_page_id_for_table() {
+    _next_page_id += 1;
+    return _next_page_id;
+}
+
+void page::MetadataPage::increment_marked_pages(PageType page_type) {
+    _n_marked_pages += 1;
+    _n_unmarked_pages -= 1;
+
+    if (page_type == PageType::Data) {
+        _n_data_pages += 1;
+    }
+
+    if (page_type == PageType::RowMap) {
+        _n_rowmap_pages += 1;
+    }
+}

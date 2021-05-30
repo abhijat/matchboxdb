@@ -46,6 +46,12 @@ public:
 
     stream_utils::ByteBuffer empty_page() override;
 
+    bool has_pages_available() const;
+
+    PageId next_page_id_for_table();
+
+    void increment_marked_pages(PageType page_type);
+
 protected:
     uint32_t _max_row_id{};
     uint32_t _n_data_pages{};

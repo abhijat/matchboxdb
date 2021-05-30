@@ -29,7 +29,7 @@ add_executable(
         src/insert_object.h
         src/select_object.cpp
         src/select_object.h
-)
+        src/page_creator.cpp src/page_creator.h)
 
 include(FetchContent)
 FetchContent_Declare(

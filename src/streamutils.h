@@ -79,6 +79,10 @@ page::SlottedDataPage read_nth_data_page(std::istream &is, uint32_t n = 0);
 
 page::RowMappingPage read_nth_row_mapping_page(std::istream &is, uint32_t n = 0);
 
+std::fstream open_db_file(const std::string& file_name);
+
+std::fstream &write_page_to_stream(std::fstream &f, const ByteBuffer& buffer);
+
 }
 
 #endif //MATCHBOXDB_STREAMUTILS_H

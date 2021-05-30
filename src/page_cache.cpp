@@ -8,7 +8,7 @@
 #include <iostream>
 
 page::Page *page_cache::PageCache::get_page_id(
-    page_cache::PageId page_id,
+    page::PageId page_id,
     const std::string &table_name,
     page::PageType page_type
 ) {
@@ -50,7 +50,8 @@ page_cache::PageCache::PageCache(uint32_t max_size, const std::vector<std::strin
 }
 
 std::unique_ptr<page::Page>
-page_cache::PageCache::load_page_from_disk(PageId page_id, const std::string &table_name, page::PageType page_type) {
+page_cache::PageCache::load_page_from_disk(page::PageId page_id, const std::string &table_name,
+                                           page::PageType page_type) {
     auto table_file_name = _table_file_names[table_name];
     std::ifstream i{table_file_name, std::ios::binary};
 
@@ -215,8 +216,8 @@ void page_cache::PageCache::scan_free_pages_in_table_stream(const std::string &t
     // skip ahead of the metadata page
     is.seekg(page::k_page_size, std::ios::beg);
 
-    std::vector<FreePageInfo> free_data_pages{};
-    std::vector<FreePageInfo> free_row_map_pages{};
+    std::vector<page::FreePageInfo> free_data_pages{};
+    std::vector<page::FreePageInfo> free_row_map_pages{};
 
     for (auto i = 0; i < n_pages_to_scan; ++i) {
         // TODO - read only the header here. we can get page id and free space from there.
@@ -246,7 +247,7 @@ void page_cache::PageCache::scan_free_pages_in_table_stream(const std::string &t
     _free_rowmap_pages.insert({table_name, free_row_map_pages});
 }
 
-std::optional<page_cache::PageId>
+std::optional<page::PageId>
 page_cache::PageCache::get_page_id_for_size(const std::string &table_name, uint32_t data_size,
                                             page::PageType page_type) {
     switch (page_type) {
@@ -286,7 +287,7 @@ page_cache::PageCache::get_page_id_for_size(const std::string &table_name, uint3
     return {};
 }
 
-std::ifstream &page_cache::seek_to_rowmap_page_offset(page_cache::PageId page_id, std::ifstream &ifs) {
+std::ifstream &page_cache::seek_to_rowmap_page_offset(page::PageId page_id, std::ifstream &ifs) {
     ifs.seekg(0, std::ios::end);
     uint32_t end = ifs.tellg();
 
@@ -296,7 +297,7 @@ std::ifstream &page_cache::seek_to_rowmap_page_offset(page_cache::PageId page_id
     return ifs;
 }
 
-std::ifstream &page_cache::seek_to_data_page_offset(page_cache::PageId page_id, std::ifstream &ifs) {
+std::ifstream &page_cache::seek_to_data_page_offset(page::PageId page_id, std::ifstream &ifs) {
     // account for metadata page
     auto base_offset = page::k_page_size;
 
@@ -309,7 +310,7 @@ std::ifstream &page_cache::seek_to_data_page_offset(page_cache::PageId page_id, 
 }
 
 std::string
-page_cache::generate_cache_key(page_cache::PageId page_id, const std::string &table_name, page::PageType page_type) {
+page_cache::generate_cache_key(page::PageId page_id, const std::string &table_name, page::PageType page_type) {
     auto key = table_name + "::" + std::to_string(page_id);
     switch (page_type) {
         case page::PageType::Data:

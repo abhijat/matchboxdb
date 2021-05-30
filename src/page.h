@@ -13,6 +13,11 @@
 
 namespace page {
 
+
+using PageId = uint32_t;
+
+using FreePageInfo = std::pair<PageId, uint32_t>;
+
 const uint32_t k_page_size{4096};
 const uint32_t k_base_header_size{sizeof(uint32_t) * 6};
 

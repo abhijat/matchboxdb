@@ -1,5 +1,6 @@
 #include <iostream>
 #include <numeric>
+#include <fstream>
 
 #include "streamutils.h"
 #include "metadata_page.h"
@@ -162,5 +163,19 @@ stream_utils::ByteBuffer stream_utils::read_page_from_stream(std::istream &is) {
     ByteBuffer buffer(page::k_page_size);
     is.read(reinterpret_cast<char *>(buffer.data()), page::k_page_size);
     return buffer;
+}
+
+std::fstream stream_utils::open_db_file(const std::string &file_name) {
+    std::fstream f{file_name, std::ios::binary | std::ios::out | std::ios::in};
+    if (!f) {
+        throw std::ios::failure{"failed to open_db_file"};
+    }
+
+    return f;
+}
+
+std::fstream &stream_utils::write_page_to_stream(std::fstream &f, const stream_utils::ByteBuffer &buffer) {
+    f.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
+    return f;
 }
 
