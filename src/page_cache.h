@@ -54,7 +54,7 @@ protected:
     std::list<std::pair<std::string, std::unique_ptr<page::Page>>> _page_ids{};
     std::unordered_map<std::string, decltype(_page_ids.begin())> _pages{};
 
-    std::pair<std::vector<FreePageInfo>, std::vector<FreePageInfo>>
+    static std::pair<std::vector<FreePageInfo>, std::vector<FreePageInfo>>
     scan_free_pages_in_table_stream(std::istream &is, uint32_t n_pages_to_scan);
 
     void handle_missing_cache_entry(unsigned int page_id, const std::string &table_name, page::PageType &page_type,

@@ -236,6 +236,9 @@ page_cache::PageCache::scan_free_pages_in_table_stream(std::istream &is, uint32_
     std::vector<FreePageInfo> free_row_map_pages{};
 
     for (auto i = 0; i < n_pages_to_scan; ++i) {
+        // TODO - read only the header here. we can get page id and free space from there.
+        //  No need to load up the entire buffer in memory.
+        //  Then we also need to advance the stream manually to next page offset.
         auto buffer = stream_utils::read_page_from_stream(is);
         auto free_space = page::free_space_from_buffer(buffer);
         if (free_space > 0) {
