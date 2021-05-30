@@ -35,6 +35,7 @@ page::PageId page::PageCreator::create_data_page(std::fstream &f) {
     auto page_id = _metadata_page->next_page_id_for_table();
     page::SlottedDataPage slotted_data_page{page_id, page::k_page_size};
     stream_utils::write_page_to_stream(f, slotted_data_page.empty_page());
+    _metadata_page->increment_marked_pages(PageType::Data);
     return page_id;
 }
 
@@ -42,5 +43,6 @@ page::PageId page::PageCreator::create_row_map_page(std::fstream &f) {
     auto page_id = _metadata_page->next_page_id_for_table();
     page::RowMappingPage row_mapping_page{page_id, page::k_page_size};
     stream_utils::write_page_to_stream(f, row_mapping_page.empty_page());
+    _metadata_page->increment_marked_pages(PageType::RowMap);
     return page_id;
 }
