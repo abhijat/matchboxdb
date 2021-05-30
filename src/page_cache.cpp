@@ -33,7 +33,6 @@ void page_cache::PageCache::handle_missing_cache_entry(
     auto page = load_page_from_disk(page_id, table_name, page_type);
 
     if (_page_ids.size() == _max_size) {
-        std::cout << "triggering eviction, max size reached\n";
         evict();
     }
 
@@ -85,11 +84,11 @@ page_cache::PageCache::make_page_from_buffer(const page::PageType &page_type,
     }
 }
 
-void page_cache::PageCache::evict() {
+std::string page_cache::PageCache::evict() {
     auto page_id_to_evict = _page_ids.back().first;
     _page_ids.pop_back();
     _pages.erase(page_id_to_evict);
-    std::cout << "evicted page id: " << page_id_to_evict << "\n";
+    return page_id_to_evict;
 }
 
 void page_cache::PageCache::scan_tables() {
@@ -157,6 +156,8 @@ void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
             throw std::ios::failure{"failed to write page to file"};
         }
     }
+
+    _dirty_pages[table_name].clear();
 }
 
 page::RowMappingPage *page_cache::PageCache::rowmap_page_for_row_id(const std::string &table_name, uint32_t row_id) {

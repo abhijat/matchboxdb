@@ -1,7 +1,28 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock-matchers.h>
+
 #include <fstream>
+
 #include "test_utilities.h"
 #include "../src/page_cache.h"
+
+class TestPageCache : public page_cache::PageCache {
+public:
+    TestPageCache(uint32_t max_size, const std::vector<std::string> &tables) : PageCache(max_size, tables) {}
+
+    uint32_t dirty_page_size(const std::string &table_name) const {
+        return _dirty_pages.at(table_name).size();
+    }
+
+    std::string last_evicted{};
+
+protected:
+    std::string evict() override {
+        last_evicted = page_cache::PageCache::evict();
+        return last_evicted;
+    }
+
+};
 
 class PageCacheTests : public ::testing::Test {
 protected:
@@ -35,10 +56,15 @@ TEST_F(PageCacheTests, FirstCallCreatesPages) {
     ASSERT_EQ(r->page_type(), page::PageType::RowMap);
 }
 
-TEST_F(PageCacheTests, WriteDirtyPages) {
-    page_cache::PageCache pc{5, {testutils::k_table_name}};
+TEST_F(PageCacheTests, WriteDirtyPagesToDisk) {
+    TestPageCache pc{5, {testutils::k_table_name}};
     const auto&[r, d] = pc.get_pages_for_data_size(testutils::k_table_name, 32);
+
+    ASSERT_EQ(pc.dirty_page_size(testutils::k_table_name), 3);
+
     pc.write_dirty_pages(testutils::k_table_name);
+
+    ASSERT_EQ(pc.dirty_page_size(testutils::k_table_name), 0);
 
     std::ifstream f{testutils::k_file_name, std::ios::binary};
     auto buffer = stream_utils::read_page_from_stream(f, d->page_id());
@@ -71,6 +97,19 @@ TEST_F(PageCacheTests, WriteDirtyPagesUpdatesTableMetadata) {
         ASSERT_EQ(metadata_on_disk.n_rowmap_pages(), 1);
         ASSERT_EQ(metadata_on_disk.n_marked_pages(), 2);
     }
+}
+
+TEST_F(PageCacheTests, CacheEviction) {
+    TestPageCache pc{2, {testutils::k_table_name}};
+    ASSERT_TRUE(pc.last_evicted.empty());
+
+    // this should trigger metadata page eviction:
+    const auto&[r, d] = pc.get_pages_for_data_size(testutils::k_table_name, 32);
+    ASSERT_EQ(pc.last_evicted, page_cache::generate_cache_key(0, testutils::k_table_name, page::PageType::Metadata));
+
+    // this should trigger data page eviction:
+    pc.metadata_page_for_table(testutils::k_table_name);
+    ASSERT_EQ(pc.last_evicted, page_cache::generate_cache_key(1, testutils::k_table_name, page::PageType::Data));
 }
 
 TEST(PageCacheUtilityTests, FileNameFromTableName) {

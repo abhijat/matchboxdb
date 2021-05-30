@@ -36,7 +36,7 @@ protected:
 
     void scan_table_file(const std::string &table_name, const std::string &file_name);
 
-    void evict();
+    virtual std::string evict();
 
     std::unique_ptr<page::Page>
     load_page_from_disk(page::PageId page_id, const std::string &table_name, page::PageType page_type);
