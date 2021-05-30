@@ -62,6 +62,8 @@ add_executable(alltests tests/tests.cpp
         src/table_initializer.cpp
         src/table_initializer.h
         src/metadata.cpp
+        src/page_creator.cpp
+        src/page_creator.h
         tests/stream_tests.cpp tests/table_initializer_tests.cpp tests/slotted_data_page_tests.cpp)
 target_link_libraries(alltests gtest gmock gtest_main)
 
