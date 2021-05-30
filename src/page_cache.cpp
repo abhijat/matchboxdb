@@ -119,10 +119,7 @@ void page_cache::PageCache::scan_table_file(const std::string &table_name, const
 
     page::MetadataPage m{buffer};
 
-    auto[free_data_pages, free_row_map_pages] = scan_free_pages_in_table_stream(ifs, m.n_marked_pages());
-
-    _free_data_pages.insert({table_name, free_data_pages});
-    _free_rowmap_pages.insert({table_name, free_row_map_pages});
+    scan_free_pages_in_table_stream(table_name, ifs, m.n_marked_pages());
 }
 
 std::pair<page::RowMappingPage *, page::SlottedDataPage *>
@@ -227,8 +224,8 @@ page::MetadataPage *page_cache::PageCache::metadata_page_for_table(const std::st
     return dynamic_cast<page::MetadataPage *>(get_page_id(0, table_name, page::PageType::Metadata));
 }
 
-std::pair<std::vector<page_cache::FreePageInfo>, std::vector<page_cache::FreePageInfo>>
-page_cache::PageCache::scan_free_pages_in_table_stream(std::istream &is, uint32_t n_pages_to_scan) {
+void page_cache::PageCache::scan_free_pages_in_table_stream(const std::string &table_name, std::istream &is,
+                                                            uint32_t n_pages_to_scan) {
     // skip ahead of the metadata page
     is.seekg(page::k_page_size, std::ios::beg);
 
@@ -259,7 +256,8 @@ page_cache::PageCache::scan_free_pages_in_table_stream(std::istream &is, uint32_
         }
     }
 
-    return std::make_pair(free_data_pages, free_row_map_pages);
+    _free_data_pages.insert({table_name, free_data_pages});
+    _free_rowmap_pages.insert({table_name, free_row_map_pages});
 }
 
 std::ifstream &page_cache::seek_to_rowmap_page_offset(page_cache::PageId page_id, std::ifstream &ifs) {
