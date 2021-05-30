@@ -62,10 +62,6 @@ protected:
     get_page_id_for_size(const std::string &table_name, uint32_t data_size, page::PageType page_type);
 };
 
-std::ifstream &seek_to_data_page_offset(page::PageId page_id, std::ifstream &ifs);
-
-std::ifstream &seek_to_rowmap_page_offset(page::PageId page_id, std::ifstream &ifs);
-
 std::string generate_cache_key(page::PageId page_id, const std::string &table_name, page::PageType page_type);
 
 std::string file_name_from_table_name(const std::string &table_name);

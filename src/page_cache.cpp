@@ -60,20 +60,8 @@ page_cache::PageCache::load_page_from_disk(page::PageId page_id, const std::stri
         throw std::ios::failure("failed to open table file");
     }
 
-    switch (page_type) {
-        case page::PageType::Data:
-            seek_to_data_page_offset(page_id, i);
-            break;
-        case page::PageType::RowMap:
-            seek_to_rowmap_page_offset(page_id, i);
-            break;
-        case page::PageType::Metadata:
-            i.seekg(0, std::ios::beg);
-            break;
-    }
-
-    stream_utils::ByteBuffer buffer(page::k_page_size);
-    i.read(reinterpret_cast<char *>(buffer.data()), page::k_page_size);
+    i.seekg(page::k_page_size * page_id, std::ios::beg);
+    auto buffer = stream_utils::read_page_from_stream(i);
 
     if (!i) {
         throw std::ios::failure("failed to read _buffer from disk");
@@ -277,28 +265,6 @@ page_cache::PageCache::get_page_id_for_size(const std::string &table_name, uint3
     }
 
     return {};
-}
-
-std::ifstream &page_cache::seek_to_rowmap_page_offset(page::PageId page_id, std::ifstream &ifs) {
-    ifs.seekg(0, std::ios::end);
-    uint32_t end = ifs.tellg();
-
-    auto base_offset = end - ((page_id + 1) * page::k_page_size);
-    ifs.seekg(base_offset, std::ios::beg);
-
-    return ifs;
-}
-
-std::ifstream &page_cache::seek_to_data_page_offset(page::PageId page_id, std::ifstream &ifs) {
-    // account for metadata page
-    auto base_offset = page::k_page_size;
-
-    // skip over the required bytes for data pages
-    base_offset += (page_id * page::k_page_size);
-
-    ifs.seekg(base_offset, std::ios::beg);
-
-    return ifs;
 }
 
 std::string
