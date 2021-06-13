@@ -18,6 +18,14 @@ TEST(Lexer, SyntaxLexing) {
     !-/*5;
     5 < 10 > 5;
 
+    if (5 < 10) {
+        return true;
+    } else {
+        return false;
+    }
+
+    10 == 10;
+    10 != 9;
 )S"};
     std::vector<token::Token> expected{
         {token::TokenKind::LET,       "let"},
@@ -72,6 +80,34 @@ TEST(Lexer, SyntaxLexing) {
         {token::TokenKind::INT,       "10"},
         {token::TokenKind::GT,        ">"},
         {token::TokenKind::INT,       "5"},
+        {token::TokenKind::SEMICOLON, ";"},
+
+        {token::TokenKind::IF,        "if"},
+        {token::TokenKind::LPAREN,    "("},
+        {token::TokenKind::INT,       "5"},
+        {token::TokenKind::LT,        "<"},
+        {token::TokenKind::INT,       "10"},
+        {token::TokenKind::RPAREN,    ")"},
+        {token::TokenKind::LBRACE,    "{"},
+        {token::TokenKind::RETURN,    "return"},
+        {token::TokenKind::TRUE,      "true"},
+        {token::TokenKind::SEMICOLON, ";"},
+        {token::TokenKind::RBRACE,    "}"},
+        {token::TokenKind::ELSE,      "else"},
+        {token::TokenKind::LBRACE,    "{"},
+        {token::TokenKind::RETURN,    "return"},
+        {token::TokenKind::FALSE,     "false"},
+        {token::TokenKind::SEMICOLON, ";"},
+        {token::TokenKind::RBRACE,    "}"},
+
+        {token::TokenKind::INT,       "10"},
+        {token::TokenKind::EQ,       "=="},
+        {token::TokenKind::INT,       "10"},
+        {token::TokenKind::SEMICOLON, ";"},
+
+        {token::TokenKind::INT,       "10"},
+        {token::TokenKind::NE,       "!="},
+        {token::TokenKind::INT,       "9"},
         {token::TokenKind::SEMICOLON, ";"},
     };
 

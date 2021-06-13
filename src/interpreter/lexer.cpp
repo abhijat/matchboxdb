@@ -22,8 +22,14 @@ token::Token lexer::Lexer::next_token() {
     eat_whitespace();
 
     switch (character) {
-        case '=':
-            t = {token::TokenKind::ASSIGN, "="};
+        case '=': {
+            if (peek_character() == '=') {
+                read_character();
+                t = {token::TokenKind::EQ, "=="};
+            } else {
+                t = {token::TokenKind::ASSIGN, "="};
+            }
+        }
             break;
         case ';':
             t = {token::TokenKind::SEMICOLON, ";"};
@@ -46,8 +52,14 @@ token::Token lexer::Lexer::next_token() {
         case '+':
             t = {token::TokenKind::PLUS, "+"};
             break;
-        case '!':
-            t = {token::TokenKind::BANG, "!"};
+        case '!': {
+            if (peek_character() == '=') {
+                read_character();
+                t = {token::TokenKind::NE, "!="};
+            } else {
+                t = {token::TokenKind::BANG, "!"};
+            }
+        }
             break;
         case '-':
             t = {token::TokenKind::MINUS, "-"};
@@ -106,4 +118,12 @@ std::string lexer::Lexer::read_number() {
     }
 
     return input.substr(start, position - start);
+}
+
+unsigned char lexer::Lexer::peek_character() const {
+    if (read_position >= input.size()) {
+        return 0;
+    } else {
+        return input.at(read_position);
+    }
 }

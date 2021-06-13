@@ -10,15 +10,19 @@ class Lexer {
 public:
     Lexer(std::string input);
 
-    void read_character();
 
     token::Token next_token();
+
+protected:
+    void read_character();
 
     std::string read_identifier();
 
     std::string read_number();
 
     void eat_whitespace();
+
+    unsigned char peek_character() const;
 
 protected:
     std::string input;
