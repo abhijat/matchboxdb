@@ -83,3 +83,10 @@ add_executable(interpreter_tests
         tests/interpreter_tests/lexer_tests.cpp)
 target_link_libraries(interpreter_tests gtest gmock gtest_main)
 add_test(NAME sqltest COMMAND interpreter_tests)
+
+
+add_executable(repl src/interpreter/repl.cpp
+        src/interpreter/lexer.cpp
+        src/interpreter/lexer.h
+        src/interpreter/token.h
+        src/interpreter/token.cpp)
