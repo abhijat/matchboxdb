@@ -8,8 +8,6 @@ void loop(std::istream &in, std::ostream &out) {
         out << ">> ";
 
         std::string input;
-        in >> input;
-
         std::getline(in, input);
 
         if (!in) {
