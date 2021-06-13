@@ -1,10 +1,26 @@
 #ifndef MATCHBOXDB_PARSER_H
 #define MATCHBOXDB_PARSER_H
 
+#include <unordered_map>
+#include <functional>
 #include "lexer.h"
 #include "program.h"
+#include "expression.h"
 
 namespace parser {
+
+using PrefixParserFn = std::function<std::optional<std::unique_ptr<ast::Expression>>()>;
+using InfixParserFn = std::function<std::optional<std::unique_ptr<ast::Expression>>(const ast::Expression *)>;
+
+enum class Precedence {
+    LOWEST,
+    EQUALS,
+    LESSGT,
+    SUM,
+    PRODUCT,
+    PREFIX,
+    FNCALL,
+};
 
 class Parser {
 public:
@@ -14,7 +30,13 @@ public:
 
     const std::vector<std::string> &errors() const;
 
+    void register_prefix_fn(token::TokenKind token_kind, PrefixParserFn fn);
+
+    void register_infix_fn(token::TokenKind token_kind, InfixParserFn fn);
+
 protected:
+    std::optional<std::unique_ptr<ast::Expression>> parse_identifier();
+
     std::optional<std::unique_ptr<ast::Statement>> parse_statement();
 
     std::optional<std::unique_ptr<ast::Statement>> parse_let_statement();
@@ -29,11 +51,19 @@ protected:
 
     void peek_error(token::TokenKind expected);
 
+    std::optional<std::unique_ptr<ast::Statement>> parse_expression_statement();
+
+    std::optional<std::unique_ptr<ast::Expression>> parse_expression(Precedence precedence);
+
 protected:
     lexer::Lexer _lexer;
     token::Token _current_token{};
     token::Token _peek_token{};
     std::vector<std::string> _errors{};
+    std::unordered_map<token::TokenKind, PrefixParserFn> _prefix_parsers{};
+    std::unordered_map<token::TokenKind, InfixParserFn> _infix_parsers{};
+
+    std::optional<std::unique_ptr<ast::Expression>> parse_integer_literal();
 };
 
 }

@@ -1,11 +1,22 @@
 #include "parser.h"
 #include "let_statement.h"
 #include "return_statement.h"
+#include "expression_statement.h"
+#include "integer_literal.h"
 
 #include <utility>
 #include <sstream>
 
 parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
+
+    register_prefix_fn(token::TokenKind::IDENT, [&]() {
+        return parse_identifier();
+    });
+
+    register_prefix_fn(token::TokenKind::INT, [&]() {
+        return parse_integer_literal();
+    });
+
     next_token();
     next_token();
 }
@@ -34,7 +45,7 @@ std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_statement()
         case token::TokenKind::RETURN:
             return parse_return_statement();
         default:
-            return std::nullopt;
+            return parse_expression_statement();
     }
 }
 
@@ -91,4 +102,43 @@ std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_return_stat
     }
 
     return std::make_unique<ast::ReturnStatement>(token, nullptr);
+}
+
+std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_expression_statement() {
+    auto token = _current_token;
+    auto expression = parse_expression(Precedence::LOWEST);
+
+    if (_peek_token.kind == token::TokenKind::SEMICOLON) {
+        next_token();
+    }
+
+    return std::make_unique<ast::ExpressionStatement>(token, std::move(*expression));
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_expression(parser::Precedence precedence) {
+    auto prefix_parser = _prefix_parsers.find(_current_token.kind);
+    if (prefix_parser == _prefix_parsers.end()) {
+        return std::nullopt;
+    }
+
+    auto lhs_expression = prefix_parser->second();
+    return lhs_expression;
+}
+
+void parser::Parser::register_prefix_fn(token::TokenKind token_kind, parser::PrefixParserFn fn) {
+    _prefix_parsers[token_kind] = std::move(fn);
+}
+
+void parser::Parser::register_infix_fn(token::TokenKind token_kind, parser::InfixParserFn fn) {
+    _infix_parsers[token_kind] = std::move(fn);
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_identifier() {
+    return std::make_unique<ast::Identifier>(_current_token, _current_token.literal);
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_integer_literal() {
+    auto token = _current_token;
+    auto value = std::stoi(_current_token.literal);
+    return std::make_unique<ast::IntegerLiteral>(token, value);
 }

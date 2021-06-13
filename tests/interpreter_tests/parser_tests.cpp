@@ -2,6 +2,8 @@
 #include "../../src/interpreter/parser.h"
 #include "../../src/interpreter/let_statement.h"
 #include "../../src/interpreter/return_statement.h"
+#include "../../src/interpreter/expression_statement.h"
+#include "../../src/interpreter/integer_literal.h"
 
 void assert_let_statement(const ast::Statement *statement, std::string_view identifier_name) {
     ASSERT_EQ(statement->token_literal(), "let");
@@ -81,4 +83,36 @@ TEST(Parser, Stringify) {
     ss << ls;
 
     ASSERT_EQ(ss.str(), "let lhs = rhs;");
+}
+
+TEST(Parser, IndentifierExpression) {
+    parser::Parser p{lexer::Lexer{"foobar;"}};
+    auto program = p.parse();
+    check_parser_errors(p);
+
+    ASSERT_EQ(program.statements().size(), 1);
+
+    const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+    ASSERT_NE(expression_statement, nullptr);
+
+    const auto *identifier = dynamic_cast<const ast::Identifier *>(expression_statement->expression());
+    ASSERT_NE(identifier, nullptr);
+
+    ASSERT_EQ(identifier->token_literal(), "foobar");
+}
+
+TEST(Parser, IntegerLiteralExpression) {
+    parser::Parser p{lexer::Lexer{"100;"}};
+    auto program = p.parse();
+    check_parser_errors(p);
+
+    ASSERT_EQ(program.statements().size(), 1);
+
+    const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+    ASSERT_NE(expression_statement, nullptr);
+
+    const auto *identifier = dynamic_cast<const ast::IntegerLiteral *>(expression_statement->expression());
+    ASSERT_NE(identifier, nullptr);
+
+    ASSERT_EQ(identifier->token_literal(), "100");
 }

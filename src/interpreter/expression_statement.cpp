@@ -15,3 +15,7 @@ std::ostream &ast::ExpressionStatement::repr(std::ostream &os) const {
     }
     return os;
 }
+
+const ast::Expression * ast::ExpressionStatement::expression() const {
+    return _expression.get();
+}

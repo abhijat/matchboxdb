@@ -13,6 +13,8 @@ class ExpressionStatement : public Statement {
 public:
     ExpressionStatement(token::Token token, std::unique_ptr<Expression> expression);
 
+    const Expression * expression() const;
+
     std::string token_literal() const override;
 
     std::ostream &repr(std::ostream &os) const override;
