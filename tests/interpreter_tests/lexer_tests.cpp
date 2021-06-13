@@ -14,6 +14,10 @@ TEST(Lexer, SyntaxLexing) {
     };
 
     let result = add(five, ten);
+
+    !-/*5;
+    5 < 10 > 5;
+
 )S"};
     std::vector<token::Token> expected{
         {token::TokenKind::LET,       "let"},
@@ -55,11 +59,25 @@ TEST(Lexer, SyntaxLexing) {
         {token::TokenKind::IDENT,     "ten"},
         {token::TokenKind::RPAREN,    ")"},
         {token::TokenKind::SEMICOLON, ";"},
+
+        {token::TokenKind::BANG,      "!"},
+        {token::TokenKind::MINUS,     "-"},
+        {token::TokenKind::SLASH,     "/"},
+        {token::TokenKind::ASTERISK,  "*"},
+        {token::TokenKind::INT,       "5"},
+        {token::TokenKind::SEMICOLON, ";"},
+
+        {token::TokenKind::INT,       "5"},
+        {token::TokenKind::LT,        "<"},
+        {token::TokenKind::INT,       "10"},
+        {token::TokenKind::GT,        ">"},
+        {token::TokenKind::INT,       "5"},
+        {token::TokenKind::SEMICOLON, ";"},
     };
 
     lexer::Lexer l{input};
     for (const auto &e: expected) {
         auto next_token = l.next_token();
-        ASSERT_EQ(e, next_token) << "expected: " << e.literal << " does not match found: " << next_token.literal;
+        ASSERT_EQ(e, next_token);
     }
 }

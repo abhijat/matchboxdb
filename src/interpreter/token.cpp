@@ -17,3 +17,8 @@ token::TokenKind token::lookup_identifier_kind(const std::string &identifier) {
 
     return TokenKind::IDENT;
 }
+
+std::ostream &token::operator<<(std::ostream &os, const token::Token &t) {
+    os << "{ Kind: " << static_cast<int>(t.kind) << ", Literal: " << t.literal << " }";
+    return os;
+}

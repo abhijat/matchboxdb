@@ -46,6 +46,24 @@ token::Token lexer::Lexer::next_token() {
         case '+':
             t = {token::TokenKind::PLUS, "+"};
             break;
+        case '!':
+            t = {token::TokenKind::BANG, "!"};
+            break;
+        case '-':
+            t = {token::TokenKind::MINUS, "-"};
+            break;
+        case '/':
+            t = {token::TokenKind::SLASH, "/"};
+            break;
+        case '*':
+            t = {token::TokenKind::ASTERISK, "*"};
+            break;
+        case '<':
+            t = {token::TokenKind::LT, "<"};
+            break;
+        case '>':
+            t = {token::TokenKind::GT, ">"};
+            break;
         case 0:
             t = {token::TokenKind::ENDOFINPUT, ""};
             break;
