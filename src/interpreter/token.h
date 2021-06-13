@@ -43,6 +43,8 @@ enum class TokenKind {
     FALSE,
 };
 
+std::ostream &operator<<(std::ostream &os, TokenKind token_kind);
+
 static const std::map<std::string, TokenKind> keywords = {
     {"fn",     TokenKind::FUNCTION},
     {"let",    TokenKind::LET},
