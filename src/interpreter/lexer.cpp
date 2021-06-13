@@ -19,6 +19,8 @@ void lexer::Lexer::read_character() {
 
 token::Token lexer::Lexer::next_token() {
     token::Token t;
+    eat_whitespace();
+
     switch (character) {
         case '=':
             t = {token::TokenKind::ASSIGN, "="};
@@ -47,8 +49,43 @@ token::Token lexer::Lexer::next_token() {
         case 0:
             t = {token::TokenKind::ENDOFINPUT, ""};
             break;
+        default: {
+            if (std::isalpha(character)) {
+                auto literal = read_identifier();
+                auto kind = token::lookup_identifier_kind(literal);
+                return {kind, literal};
+            } else if (std::isdigit(character)) {
+                return {token::TokenKind::INT, read_number()};
+            } else {
+                t = {token::TokenKind::ILLEGAL, std::string(1, character)};
+            }
+        }
     }
 
     read_character();
     return t;
+}
+
+std::string lexer::Lexer::read_identifier() {
+    auto start = position;
+    while (std::isalpha(character) || character == '_') {
+        read_character();
+    }
+
+    return input.substr(start, position - start);
+}
+
+void lexer::Lexer::eat_whitespace() {
+    while (std::isspace(character)) {
+        read_character();
+    }
+}
+
+std::string lexer::Lexer::read_number() {
+    auto start = position;
+    while (std::isdigit(character)) {
+        read_character();
+    }
+
+    return input.substr(start, position - start);
 }

@@ -2,6 +2,7 @@
 #define MATCHBOXDB_TOKEN_H
 
 #include <string>
+#include <map>
 
 namespace token {
 
@@ -22,12 +23,19 @@ enum class TokenKind {
     LET,
 };
 
+static const std::map<std::string, TokenKind> keywords = {
+    {"fn",  TokenKind::FUNCTION},
+    {"let", TokenKind::LET},
+};
+
+TokenKind lookup_identifier_kind(const std::string& identifier);
+
 struct Token {
     Token();
 
     Token(TokenKind kind, std::string literal);
 
-    bool operator==(const Token& rhs) const;
+    bool operator==(const Token &rhs) const;
 
     TokenKind kind;
     std::string literal;

@@ -9,8 +9,16 @@ namespace lexer {
 class Lexer {
 public:
     Lexer(std::string input);
+
     void read_character();
+
     token::Token next_token();
+
+    std::string read_identifier();
+
+    std::string read_number();
+
+    void eat_whitespace();
 
 protected:
     std::string input;
