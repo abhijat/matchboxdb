@@ -29,7 +29,7 @@ add_executable(
         src/insert_object.h
         src/select_object.cpp
         src/select_object.h
-        src/page_creator.cpp src/page_creator.h)
+        src/page_creator.cpp src/page_creator.h src/interpreter/lexer.cpp src/interpreter/lexer.h src/interpreter/token.h src/interpreter/token.cpp)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -64,7 +64,22 @@ add_executable(alltests tests/tests.cpp
         src/metadata.cpp
         src/page_creator.cpp
         src/page_creator.h
-        tests/stream_tests.cpp tests/table_initializer_tests.cpp tests/slotted_data_page_tests.cpp tests/page_creator_tests.cpp tests/page_cache_tests.cpp tests/test_utilities.cpp tests/test_utilities.h)
+        tests/stream_tests.cpp
+        tests/table_initializer_tests.cpp
+        tests/slotted_data_page_tests.cpp
+        tests/page_creator_tests.cpp
+        tests/page_cache_tests.cpp
+        tests/test_utilities.cpp
+        tests/test_utilities.h)
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)
+
+add_executable(interpreter_tests
+        src/interpreter/lexer.cpp
+        src/interpreter/lexer.h
+        src/interpreter/token.h
+        src/interpreter/token.cpp
+        tests/interpreter_tests/lexer_tests.cpp)
+target_link_libraries(interpreter_tests gtest gmock gtest_main)
+add_test(NAME sqltest COMMAND interpreter_tests)
