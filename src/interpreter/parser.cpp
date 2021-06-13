@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "let_statement.h"
+#include "return_statement.h"
 
 #include <utility>
 #include <sstream>
@@ -30,6 +31,8 @@ std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_statement()
     switch (_current_token.kind) {
         case token::TokenKind::LET:
             return parse_let_statement();
+        case token::TokenKind::RETURN:
+            return parse_return_statement();
         default:
             return std::nullopt;
     }
@@ -76,4 +79,16 @@ void parser::Parser::peek_error(token::TokenKind kind) {
     std::stringstream error;
     error << "expected next token to be " << kind << ", got " << _peek_token.kind << " instead";
     _errors.push_back(error.str());
+}
+
+std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_return_statement() {
+    auto token = _current_token;
+
+    next_token();
+
+    while (!current_token_is(token::TokenKind::SEMICOLON)) {
+        next_token();
+    }
+
+    return std::make_unique<ast::ReturnStatement>(token, nullptr);
 }

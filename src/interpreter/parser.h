@@ -19,6 +19,8 @@ protected:
 
     std::optional<std::unique_ptr<ast::Statement>> parse_let_statement();
 
+    std::optional<std::unique_ptr<ast::Statement>> parse_return_statement();
+
     void next_token();
 
     bool current_token_is(token::TokenKind token_kind) const;
