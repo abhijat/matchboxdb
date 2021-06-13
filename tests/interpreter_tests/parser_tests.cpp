@@ -69,3 +69,16 @@ TEST(Parser, ReturnStatements) {
         EXPECT_EQ(rs->token_literal(), "return");
     }
 }
+
+TEST(Parser, Stringify) {
+    ast::LetStatement ls{
+        {token::TokenKind::LET, "let"},
+        ast::Identifier{{token::TokenKind::IDENT, "lhs"}, "lhs"},
+        std::make_unique<ast::Identifier>(ast::Identifier{{token::TokenKind::IDENT, "rhs"}, "rhs"})
+    };
+
+    std::stringstream ss;
+    ss << ls;
+
+    ASSERT_EQ(ss.str(), "let lhs = rhs;");
+}

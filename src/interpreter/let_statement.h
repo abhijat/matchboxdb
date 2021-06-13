@@ -19,6 +19,8 @@ public:
 
     const Expression *value() const;
 
+    std::ostream &repr(std::ostream &os) const override;
+
 protected:
     token::Token _token;
     Identifier _name;

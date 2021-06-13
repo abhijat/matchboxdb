@@ -15,9 +15,11 @@ public:
 
     std::string token_literal() const override;
 
+    std::ostream &repr(std::ostream &os) const override;
+
 protected:
     token::Token _token;
-    std::unique_ptr<Expression> _expression;
+    std::unique_ptr<Expression> _value;
 };
 
 }

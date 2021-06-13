@@ -14,6 +14,8 @@ public:
 
     const std::string &value() const;
 
+    std::ostream &repr(std::ostream &os) const override;
+
 protected:
     token::Token _token;
     std::string _value;

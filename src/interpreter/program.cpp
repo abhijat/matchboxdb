@@ -1,5 +1,6 @@
 #include "program.h"
 
+#include <ostream>
 #include <utility>
 
 std::string ast::Program::token_literal() const {
@@ -15,3 +16,10 @@ const std::vector<std::unique_ptr<ast::Statement>> &ast::Program::statements() c
 }
 
 ast::Program::Program(std::vector<std::unique_ptr<Statement>> statements) : _statements(std::move(statements)) {}
+
+std::ostream &ast::Program::repr(std::ostream &os) const {
+    for (const auto &statement : _statements) {
+        statement->repr(os);
+    }
+    return os;
+}

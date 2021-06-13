@@ -19,3 +19,16 @@ ast::LetStatement::LetStatement(token::Token token, ast::Identifier name,
     _token(std::move(token)),
     _name(std::move(name)),
     _value(std::move(value)) {}
+
+std::ostream &ast::LetStatement::repr(std::ostream &os) const {
+    os << token_literal() << " ";
+
+    _name.repr(os) << " = ";
+
+    if (_value) {
+        _value->repr(os);
+    }
+
+    os << ";";
+    return os;
+}

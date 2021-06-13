@@ -80,7 +80,7 @@ add_executable(interpreter_tests
         src/interpreter/lexer.h
         src/interpreter/token.h
         src/interpreter/token.cpp
-        tests/interpreter_tests/lexer_tests.cpp src/interpreter/node.h src/interpreter/statement.h src/interpreter/expression.h src/interpreter/program.cpp src/interpreter/program.h src/interpreter/identifier.cpp src/interpreter/identifier.h src/interpreter/let_statement.cpp src/interpreter/let_statement.h src/interpreter/parser.cpp src/interpreter/parser.h tests/interpreter_tests/parser_tests.cpp src/interpreter/return_statement.cpp src/interpreter/return_statement.h)
+        tests/interpreter_tests/lexer_tests.cpp src/interpreter/node.h src/interpreter/statement.h src/interpreter/expression.h src/interpreter/program.cpp src/interpreter/program.h src/interpreter/identifier.cpp src/interpreter/identifier.h src/interpreter/let_statement.cpp src/interpreter/let_statement.h src/interpreter/parser.cpp src/interpreter/parser.h tests/interpreter_tests/parser_tests.cpp src/interpreter/return_statement.cpp src/interpreter/return_statement.h src/interpreter/expression_statement.cpp src/interpreter/expression_statement.h)
 target_link_libraries(interpreter_tests gtest gmock gtest_main)
 add_test(NAME sqltest COMMAND interpreter_tests)
 
