@@ -9,6 +9,20 @@ void assert_let_statement(const ast::Statement *statement, std::string_view iden
     ASSERT_EQ(let_statement->name().value(), identifier_name);
 }
 
+void check_parser_errors(const parser::Parser &p) {
+    auto errors = p.errors();
+    if (errors.empty()) {
+        return;
+    }
+
+    std::cout << "found " << errors.size() << " parser errors\n";
+    for (const auto &error : errors) {
+        std::cout << "parser error: " << error << "\n";
+    }
+
+    FAIL() << "parser errors found\n";
+}
+
 TEST(Parser, LetStatementParsing) {
     std::string input{R"S(
 
@@ -21,6 +35,7 @@ TEST(Parser, LetStatementParsing) {
 
     parser::Parser p{lexer::Lexer{input}};
     auto program = p.parse();
+    check_parser_errors(p);
 
     ASSERT_EQ(program.statements().size(), 3);
 

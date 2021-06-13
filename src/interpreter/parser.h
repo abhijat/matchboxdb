@@ -12,6 +12,8 @@ public:
 
     ast::Program parse();
 
+    const std::vector<std::string> &errors() const;
+
 protected:
     std::optional<std::unique_ptr<ast::Statement>> parse_statement();
 
@@ -23,10 +25,13 @@ protected:
 
     bool expect_peek_token(token::TokenKind token_kind);
 
+    void peek_error(token::TokenKind expected);
+
 protected:
     lexer::Lexer _lexer;
     token::Token _current_token{};
     token::Token _peek_token{};
+    std::vector<std::string> _errors{};
 };
 
 }

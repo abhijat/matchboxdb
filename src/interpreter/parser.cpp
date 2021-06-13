@@ -2,6 +2,7 @@
 #include "let_statement.h"
 
 #include <utility>
+#include <sstream>
 
 parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
     next_token();
@@ -62,6 +63,17 @@ bool parser::Parser::expect_peek_token(token::TokenKind token_kind) {
         next_token();
         return true;
     } else {
+        peek_error(token_kind);
         return false;
     }
+}
+
+const std::vector<std::string> &parser::Parser::errors() const {
+    return _errors;
+}
+
+void parser::Parser::peek_error(token::TokenKind kind) {
+    std::stringstream error;
+    error << "expected next token to be " << kind << ", got " << _peek_token.kind << " instead";
+    _errors.push_back(error.str());
 }
