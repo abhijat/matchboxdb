@@ -3,6 +3,7 @@
 #include "return_statement.h"
 #include "expression_statement.h"
 #include "integer_literal.h"
+#include "prefix_expression.h"
 
 #include <utility>
 #include <sstream>
@@ -15,6 +16,14 @@ parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
 
     register_prefix_fn(token::TokenKind::INT, [&]() {
         return parse_integer_literal();
+    });
+
+    register_prefix_fn(token::TokenKind::BANG, [&]() {
+        return parse_prefix_expression();
+    });
+
+    register_prefix_fn(token::TokenKind::MINUS, [&]() {
+        return parse_prefix_expression();
     });
 
     next_token();
@@ -118,6 +127,7 @@ std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_expression_
 std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_expression(parser::Precedence precedence) {
     auto prefix_parser = _prefix_parsers.find(_current_token.kind);
     if (prefix_parser == _prefix_parsers.end()) {
+        no_prefix_parser_fn_error(_current_token.kind);
         return std::nullopt;
     }
 
@@ -141,4 +151,17 @@ std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_integer_li
     auto token = _current_token;
     auto value = std::stoi(_current_token.literal);
     return std::make_unique<ast::IntegerLiteral>(token, value);
+}
+
+void parser::Parser::no_prefix_parser_fn_error(token::TokenKind token_kind) {
+    std::stringstream err;
+    err << "no prefix parser function for " << token_kind << " found";
+    _errors.push_back(err.str());
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_prefix_expression() {
+    auto token = _current_token;
+    next_token();
+    auto expression = parse_expression(Precedence::PREFIX);
+    return std::make_unique<ast::PrefixExpression>(token, token.literal, std::move(*expression));
 }

@@ -4,6 +4,7 @@
 #include "../../src/interpreter/return_statement.h"
 #include "../../src/interpreter/expression_statement.h"
 #include "../../src/interpreter/integer_literal.h"
+#include "../../src/interpreter/prefix_expression.h"
 
 void assert_let_statement(const ast::Statement *statement, std::string_view identifier_name) {
     ASSERT_EQ(statement->token_literal(), "let");
@@ -101,6 +102,12 @@ TEST(Parser, IndentifierExpression) {
     ASSERT_EQ(identifier->token_literal(), "foobar");
 }
 
+void assert_is_integer_literal(const ast::Expression *expression, int64_t value) {
+    const auto *identifier = dynamic_cast<const ast::IntegerLiteral *>(expression);
+    ASSERT_NE(identifier, nullptr);
+    ASSERT_EQ(identifier->value(), value);
+}
+
 TEST(Parser, IntegerLiteralExpression) {
     parser::Parser p{lexer::Lexer{"100;"}};
     auto program = p.parse();
@@ -111,8 +118,39 @@ TEST(Parser, IntegerLiteralExpression) {
     const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
     ASSERT_NE(expression_statement, nullptr);
 
-    const auto *identifier = dynamic_cast<const ast::IntegerLiteral *>(expression_statement->expression());
-    ASSERT_NE(identifier, nullptr);
+    assert_is_integer_literal(expression_statement->expression(), 100);
+}
 
-    ASSERT_EQ(identifier->token_literal(), "100");
+TEST(Parser, PrefixExpression) {
+    {
+        parser::Parser p{lexer::Lexer{"!5;"}};
+        auto program = p.parse();
+        check_parser_errors(p);
+
+        ASSERT_EQ(program.statements().size(), 1);
+        const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+        ASSERT_NE(expression_statement, nullptr);
+
+        const auto *prefix_expression = dynamic_cast<const ast::PrefixExpression *>(expression_statement->expression());
+        ASSERT_NE(prefix_expression, nullptr);
+
+        ASSERT_EQ(prefix_expression->prefix_operator(), "!");
+        assert_is_integer_literal(prefix_expression->right(), 5);
+    }
+
+    {
+        parser::Parser p{lexer::Lexer{"-1115;"}};
+        auto program = p.parse();
+        check_parser_errors(p);
+
+        ASSERT_EQ(program.statements().size(), 1);
+        const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+        ASSERT_NE(expression_statement, nullptr);
+
+        const auto *prefix_expression = dynamic_cast<const ast::PrefixExpression *>(expression_statement->expression());
+        ASSERT_NE(prefix_expression, nullptr);
+
+        ASSERT_EQ(prefix_expression->prefix_operator(), "-");
+        assert_is_integer_literal(prefix_expression->right(), 1115);
+    }
 }

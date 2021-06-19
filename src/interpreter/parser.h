@@ -51,9 +51,13 @@ protected:
 
     void peek_error(token::TokenKind expected);
 
+    void no_prefix_parser_fn_error(token::TokenKind token_kind);
+
     std::optional<std::unique_ptr<ast::Statement>> parse_expression_statement();
 
     std::optional<std::unique_ptr<ast::Expression>> parse_expression(Precedence precedence);
+
+    std::optional<std::unique_ptr<ast::Expression>> parse_prefix_expression();
 
 protected:
     lexer::Lexer _lexer;
