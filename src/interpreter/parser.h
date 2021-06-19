@@ -6,6 +6,7 @@
 #include "lexer.h"
 #include "program.h"
 #include "expression.h"
+#include "block_statement.h"
 
 namespace parser {
 
@@ -78,6 +79,14 @@ protected:
 
     std::optional<std::unique_ptr<ast::Expression>> parse_boolean_expression();
 
+    std::optional<std::unique_ptr<ast::Expression>> parse_integer_literal();
+
+    std::optional<std::unique_ptr<ast::Expression>> parse_grouped_expression();
+
+    std::optional<std::unique_ptr<ast::Expression>> parse_if_expression();
+
+    ast::BlockStatement parse_block_statement();
+
 protected:
     lexer::Lexer _lexer;
     token::Token _current_token{};
@@ -85,10 +94,6 @@ protected:
     std::vector<std::string> _errors{};
     std::unordered_map<token::TokenKind, PrefixParserFn> _prefix_parsers{};
     std::unordered_map<token::TokenKind, InfixParserFn> _infix_parsers{};
-
-    std::optional<std::unique_ptr<ast::Expression>> parse_integer_literal();
-
-    std::optional<std::unique_ptr<ast::Expression>> parse_grouped_expression();
 };
 
 }

@@ -7,6 +7,7 @@
 #include "../../src/interpreter/prefix_expression.h"
 #include "../../src/interpreter/infix_expression.h"
 #include "../../src/interpreter/boolean_expression.h"
+#include "../../src/interpreter/if_expression.h"
 
 void assert_let_statement(const ast::Statement *statement, std::string_view identifier_name) {
     ASSERT_EQ(statement->token_literal(), "let");
@@ -55,7 +56,7 @@ void assert_literal_expression(const ast::Expression *expression, int64_t expect
     assert_integer_literal(expression, expected);
 }
 
-void assert_literal_expression(const ast::Expression *expression, const std::string &expected) {
+void assert_literal_expression(const ast::Expression *expression, std::string expected) {
     assert_identifier(expression, expected);
 }
 
@@ -242,7 +243,7 @@ TEST(Parser, InfixExpression) {
     ASSERT_EQ(program.statements().size(), 1);
     const auto *expression = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
     ASSERT_NE(expression, nullptr);
-    assert_infix_expression(expression->expression(), "alice", "bob", "*");
+    assert_infix_expression(expression->expression(), std::string{"alice"}, std::string{"bob"}, "*");
 }
 
 TEST(Parser, PrecedenceParsing) {
@@ -296,4 +297,32 @@ TEST(Parser, BooleanExpression) {
         auto expression = assert_expression_statement_and_extract_expression(program.statements().at(0).get());
         assert_boolean_expression(expression, output);
     }
+}
+
+TEST(Parser, IfExpression) {
+    parser::Parser p{lexer::Lexer{"if (x < y) { x } else {y}"}};
+    auto program = p.parse();
+    check_parser_errors(p);
+
+    ASSERT_EQ(program.statements().size(), 1);
+    auto expression = assert_expression_statement_and_extract_expression(program.statements().at(0).get());
+    const auto *if_expression = dynamic_cast<const ast::IfExpression *>(expression);
+    ASSERT_NE(if_expression, nullptr);
+
+    const auto *condition = dynamic_cast<const ast::InfixExpression *>(if_expression->condition());
+    ASSERT_NE(condition, nullptr);
+
+    assert_infix_expression(condition, std::string{"x"}, std::string{"y"}, "<");
+
+    const auto &consequence = if_expression->consequence();
+    ASSERT_EQ(consequence.statements().size(), 1);
+
+    const auto *cexpr = assert_expression_statement_and_extract_expression(consequence.statements().at(0).get());
+    assert_literal_expression(cexpr, std::string{"x"});
+
+    const auto &alternative = if_expression->alternative();
+    ASSERT_EQ(alternative->statements().size(), 1);
+
+    const auto *alt = assert_expression_statement_and_extract_expression(alternative->statements().at(0).get());
+    assert_literal_expression(alt, std::string{"y"});
 }

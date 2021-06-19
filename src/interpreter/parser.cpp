@@ -6,6 +6,7 @@
 #include "prefix_expression.h"
 #include "infix_expression.h"
 #include "boolean_expression.h"
+#include "if_expression.h"
 
 #include <utility>
 #include <sstream>
@@ -38,6 +39,10 @@ parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
 
     register_prefix_fn(token::TokenKind::LPAREN, [&]() {
         return parse_grouped_expression();
+    });
+
+    register_prefix_fn(token::TokenKind::IF, [&]() {
+        return parse_if_expression();
     });
 
     register_infix_fn(token::TokenKind::PLUS, [&](auto left) {
@@ -261,4 +266,50 @@ std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_grouped_ex
         return std::nullopt;
     }
     return expression;
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_if_expression() {
+    auto token = _current_token;
+    if (!expect_peek_token(token::TokenKind::LPAREN)) {
+        return std::nullopt;
+    }
+
+    next_token();
+    auto condition = parse_expression(Precedence::LOWEST);
+    if (!expect_peek_token(token::TokenKind::RPAREN)) {
+        return std::nullopt;
+    }
+
+    if (!expect_peek_token(token::TokenKind::LBRACE)) {
+        return std::nullopt;
+    }
+
+    auto consequence = parse_block_statement();
+
+    std::optional<decltype(consequence)> alternative{};
+    if (_peek_token.kind == token::TokenKind::ELSE) {
+        next_token();
+        if (!expect_peek_token(token::TokenKind::LBRACE)) {
+            return std::nullopt;
+        }
+
+        alternative = parse_block_statement();
+    }
+
+    return std::make_unique<ast::IfExpression>(std::move(token), std::move(*condition), std::move(consequence),
+                                               std::move(alternative));
+}
+
+ast::BlockStatement parser::Parser::parse_block_statement() {
+    auto token = _current_token;
+    std::vector<std::unique_ptr<ast::Statement>> statements{};
+    next_token();
+    while (!current_token_is(token::TokenKind::RBRACE) && !current_token_is(token::TokenKind::ENDOFINPUT)) {
+        auto statement = parse_statement();
+        if (statement) {
+            statements.push_back(std::move(*statement));
+        }
+        next_token();
+    }
+    return ast::BlockStatement{std::move(token), std::move(statements)};
 }
