@@ -29,6 +29,37 @@ void check_parser_errors(const parser::Parser &p) {
     FAIL() << "parser errors found\n";
 }
 
+void assert_identifier(const ast::Expression *expression, const std::string &value) {
+    const auto *identifier = dynamic_cast<const ast::Identifier *>(expression);
+    ASSERT_NE(identifier, nullptr);
+
+    ASSERT_EQ(identifier->value(), value);
+    ASSERT_EQ(identifier->token_literal(), value);
+}
+
+
+void assert_integer_literal(const ast::Expression *expression, int64_t value) {
+    const auto *integer_literal = dynamic_cast<const ast::IntegerLiteral *>(expression);
+    ASSERT_NE(integer_literal, nullptr);
+    ASSERT_EQ(integer_literal->value(), value);
+}
+
+void assert_literal_expression(const ast::Expression *expression, int64_t expected) {
+    assert_integer_literal(expression, expected);
+}
+
+void assert_literal_expression(const ast::Expression *expression, const std::string &expected) {
+    assert_identifier(expression, expected);
+}
+
+template<typename ExpressionType>
+void assert_infix_expression(const ast::InfixExpression *expression, ExpressionType left, ExpressionType right,
+                             const std::string &infix_operator) {
+    assert_literal_expression(expression->left(), left);
+    assert_literal_expression(expression->right(), right);
+    ASSERT_EQ(expression->infix_operator(), infix_operator);
+}
+
 TEST(Parser, LetStatementParsing) {
     std::string input{R"S(
 
@@ -97,16 +128,7 @@ TEST(Parser, IndentifierExpression) {
     const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
     ASSERT_NE(expression_statement, nullptr);
 
-    const auto *identifier = dynamic_cast<const ast::Identifier *>(expression_statement->expression());
-    ASSERT_NE(identifier, nullptr);
-
-    ASSERT_EQ(identifier->token_literal(), "foobar");
-}
-
-void assert_is_integer_literal(const ast::Expression *expression, int64_t value) {
-    const auto *identifier = dynamic_cast<const ast::IntegerLiteral *>(expression);
-    ASSERT_NE(identifier, nullptr);
-    ASSERT_EQ(identifier->value(), value);
+    assert_identifier(expression_statement->expression(), "foobar");
 }
 
 TEST(Parser, IntegerLiteralExpression) {
@@ -119,7 +141,7 @@ TEST(Parser, IntegerLiteralExpression) {
     const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
     ASSERT_NE(expression_statement, nullptr);
 
-    assert_is_integer_literal(expression_statement->expression(), 100);
+    assert_integer_literal(expression_statement->expression(), 100);
 }
 
 TEST(Parser, PrefixExpression) {
@@ -137,7 +159,7 @@ TEST(Parser, PrefixExpression) {
         ASSERT_NE(prefix_expression, nullptr);
 
         ASSERT_EQ(prefix_expression->prefix_operator(), "!");
-        assert_is_integer_literal(prefix_expression->right(), 5);
+        assert_integer_literal(prefix_expression->right(), 5);
     }
 
     {
@@ -154,16 +176,10 @@ TEST(Parser, PrefixExpression) {
         ASSERT_NE(prefix_expression, nullptr);
 
         ASSERT_EQ(prefix_expression->prefix_operator(), "-");
-        assert_is_integer_literal(prefix_expression->right(), 1115);
+        assert_integer_literal(prefix_expression->right(), 1115);
     }
 }
 
-void assert_infix_expression(const ast::InfixExpression *expression, int64_t left, int64_t right,
-                             const std::string &infix_operator) {
-    assert_is_integer_literal(expression->left(), left);
-    assert_is_integer_literal(expression->right(), right);
-    ASSERT_EQ(expression->infix_operator(), infix_operator);
-}
 
 TEST(Parser, InfixExpression) {
     struct TestValue {
@@ -199,6 +215,19 @@ TEST(Parser, InfixExpression) {
 
         assert_infix_expression(infix, t.left, t.right, t.infix_operator);
     }
+
+    parser::Parser p{lexer::Lexer{"alice * bob"}};
+    auto program = p.parse();
+    check_parser_errors(p);
+
+    ASSERT_EQ(program.statements().size(), 1);
+    const auto *expression = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+    ASSERT_NE(expression, nullptr);
+
+    const auto *infix = dynamic_cast<const ast::InfixExpression *>(expression->expression());
+    ASSERT_NE(infix, nullptr);
+
+    assert_infix_expression(infix, "alice", "bob", "*");
 }
 
 TEST(Parser, PrecedenceParsing) {
