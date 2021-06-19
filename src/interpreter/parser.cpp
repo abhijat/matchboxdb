@@ -4,6 +4,7 @@
 #include "expression_statement.h"
 #include "integer_literal.h"
 #include "prefix_expression.h"
+#include "infix_expression.h"
 
 #include <utility>
 #include <sstream>
@@ -24,6 +25,38 @@ parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
 
     register_prefix_fn(token::TokenKind::MINUS, [&]() {
         return parse_prefix_expression();
+    });
+
+    register_infix_fn(token::TokenKind::PLUS, [&](auto left) {
+        return parse_infix_expression(std::move(left));
+    });
+
+    register_infix_fn(token::TokenKind::MINUS, [&](auto left) {
+        return parse_infix_expression(std::move(left));
+    });
+
+    register_infix_fn(token::TokenKind::SLASH, [&](auto left) {
+        return parse_infix_expression(std::move(left));
+    });
+
+    register_infix_fn(token::TokenKind::ASTERISK, [&](auto left) {
+        return parse_infix_expression(std::move(left));
+    });
+
+    register_infix_fn(token::TokenKind::GT, [&](auto left) {
+        return parse_infix_expression(std::move(left));
+    });
+
+    register_infix_fn(token::TokenKind::LT, [&](auto left) {
+        return parse_infix_expression(std::move(left));
+    });
+
+    register_infix_fn(token::TokenKind::EQ, [&](auto left) {
+        return parse_infix_expression(std::move(left));
+    });
+
+    register_infix_fn(token::TokenKind::NE, [&](auto left) {
+        return parse_infix_expression(std::move(left));
     });
 
     next_token();
@@ -132,6 +165,17 @@ std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_expression
     }
 
     auto lhs_expression = prefix_parser->second();
+
+    while (_peek_token.kind != token::TokenKind::SEMICOLON && precedence < peek_precedence()) {
+        auto infix_parser = _infix_parsers.find(_peek_token.kind);
+        if (infix_parser == _infix_parsers.end()) {
+            return lhs_expression;
+        }
+
+        next_token();
+        lhs_expression = infix_parser->second(std::move(*lhs_expression));
+    }
+
     return lhs_expression;
 }
 
@@ -164,4 +208,31 @@ std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_prefix_exp
     next_token();
     auto expression = parse_expression(Precedence::PREFIX);
     return std::make_unique<ast::PrefixExpression>(token, token.literal, std::move(*expression));
+}
+
+parser::Precedence parser::Parser::peek_precedence() const {
+    auto precedence = k_precedences.find(_peek_token.kind);
+    if (precedence == k_precedences.end()) {
+        return Precedence::LOWEST;
+    }
+
+    return precedence->second;
+}
+
+parser::Precedence parser::Parser::current_precedence() const {
+    auto precedence = k_precedences.find(_current_token.kind);
+    if (precedence == k_precedences.end()) {
+        return Precedence::LOWEST;
+    }
+
+    return precedence->second;
+}
+
+std::optional<std::unique_ptr<ast::Expression>>
+parser::Parser::parse_infix_expression(std::unique_ptr<ast::Expression> left) {
+    auto token = _current_token;
+    auto precedence = current_precedence();
+    next_token();
+    auto right = parse_expression(precedence);
+    return std::make_unique<ast::InfixExpression>(token, std::move(left), std::move(*right), token.literal);
 }

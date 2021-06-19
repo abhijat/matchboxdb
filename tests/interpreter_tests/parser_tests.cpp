@@ -5,6 +5,7 @@
 #include "../../src/interpreter/expression_statement.h"
 #include "../../src/interpreter/integer_literal.h"
 #include "../../src/interpreter/prefix_expression.h"
+#include "../../src/interpreter/infix_expression.h"
 
 void assert_let_statement(const ast::Statement *statement, std::string_view identifier_name) {
     ASSERT_EQ(statement->token_literal(), "let");
@@ -128,7 +129,8 @@ TEST(Parser, PrefixExpression) {
         check_parser_errors(p);
 
         ASSERT_EQ(program.statements().size(), 1);
-        const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+        const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(
+            0).get());
         ASSERT_NE(expression_statement, nullptr);
 
         const auto *prefix_expression = dynamic_cast<const ast::PrefixExpression *>(expression_statement->expression());
@@ -144,7 +146,8 @@ TEST(Parser, PrefixExpression) {
         check_parser_errors(p);
 
         ASSERT_EQ(program.statements().size(), 1);
-        const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+        const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(
+            0).get());
         ASSERT_NE(expression_statement, nullptr);
 
         const auto *prefix_expression = dynamic_cast<const ast::PrefixExpression *>(expression_statement->expression());
@@ -152,5 +155,48 @@ TEST(Parser, PrefixExpression) {
 
         ASSERT_EQ(prefix_expression->prefix_operator(), "-");
         assert_is_integer_literal(prefix_expression->right(), 1115);
+    }
+}
+
+void assert_infix_expression(const ast::InfixExpression *expression, int64_t left, int64_t right,
+                             const std::string &infix_operator) {
+    assert_is_integer_literal(expression->left(), left);
+    assert_is_integer_literal(expression->right(), right);
+    ASSERT_EQ(expression->infix_operator(), infix_operator);
+}
+
+TEST(Parser, InfixExpression) {
+    struct TestValue {
+        std::string input;
+        int64_t left;
+        int64_t right;
+        std::string infix_operator;
+    };
+
+    std::vector<TestValue> tests{
+        {"5 + 5;",  5, 5, "+"},
+        {"5 - 5;",  5, 5, "-"},
+        {"5 * 5;",  5, 5, "*"},
+        {"5 / 5;",  5, 5, "/"},
+        {"5 < 5;",  5, 5, "<"},
+        {"5 > 5;",  5, 5, ">"},
+        {"5 == 5;", 5, 5, "=="},
+        {"5 != 5;", 5, 5, "!="},
+    };
+
+    for (const auto &t: tests) {
+        parser::Parser p{lexer::Lexer{t.input}};
+        auto program = p.parse();
+        check_parser_errors(p);
+
+        ASSERT_EQ(program.statements().size(), 1) << "failed for " << t.input;
+
+        const auto *expression = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
+        ASSERT_NE(expression, nullptr) << "failed for " << t.input;
+
+        const auto *infix = dynamic_cast<const ast::InfixExpression *>(expression->expression());
+        ASSERT_NE(infix, nullptr) << "failed for " << t.input;
+
+        assert_infix_expression(infix, t.left, t.right, t.infix_operator);
     }
 }

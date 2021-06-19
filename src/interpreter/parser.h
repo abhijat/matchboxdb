@@ -10,7 +10,7 @@
 namespace parser {
 
 using PrefixParserFn = std::function<std::optional<std::unique_ptr<ast::Expression>>()>;
-using InfixParserFn = std::function<std::optional<std::unique_ptr<ast::Expression>>(const ast::Expression *)>;
+using InfixParserFn = std::function<std::optional<std::unique_ptr<ast::Expression>>(std::unique_ptr<ast::Expression>)>;
 
 enum class Precedence {
     LOWEST,
@@ -20,6 +20,17 @@ enum class Precedence {
     PRODUCT,
     PREFIX,
     FNCALL,
+};
+
+static const std::map<token::TokenKind, Precedence> k_precedences = {
+    {token::TokenKind::EQ,       Precedence::EQUALS},
+    {token::TokenKind::NE,       Precedence::EQUALS},
+    {token::TokenKind::LT,       Precedence::LESSGT},
+    {token::TokenKind::GT,       Precedence::LESSGT},
+    {token::TokenKind::PLUS,     Precedence::SUM},
+    {token::TokenKind::MINUS,    Precedence::SUM},
+    {token::TokenKind::SLASH,    Precedence::PRODUCT},
+    {token::TokenKind::ASTERISK, Precedence::PRODUCT},
 };
 
 class Parser {
@@ -53,11 +64,17 @@ protected:
 
     void no_prefix_parser_fn_error(token::TokenKind token_kind);
 
+    Precedence peek_precedence() const;
+
+    Precedence current_precedence() const;
+
     std::optional<std::unique_ptr<ast::Statement>> parse_expression_statement();
 
     std::optional<std::unique_ptr<ast::Expression>> parse_expression(Precedence precedence);
 
     std::optional<std::unique_ptr<ast::Expression>> parse_prefix_expression();
+
+    std::optional<std::unique_ptr<ast::Expression>> parse_infix_expression(std::unique_ptr<ast::Expression> left);
 
 protected:
     lexer::Lexer _lexer;
