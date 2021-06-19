@@ -45,12 +45,22 @@ void assert_integer_literal(const ast::Expression *expression, int64_t value) {
     ASSERT_EQ(integer_literal->value(), value);
 }
 
+void assert_boolean_expression(const ast::Expression *expression, bool value) {
+    const auto *boolean_expression = dynamic_cast<const ast::BooleanExpression *>(expression);
+    ASSERT_NE(boolean_expression, nullptr);
+    ASSERT_EQ(boolean_expression->value(), value);
+}
+
 void assert_literal_expression(const ast::Expression *expression, int64_t expected) {
     assert_integer_literal(expression, expected);
 }
 
 void assert_literal_expression(const ast::Expression *expression, const std::string &expected) {
     assert_identifier(expression, expected);
+}
+
+void assert_literal_expression(const ast::Expression *expression, bool value) {
+    assert_boolean_expression(expression, value);
 }
 
 template<typename ExpressionType>
@@ -62,12 +72,6 @@ void assert_infix_expression(const ast::Expression *expression, ExpressionType l
     assert_literal_expression(infix_expression->left(), left);
     assert_literal_expression(infix_expression->right(), right);
     ASSERT_EQ(infix_expression->infix_operator(), infix_operator);
-}
-
-void assert_boolean_expression(const ast::Expression *expression, bool value) {
-    const auto *boolean_expression = dynamic_cast<const ast::BooleanExpression *>(expression);
-    ASSERT_NE(boolean_expression, nullptr);
-    ASSERT_EQ(boolean_expression->value(), value);
 }
 
 const ast::Expression *assert_expression_statement_and_extract_expression(const ast::Statement *statement) {
@@ -259,6 +263,11 @@ TEST(Parser, PrecedenceParsing) {
         {"false",                      "false"},
         {"3 > 5 == false",             "((3 > 5) == false)"},
         {"4 < 100 == true",            "((4 < 100) == true)"},
+        {"1 + (2 + 3) + 4",            "((1 + (2 + 3)) + 4)"},
+        {"(5 + 5) * 2",                "((5 + 5) * 2)"},
+        {"2 / (5 + 5)",                "(2 / (5 + 5))"},
+        {"-(5 + 5)",                   "(-(5 + 5))"},
+        {"!(true == true)",            "(!(true == true))"},
     };
 
     for (const auto&[input, output]: tests) {

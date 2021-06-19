@@ -87,6 +87,8 @@ protected:
     std::unordered_map<token::TokenKind, InfixParserFn> _infix_parsers{};
 
     std::optional<std::unique_ptr<ast::Expression>> parse_integer_literal();
+
+    std::optional<std::unique_ptr<ast::Expression>> parse_grouped_expression();
 };
 
 }

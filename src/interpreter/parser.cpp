@@ -36,6 +36,10 @@ parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
         return parse_boolean_expression();
     });
 
+    register_prefix_fn(token::TokenKind::LPAREN, [&]() {
+        return parse_grouped_expression();
+    });
+
     register_infix_fn(token::TokenKind::PLUS, [&](auto left) {
         return parse_infix_expression(std::move(left));
     });
@@ -248,4 +252,13 @@ parser::Parser::parse_infix_expression(std::unique_ptr<ast::Expression> left) {
 
 std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_boolean_expression() {
     return std::make_unique<ast::BooleanExpression>(_current_token, current_token_is(token::TokenKind::TRUE));
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_grouped_expression() {
+    next_token();
+    auto expression = parse_expression(Precedence::LOWEST);
+    if (!expect_peek_token(token::TokenKind::RPAREN)) {
+        return std::nullopt;
+    }
+    return expression;
 }
