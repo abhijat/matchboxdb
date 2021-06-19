@@ -53,11 +53,14 @@ void assert_literal_expression(const ast::Expression *expression, const std::str
 }
 
 template<typename ExpressionType>
-void assert_infix_expression(const ast::InfixExpression *expression, ExpressionType left, ExpressionType right,
+void assert_infix_expression(const ast::Expression *expression, ExpressionType left, ExpressionType right,
                              const std::string &infix_operator) {
-    assert_literal_expression(expression->left(), left);
-    assert_literal_expression(expression->right(), right);
-    ASSERT_EQ(expression->infix_operator(), infix_operator);
+    const auto *infix_expression = dynamic_cast<const ast::InfixExpression *>(expression);
+    ASSERT_NE(infix_expression, nullptr);
+
+    assert_literal_expression(infix_expression->left(), left);
+    assert_literal_expression(infix_expression->right(), right);
+    ASSERT_EQ(infix_expression->infix_operator(), infix_operator);
 }
 
 TEST(Parser, LetStatementParsing) {
@@ -209,11 +212,7 @@ TEST(Parser, InfixExpression) {
 
         const auto *expression = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
         ASSERT_NE(expression, nullptr) << "failed for " << t.input;
-
-        const auto *infix = dynamic_cast<const ast::InfixExpression *>(expression->expression());
-        ASSERT_NE(infix, nullptr) << "failed for " << t.input;
-
-        assert_infix_expression(infix, t.left, t.right, t.infix_operator);
+        assert_infix_expression(expression->expression(), t.left, t.right, t.infix_operator);
     }
 
     parser::Parser p{lexer::Lexer{"alice * bob"}};
@@ -223,11 +222,7 @@ TEST(Parser, InfixExpression) {
     ASSERT_EQ(program.statements().size(), 1);
     const auto *expression = dynamic_cast<const ast::ExpressionStatement *>(program.statements().at(0).get());
     ASSERT_NE(expression, nullptr);
-
-    const auto *infix = dynamic_cast<const ast::InfixExpression *>(expression->expression());
-    ASSERT_NE(infix, nullptr);
-
-    assert_infix_expression(infix, "alice", "bob", "*");
+    assert_infix_expression(expression->expression(), "alice", "bob", "*");
 }
 
 TEST(Parser, PrecedenceParsing) {
