@@ -6,6 +6,7 @@
 #include "../../src/interpreter/integer_literal.h"
 #include "../../src/interpreter/prefix_expression.h"
 #include "../../src/interpreter/infix_expression.h"
+#include "../../src/interpreter/boolean_expression.h"
 
 void assert_let_statement(const ast::Statement *statement, std::string_view identifier_name) {
     ASSERT_EQ(statement->token_literal(), "let");
@@ -61,6 +62,21 @@ void assert_infix_expression(const ast::Expression *expression, ExpressionType l
     assert_literal_expression(infix_expression->left(), left);
     assert_literal_expression(infix_expression->right(), right);
     ASSERT_EQ(infix_expression->infix_operator(), infix_operator);
+}
+
+void assert_boolean_expression(const ast::Expression *expression, bool value) {
+    const auto *boolean_expression = dynamic_cast<const ast::BooleanExpression *>(expression);
+    ASSERT_NE(boolean_expression, nullptr);
+    ASSERT_EQ(boolean_expression->value(), value);
+}
+
+const ast::Expression *assert_expression_statement_and_extract_expression(const ast::Statement *statement) {
+    const auto *expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement);
+    if (expression_statement == nullptr) {
+        throw std::invalid_argument{"Failed because statement is not an expression statement"};
+    }
+
+    return expression_statement->expression();
 }
 
 TEST(Parser, LetStatementParsing) {
@@ -249,5 +265,22 @@ TEST(Parser, PrecedenceParsing) {
         std::stringstream ss;
         ss << program;
         ASSERT_EQ(ss.str(), output);
+    }
+}
+
+TEST(Parser, BooleanExpression) {
+    std::vector<std::pair<std::string, bool>> tests{
+        {"true;",  true},
+        {"false;", false}
+    };
+
+    for (const auto&[input, output]: tests) {
+        parser::Parser p{lexer::Lexer{input}};
+        auto program = p.parse();
+        check_parser_errors(p);
+
+        ASSERT_EQ(program.statements().size(), 1);
+        auto expression = assert_expression_statement_and_extract_expression(program.statements().at(0).get());
+        assert_boolean_expression(expression, output);
     }
 }

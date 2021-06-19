@@ -5,6 +5,7 @@
 #include "integer_literal.h"
 #include "prefix_expression.h"
 #include "infix_expression.h"
+#include "boolean_expression.h"
 
 #include <utility>
 #include <sstream>
@@ -25,6 +26,14 @@ parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
 
     register_prefix_fn(token::TokenKind::MINUS, [&]() {
         return parse_prefix_expression();
+    });
+
+    register_prefix_fn(token::TokenKind::TRUE, [&]() {
+        return parse_boolean_expression();
+    });
+
+    register_prefix_fn(token::TokenKind::FALSE, [&]() {
+        return parse_boolean_expression();
     });
 
     register_infix_fn(token::TokenKind::PLUS, [&](auto left) {
@@ -235,4 +244,8 @@ parser::Parser::parse_infix_expression(std::unique_ptr<ast::Expression> left) {
     next_token();
     auto right = parse_expression(precedence);
     return std::make_unique<ast::InfixExpression>(token, std::move(left), std::move(*right), token.literal);
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_boolean_expression() {
+    return std::make_unique<ast::BooleanExpression>(_current_token, current_token_is(token::TokenKind::TRUE));
 }

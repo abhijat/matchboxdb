@@ -76,6 +76,8 @@ protected:
 
     std::optional<std::unique_ptr<ast::Expression>> parse_infix_expression(std::unique_ptr<ast::Expression> left);
 
+    std::optional<std::unique_ptr<ast::Expression>> parse_boolean_expression();
+
 protected:
     lexer::Lexer _lexer;
     token::Token _current_token{};
