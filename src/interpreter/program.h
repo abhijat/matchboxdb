@@ -12,19 +12,17 @@ namespace ast {
 
 class Program : public Node {
 public:
-    Program(std::vector<std::unique_ptr<Statement>> statements);
+    explicit Program(std::vector<std::unique_ptr<Statement>> statements);
 
-    std::string token_literal() const override;
+    [[nodiscard]] std::string token_literal() const override;
 
-    const std::vector<std::unique_ptr<Statement>> &statements() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<Statement>> &statements() const;
 
     std::ostream &repr(std::ostream &os) const override;
 
 protected:
     std::vector<std::unique_ptr<Statement>> _statements;
 };
-
-std::ostream &operator<<(std::ostream &os, const Program &program);
 
 }
 

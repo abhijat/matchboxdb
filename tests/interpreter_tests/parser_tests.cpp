@@ -200,3 +200,30 @@ TEST(Parser, InfixExpression) {
         assert_infix_expression(infix, t.left, t.right, t.infix_operator);
     }
 }
+
+TEST(Parser, PrecedenceParsing) {
+    std::vector<std::pair<std::string, std::string>> tests{
+        {"-a * b",                     "((-a) * b)"},
+        {"!-a",                        "(!(-a))"},
+        {"a + b + c",                  "((a + b) + c)"},
+        {"a + b - c",                  "((a + b) - c)"},
+        {"a * b * c",                  "((a * b) * c)"},
+        {"a * b / c",                  "((a * b) / c)"},
+        {"a + b / c",                  "(a + (b / c))"},
+        {"a + b * c + d / e - f",      "(((a + (b * c)) + (d / e)) - f)"},
+        {"3 + 4; -5 * 5",              "(3 + 4)((-5) * 5)"},
+        {"5 > 4 == 3 < 4",             "((5 > 4) == (3 < 4))"},
+        {"5 < 4 != 3 > 4",             "((5 < 4) != (3 > 4))"},
+        {"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"}
+    };
+
+    for (const auto&[input, output]: tests) {
+        parser::Parser p{lexer::Lexer{input}};
+        auto program = p.parse();
+        check_parser_errors(p);
+
+        std::stringstream ss;
+        ss << program;
+        ASSERT_EQ(ss.str(), output);
+    }
+}
