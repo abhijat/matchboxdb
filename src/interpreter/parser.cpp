@@ -101,20 +101,27 @@ std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_statement()
 std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_let_statement() {
     auto token = _current_token;
     if (!expect_peek_token(token::TokenKind::IDENT)) {
-        return std::nullopt;
+        return {};
     }
 
     auto name = ast::Identifier{_current_token, _current_token.literal};
 
     if (!expect_peek_token(token::TokenKind::ASSIGN)) {
-        return std::nullopt;
+        return {};
     }
 
-    while (!current_token_is(token::TokenKind::SEMICOLON)) {
+    next_token();
+
+    auto value = parse_expression(Precedence::LOWEST);
+    if (!value) {
+        return {};
+    }
+
+    if (peek_token_is(token::TokenKind::SEMICOLON)) {
         next_token();
     }
 
-    return std::make_unique<ast::LetStatement>(token, name, nullptr);
+    return std::make_unique<ast::LetStatement>(token, name, std::move(*value));
 }
 
 bool parser::Parser::current_token_is(token::TokenKind token_kind) const {
@@ -146,11 +153,16 @@ std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_return_stat
 
     next_token();
 
-    while (!current_token_is(token::TokenKind::SEMICOLON)) {
+    auto value = parse_expression(Precedence::LOWEST);
+    if (!value) {
+        return {};
+    }
+
+    if (peek_token_is(token::TokenKind::SEMICOLON)) {
         next_token();
     }
 
-    return std::make_unique<ast::ReturnStatement>(token, nullptr);
+    return std::make_unique<ast::ReturnStatement>(token, std::move(*value));
 }
 
 std::optional<std::unique_ptr<ast::Statement>> parser::Parser::parse_expression_statement() {
