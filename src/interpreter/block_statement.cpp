@@ -14,9 +14,12 @@ std::string ast::BlockStatement::token_literal() const {
 }
 
 std::ostream &ast::BlockStatement::repr(std::ostream &os) const {
+    os << "{\n";
     for (const auto &statement : _statements) {
         statement->repr(os);
+        os << "\n";
     }
+    os << "}\n";
 
     return os;
 }

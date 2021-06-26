@@ -14,9 +14,9 @@ std::string ast::IfExpression::token_literal() const {
 }
 
 std::ostream &ast::IfExpression::repr(std::ostream &os) const {
-    os << "if";
+    os << "if (";
     _condition->repr(os);
-    os << " ";
+    os << ") ";
     _consequence.repr(os);
     if (_alternative) {
         os << "else ";
