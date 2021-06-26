@@ -8,6 +8,7 @@
 #include "../../src/interpreter/infix_expression.h"
 #include "../../src/interpreter/boolean_expression.h"
 #include "../../src/interpreter/if_expression.h"
+#include "../../src/interpreter/function_expression.h"
 
 void assert_let_statement(const ast::Statement *statement, std::string_view identifier_name) {
     ASSERT_EQ(statement->token_literal(), "let");
@@ -31,12 +32,16 @@ void check_parser_errors(const parser::Parser &p) {
     FAIL() << "parser errors found\n";
 }
 
+void assert_identifier(const ast::Identifier *identifier, const std::string &value) {
+    ASSERT_EQ(identifier->value(), value);
+    ASSERT_EQ(identifier->token_literal(), value);
+}
+
 void assert_identifier(const ast::Expression *expression, const std::string &value) {
     const auto *identifier = dynamic_cast<const ast::Identifier *>(expression);
     ASSERT_NE(identifier, nullptr);
 
-    ASSERT_EQ(identifier->value(), value);
-    ASSERT_EQ(identifier->token_literal(), value);
+    assert_identifier(identifier, value);
 }
 
 
@@ -309,10 +314,7 @@ TEST(Parser, IfExpression) {
     const auto *if_expression = dynamic_cast<const ast::IfExpression *>(expression);
     ASSERT_NE(if_expression, nullptr);
 
-    const auto *condition = dynamic_cast<const ast::InfixExpression *>(if_expression->condition());
-    ASSERT_NE(condition, nullptr);
-
-    assert_infix_expression(condition, std::string{"x"}, std::string{"y"}, "<");
+    assert_infix_expression(if_expression->condition(), std::string{"x"}, std::string{"y"}, "<");
 
     const auto &consequence = if_expression->consequence();
     ASSERT_EQ(consequence.statements().size(), 1);
@@ -325,4 +327,52 @@ TEST(Parser, IfExpression) {
 
     const auto *alt = assert_expression_statement_and_extract_expression(alternative->statements().at(0).get());
     assert_literal_expression(alt, std::string{"y"});
+}
+
+TEST(Parser, FnExpression) {
+    parser::Parser p{lexer::Lexer{"fn(x, y) { x + y; }"}};
+    auto program = p.parse();
+    check_parser_errors(p);
+
+    ASSERT_EQ(program.statements().size(), 1);
+    auto expression = assert_expression_statement_and_extract_expression(program.statements().at(0).get());
+    const auto *fn_expr = dynamic_cast<const ast::FunctionExpression *>(expression);
+    ASSERT_NE(fn_expr, nullptr);
+
+    ASSERT_EQ(fn_expr->parameters().size(), 2);
+    assert_identifier(&fn_expr->parameters().at(0), "x");
+    assert_identifier(&fn_expr->parameters().at(1), "y");
+
+    ASSERT_EQ(fn_expr->body().statements().size(), 1);
+
+    const auto *body = assert_expression_statement_and_extract_expression(fn_expr->body().statements().at(0).get());
+    assert_infix_expression(body, std::string{"x"}, std::string{"y"}, "+");
+}
+
+TEST(Parser, FnParams) {
+    struct test {
+        std::string input;
+        std::vector<std::string> expected;
+    };
+
+    std::vector<test> tests{
+        {"fn () {};",        {}},
+        {"fn (x) {};",       {"x"}},
+        {"fn (x, y, z) {};", {"x", "y", "z"}},
+    };
+
+    for (const auto &t: tests) {
+        parser::Parser p{lexer::Lexer{t.input}};
+        auto program = p.parse();
+        check_parser_errors(p);
+
+        auto expression = assert_expression_statement_and_extract_expression(program.statements().at(0).get());
+        const auto *fn_expr = dynamic_cast<const ast::FunctionExpression *>(expression);
+        ASSERT_NE(fn_expr, nullptr);
+
+        ASSERT_EQ(fn_expr->parameters().size(), t.expected.size());
+        for (auto i = 0; i < t.expected.size(); ++i) {
+            ASSERT_EQ(t.expected[i], fn_expr->parameters()[i].token_literal());
+        }
+    }
 }

@@ -7,6 +7,7 @@
 #include "program.h"
 #include "expression.h"
 #include "block_statement.h"
+#include "identifier.h"
 
 namespace parser {
 
@@ -87,6 +88,10 @@ protected:
 
     ast::BlockStatement parse_block_statement();
 
+    std::optional<std::unique_ptr<ast::Expression>> parse_function_literal();
+
+    std::vector<ast::Identifier> parse_function_parameters();
+
 protected:
     lexer::Lexer _lexer;
     token::Token _current_token{};
@@ -94,6 +99,8 @@ protected:
     std::vector<std::string> _errors{};
     std::unordered_map<token::TokenKind, PrefixParserFn> _prefix_parsers{};
     std::unordered_map<token::TokenKind, InfixParserFn> _infix_parsers{};
+
+    bool peek_token_is(token::TokenKind kind) const;
 };
 
 }

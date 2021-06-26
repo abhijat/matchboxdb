@@ -7,6 +7,7 @@
 #include "infix_expression.h"
 #include "boolean_expression.h"
 #include "if_expression.h"
+#include "function_expression.h"
 
 #include <utility>
 #include <sstream>
@@ -43,6 +44,10 @@ parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
 
     register_prefix_fn(token::TokenKind::IF, [&]() {
         return parse_if_expression();
+    });
+
+    register_prefix_fn(token::TokenKind::FUNCTION, [&]() {
+        return parse_function_literal();
     });
 
     register_infix_fn(token::TokenKind::PLUS, [&](auto left) {
@@ -287,7 +292,7 @@ std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_if_express
     auto consequence = parse_block_statement();
 
     std::optional<decltype(consequence)> alternative{};
-    if (_peek_token.kind == token::TokenKind::ELSE) {
+    if (peek_token_is(token::TokenKind::ELSE)) {
         next_token();
         if (!expect_peek_token(token::TokenKind::LBRACE)) {
             return std::nullopt;
@@ -312,4 +317,45 @@ ast::BlockStatement parser::Parser::parse_block_statement() {
         next_token();
     }
     return ast::BlockStatement{std::move(token), std::move(statements)};
+}
+
+std::optional<std::unique_ptr<ast::Expression>> parser::Parser::parse_function_literal() {
+    auto token = _current_token;
+    if (!expect_peek_token(token::TokenKind::LPAREN)) {
+        return {};
+    }
+
+    auto params = parse_function_parameters();
+    if (!expect_peek_token(token::TokenKind::LBRACE)) {
+        return {};
+    }
+
+    return std::make_unique<ast::FunctionExpression>(std::move(token), std::move(params), parse_block_statement());
+}
+
+std::vector<ast::Identifier> parser::Parser::parse_function_parameters() {
+    std::vector<ast::Identifier> params{};
+    if (peek_token_is(token::TokenKind::RPAREN)) {
+        next_token();
+        return params;
+    }
+
+    next_token();
+    params.emplace_back(_current_token, _current_token.literal);
+
+    while (peek_token_is(token::TokenKind::COMMA)) {
+        next_token();
+        next_token();
+        params.emplace_back(_current_token, _current_token.literal);
+    }
+
+    if (!expect_peek_token(token::TokenKind::RPAREN)) {
+        return {};
+    }
+
+    return params;
+}
+
+bool parser::Parser::peek_token_is(token::TokenKind kind) const {
+    return _peek_token.kind == kind;
 }
