@@ -8,6 +8,7 @@
 #include "boolean_expression.h"
 #include "if_expression.h"
 #include "function_expression.h"
+#include "call_expression.h"
 
 #include <utility>
 #include <sstream>
@@ -50,36 +51,19 @@ parser::Parser::Parser(lexer::Lexer lexer) : _lexer(std::move(lexer)) {
         return parse_function_literal();
     });
 
-    register_infix_fn(token::TokenKind::PLUS, [&](auto left) {
-        return parse_infix_expression(std::move(left));
-    });
+    auto infix_parser = [&](auto lhs) { return parse_infix_expression(std::move(lhs)); };
 
-    register_infix_fn(token::TokenKind::MINUS, [&](auto left) {
-        return parse_infix_expression(std::move(left));
-    });
+    register_infix_fn(token::TokenKind::PLUS, infix_parser);
+    register_infix_fn(token::TokenKind::MINUS, infix_parser);
+    register_infix_fn(token::TokenKind::SLASH, infix_parser);
+    register_infix_fn(token::TokenKind::ASTERISK, infix_parser);
+    register_infix_fn(token::TokenKind::GT, infix_parser);
+    register_infix_fn(token::TokenKind::LT, infix_parser);
+    register_infix_fn(token::TokenKind::EQ, infix_parser);
+    register_infix_fn(token::TokenKind::NE, infix_parser);
 
-    register_infix_fn(token::TokenKind::SLASH, [&](auto left) {
-        return parse_infix_expression(std::move(left));
-    });
-
-    register_infix_fn(token::TokenKind::ASTERISK, [&](auto left) {
-        return parse_infix_expression(std::move(left));
-    });
-
-    register_infix_fn(token::TokenKind::GT, [&](auto left) {
-        return parse_infix_expression(std::move(left));
-    });
-
-    register_infix_fn(token::TokenKind::LT, [&](auto left) {
-        return parse_infix_expression(std::move(left));
-    });
-
-    register_infix_fn(token::TokenKind::EQ, [&](auto left) {
-        return parse_infix_expression(std::move(left));
-    });
-
-    register_infix_fn(token::TokenKind::NE, [&](auto left) {
-        return parse_infix_expression(std::move(left));
+    register_infix_fn(token::TokenKind::LPAREN, [&](auto lhs) {
+        return parse_call_expression(std::move(lhs));
     });
 
     next_token();
@@ -358,4 +342,45 @@ std::vector<ast::Identifier> parser::Parser::parse_function_parameters() {
 
 bool parser::Parser::peek_token_is(token::TokenKind kind) const {
     return _peek_token.kind == kind;
+}
+
+std::optional<std::unique_ptr<ast::Expression>>
+parser::Parser::parse_call_expression(std::unique_ptr<ast::Expression> left) {
+    auto token = _current_token;
+    return std::make_unique<ast::CallExpression>(std::move(token), std::move(left), parse_call_arguments());
+}
+
+std::vector<std::unique_ptr<ast::Expression>> parser::Parser::parse_call_arguments() {
+    std::vector<std::unique_ptr<ast::Expression>> args{};
+    if (peek_token_is(token::TokenKind::RPAREN)) {
+        next_token();
+        return args;
+    }
+
+    next_token();
+
+    auto expr = parse_expression(Precedence::LOWEST);
+    if (!expr) {
+        return {};
+    }
+
+    args.push_back(std::move(*expr));
+
+    while (peek_token_is(token::TokenKind::COMMA)) {
+        next_token();
+        next_token();
+        expr = parse_expression(Precedence::LOWEST);
+        if (!expr) {
+            return {};
+        }
+
+        args.push_back(std::move(*expr));
+
+    }
+
+    if (!expect_peek_token(token::TokenKind::RPAREN)) {
+        return {};
+    }
+
+    return args;
 }

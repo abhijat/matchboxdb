@@ -9,6 +9,7 @@
 #include "../../src/interpreter/boolean_expression.h"
 #include "../../src/interpreter/if_expression.h"
 #include "../../src/interpreter/function_expression.h"
+#include "../../src/interpreter/call_expression.h"
 
 void assert_let_statement(const ast::Statement *statement, std::string_view identifier_name) {
     ASSERT_EQ(statement->token_literal(), "let");
@@ -375,4 +376,25 @@ TEST(Parser, FnParams) {
             ASSERT_EQ(t.expected[i], fn_expr->parameters()[i].token_literal());
         }
     }
+}
+
+TEST(Parser, CallExpr) {
+    parser::Parser p{lexer::Lexer{"foobar(1, 2 * 3, 4 + 5);"}};
+    auto program = p.parse();
+    check_parser_errors(p);
+
+    ASSERT_EQ(program.statements().size(), 1);
+
+    const auto *expr = assert_expression_statement_and_extract_expression(program.statements().at(0).get());
+    const auto *call_expr = dynamic_cast<const ast::CallExpression *>(expr);
+    ASSERT_NE(call_expr, nullptr);
+
+    const auto *callable = dynamic_cast<const ast::Identifier *>(call_expr->callable().get());
+    ASSERT_NE(callable, nullptr);
+
+    ASSERT_EQ(callable->token_literal(), "foobar");
+
+    assert_literal_expression(call_expr->arguments().at(0).get(), int64_t{1});
+    assert_infix_expression<int64_t>(call_expr->arguments().at(1).get(), 2, 3, "*");
+    assert_infix_expression<int64_t>(call_expr->arguments().at(2).get(), 4, 5, "+");
 }

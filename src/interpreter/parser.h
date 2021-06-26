@@ -33,6 +33,7 @@ static const std::map<token::TokenKind, Precedence> k_precedences = {
     {token::TokenKind::MINUS,    Precedence::SUM},
     {token::TokenKind::SLASH,    Precedence::PRODUCT},
     {token::TokenKind::ASTERISK, Precedence::PRODUCT},
+    {token::TokenKind::LPAREN,   Precedence::FNCALL},
 };
 
 class Parser {
@@ -78,6 +79,8 @@ protected:
 
     std::optional<std::unique_ptr<ast::Expression>> parse_infix_expression(std::unique_ptr<ast::Expression> left);
 
+    std::optional<std::unique_ptr<ast::Expression>> parse_call_expression(std::unique_ptr<ast::Expression> left);
+
     std::optional<std::unique_ptr<ast::Expression>> parse_boolean_expression();
 
     std::optional<std::unique_ptr<ast::Expression>> parse_integer_literal();
@@ -101,6 +104,8 @@ protected:
     std::unordered_map<token::TokenKind, InfixParserFn> _infix_parsers{};
 
     bool peek_token_is(token::TokenKind kind) const;
+
+    std::vector<std::unique_ptr<ast::Expression>> parse_call_arguments();
 };
 
 }

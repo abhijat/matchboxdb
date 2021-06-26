@@ -15,13 +15,16 @@ std::ostream &ast::FunctionExpression::repr(std::ostream &os) const {
     os << token_literal();
     os << "(";
 
-    auto i = _parameters.cbegin();
-    while (i < _parameters.cend() - 1) {
+    if (!_parameters.empty()) {
+        auto i = _parameters.cbegin();
+        while (i < _parameters.cend() - 1) {
+            i->repr(os);
+            os << ", ";
+            i += 1;
+        }
         i->repr(os);
-        os << ", ";
-        i += 1;
     }
-    i->repr(os);
+
     os << ")";
 
     _body.repr(os);
