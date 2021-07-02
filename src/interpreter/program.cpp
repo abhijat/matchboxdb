@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "eval.h"
+#include "object.h"
 
 std::string ast::Program::token_literal() const {
     if (!_statements.empty()) {

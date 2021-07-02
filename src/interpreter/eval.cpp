@@ -1,6 +1,9 @@
 #include "eval.h"
 
+#include "object.h"
 #include "boolean_expression.h"
+#include "infix_expression.h"
+#include "expression_statement.h"
 #include "integer_literal.h"
 #include "program.h"
 

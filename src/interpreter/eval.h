@@ -4,9 +4,9 @@
 #include <memory>
 #include <vector>
 
-#include "object.h"
-#include "node.h"
-#include "expression_statement.h"
+namespace objects {
+class Object;
+}
 
 namespace ast {
 class Program;
@@ -14,6 +14,12 @@ class Program;
 class BooleanExpression;
 
 class IntegerLiteral;
+
+class ExpressionStatement;
+
+class Statement;
+
+class Node;
 }
 
 namespace eval {

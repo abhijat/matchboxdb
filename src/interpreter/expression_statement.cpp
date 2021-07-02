@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "eval.h"
+#include "object.h"
 
 ast::ExpressionStatement::ExpressionStatement(token::Token token, std::unique_ptr<Expression> expression)
     : _token(std::move(token)), _expression(std::move(expression)) {}
