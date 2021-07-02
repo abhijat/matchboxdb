@@ -1,6 +1,7 @@
 #include <iostream>
 #include "lexer.h"
 #include "parser.h"
+#include "eval.h"
 
 
 void dump_errors(std::ostream &out, const std::vector<std::string> &errors) {
@@ -35,7 +36,10 @@ void loop(std::istream &in, std::ostream &out) {
             continue;
         }
 
-        out << program << "\n";
+        auto evaluation = eval::evaluate(program);
+        if (evaluation) {
+            out << evaluation->inspect() << "\n";
+        }
     }
 }
 

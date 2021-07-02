@@ -156,4 +156,6 @@ add_executable(
         src/interpreter/function_expression.h
         src/interpreter/call_expression.cpp
         src/interpreter/call_expression.h
+        src/interpreter/eval.cpp
+        src/interpreter/object.cpp
 )
