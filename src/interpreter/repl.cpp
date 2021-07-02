@@ -1,7 +1,9 @@
 #include <iostream>
+
 #include "lexer.h"
 #include "parser.h"
 #include "eval.h"
+#include "object.h"
 
 
 void dump_errors(std::ostream &out, const std::vector<std::string> &errors) {
