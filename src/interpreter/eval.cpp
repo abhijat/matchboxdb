@@ -1,5 +1,9 @@
 #include "eval.h"
 
+#include "boolean_expression.h"
+#include "integer_literal.h"
+#include "program.h"
+
 std::unique_ptr<objects::Object> eval::Visitor::visit(const ast::Program &program) {
     auto statements = std::vector<const ast::Statement *>{};
     for (const auto &st : program.statements()) {
@@ -23,6 +27,10 @@ std::unique_ptr<objects::Object> eval::Visitor::visit(const std::vector<const as
         result = statement->visit(*this);
     }
     return result;
+}
+
+std::unique_ptr<objects::Object> eval::Visitor::visit(const ast::BooleanExpression &boolean_expression) {
+    return std::make_unique<objects::Boolean>(boolean_expression.value());
 }
 
 std::unique_ptr<objects::Object> eval::evaluate(const ast::Node &node) {

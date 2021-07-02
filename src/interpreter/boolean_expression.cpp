@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "eval.h"
 #include "object.h"
 
 ast::BooleanExpression::BooleanExpression(token::Token token, bool value) : _token(std::move(token)), _value(value) {}
@@ -20,5 +21,5 @@ std::ostream &ast::BooleanExpression::repr(std::ostream &os) const {
 }
 
 std::unique_ptr<objects::Object> ast::BooleanExpression::visit(eval::Visitor &visitor) const {
-    return nullptr;
+    return visitor.visit(*this);
 }
