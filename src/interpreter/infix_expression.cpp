@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 ast::InfixExpression::InfixExpression(token::Token token, std::unique_ptr<Expression> left,
                                       std::unique_ptr<Expression> right, std::string infix_operator)
     : _token(std::move(token)), _left(std::move(left)), _right(std::move(right)),
@@ -30,4 +32,8 @@ std::ostream &ast::InfixExpression::repr(std::ostream &os) const {
     _right->repr(os);
     os << ")";
     return os;
+}
+
+std::unique_ptr<objects::Object> ast::InfixExpression::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }

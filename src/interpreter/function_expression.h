@@ -23,6 +23,8 @@ public:
 
     [[nodiscard]] const BlockStatement &body() const;
 
+    std::unique_ptr<objects::Object> visit(eval::Visitor &visitor) const override;
+
 protected:
     token::Token _token;
     std::vector<Identifier> _parameters;

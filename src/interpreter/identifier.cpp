@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 std::string ast::Identifier::token_literal() const {
     return _token.literal;
 }
@@ -16,4 +18,8 @@ ast::Identifier::Identifier(token::Token token, std::string value) : _token(std:
 std::ostream &ast::Identifier::repr(std::ostream &os) const {
     os << _value;
     return os;
+}
+
+std::unique_ptr<objects::Object> ast::Identifier::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }

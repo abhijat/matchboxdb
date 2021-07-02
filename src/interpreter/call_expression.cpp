@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 ast::CallExpression::CallExpression(token::Token token, std::unique_ptr<Expression> callable,
                                     std::vector<std::unique_ptr<Expression>> arguments) : _token(std::move(token)),
                                                                                           _callable(
@@ -37,4 +39,8 @@ std::ostream &ast::CallExpression::repr(std::ostream &os) const {
 
     os << ")";
     return os;
+}
+
+std::unique_ptr<objects::Object> ast::CallExpression::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }

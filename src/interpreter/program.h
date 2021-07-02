@@ -20,6 +20,8 @@ public:
 
     std::ostream &repr(std::ostream &os) const override;
 
+    std::unique_ptr<objects::Object> visit(eval::Visitor &visitor) const override;
+
 protected:
     std::vector<std::unique_ptr<Statement>> _statements;
 };

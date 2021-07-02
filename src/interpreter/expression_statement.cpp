@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "eval.h"
+
 ast::ExpressionStatement::ExpressionStatement(token::Token token, std::unique_ptr<Expression> expression)
     : _token(std::move(token)), _expression(std::move(expression)) {}
 
@@ -16,6 +18,10 @@ std::ostream &ast::ExpressionStatement::repr(std::ostream &os) const {
     return os;
 }
 
-const ast::Expression * ast::ExpressionStatement::expression() const {
+const ast::Expression *ast::ExpressionStatement::expression() const {
     return _expression.get();
+}
+
+std::unique_ptr<objects::Object> ast::ExpressionStatement::visit(eval::Visitor &visitor) const {
+    return visitor.visit(*this);
 }

@@ -23,6 +23,8 @@ public:
 
     [[nodiscard]] const std::optional<ast::BlockStatement> &alternative() const;
 
+    std::unique_ptr<objects::Object> visit(eval::Visitor &visitor) const override;
+
 protected:
     token::Token _token;
     std::unique_ptr<ast::Expression> _condition;

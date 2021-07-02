@@ -13,13 +13,15 @@ class LetStatement : public Statement {
 public:
     LetStatement(token::Token token, Identifier name, std::unique_ptr<Expression> value);
 
-    std::string token_literal() const override;
+    [[nodiscard]] std::string token_literal() const override;
 
-    const Identifier &name() const;
+    [[nodiscard]] const Identifier &name() const;
 
-    const Expression *value() const;
+    [[nodiscard]] const Expression *value() const;
 
     std::ostream &repr(std::ostream &os) const override;
+
+    std::unique_ptr<objects::Object> visit(eval::Visitor &visitor) const override;
 
 protected:
     token::Token _token;

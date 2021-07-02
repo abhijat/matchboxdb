@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 ast::BlockStatement::BlockStatement(
     token::Token token,
     std::vector<std::unique_ptr<Statement>> statements
@@ -26,4 +28,8 @@ std::ostream &ast::BlockStatement::repr(std::ostream &os) const {
 
 const std::vector<std::unique_ptr<ast::Statement>> &ast::BlockStatement::statements() const {
     return _statements;
+}
+
+std::unique_ptr<objects::Object> ast::BlockStatement::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }

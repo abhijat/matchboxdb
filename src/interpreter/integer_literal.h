@@ -10,9 +10,11 @@ class IntegerLiteral : public Expression {
 public:
     IntegerLiteral(token::Token token, int64_t value);
 
-    int64_t value() const;
+    [[nodiscard]] int64_t value() const;
 
-    std::string token_literal() const override;
+    [[nodiscard]] std::string token_literal() const override;
+
+    std::unique_ptr<objects::Object> visit(eval::Visitor &visitor) const override;
 
     std::ostream &repr(std::ostream &os) const override;
 

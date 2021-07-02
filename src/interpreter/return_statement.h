@@ -13,9 +13,11 @@ class ReturnStatement : public Statement {
 public:
     ReturnStatement(token::Token token, std::unique_ptr<Expression> expression);
 
-    std::string token_literal() const override;
+    [[nodiscard]] std::string token_literal() const override;
 
     std::ostream &repr(std::ostream &os) const override;
+
+    std::unique_ptr<objects::Object> visit(eval::Visitor &visitor) const override;
 
 protected:
     token::Token _token;

@@ -112,7 +112,7 @@ add_executable(interpreter_tests
         src/interpreter/call_expression.cpp
         src/interpreter/call_expression.h
         tests/interpreter_tests/parser_tests.cpp
-        tests/interpreter_tests/lexer_tests.cpp)
+        tests/interpreter_tests/lexer_tests.cpp src/interpreter/object.cpp src/interpreter/object.h src/interpreter/eval.cpp src/interpreter/eval.h tests/interpreter_tests/eval_tests.cpp)
 target_link_libraries(interpreter_tests gtest gmock gtest_main)
 add_test(NAME sqltest COMMAND interpreter_tests)
 

@@ -22,6 +22,8 @@ public:
 
     std::ostream &repr(std::ostream &os) const override;
 
+    std::unique_ptr<objects::Object> visit(eval::Visitor &visitor) const override;
+
 protected:
     token::Token _token;
     std::unique_ptr<ast::Expression> _left;

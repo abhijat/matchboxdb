@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 std::string ast::LetStatement::token_literal() const {
     return _token.literal;
 }
@@ -31,4 +33,8 @@ std::ostream &ast::LetStatement::repr(std::ostream &os) const {
 
     os << ";";
     return os;
+}
+
+std::unique_ptr<objects::Object> ast::LetStatement::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }

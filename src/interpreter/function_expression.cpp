@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 ast::FunctionExpression::FunctionExpression(token::Token token, std::vector<Identifier> parameters,
                                             ast::BlockStatement body) : _token(std::move(token)),
                                                                         _parameters(std::move(parameters)),
@@ -37,4 +39,8 @@ const std::vector<ast::Identifier> &ast::FunctionExpression::parameters() const 
 
 const ast::BlockStatement &ast::FunctionExpression::body() const {
     return _body;
+}
+
+std::unique_ptr<objects::Object> ast::FunctionExpression::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }

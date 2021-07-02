@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 ast::BooleanExpression::BooleanExpression(token::Token token, bool value) : _token(std::move(token)), _value(value) {}
 
 bool ast::BooleanExpression::value() const {
@@ -15,4 +17,8 @@ std::string ast::BooleanExpression::token_literal() const {
 std::ostream &ast::BooleanExpression::repr(std::ostream &os) const {
     os << std::boolalpha << _value << std::noboolalpha;
     return os;
+}
+
+std::unique_ptr<objects::Object> ast::BooleanExpression::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }

@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include "object.h"
+
 ast::IfExpression::IfExpression(token::Token token, std::unique_ptr<ast::Expression> condition,
                                 BlockStatement consequence, std::optional<BlockStatement> alternative) :
     _token(std::move(token)),
@@ -35,4 +37,8 @@ const ast::BlockStatement &ast::IfExpression::consequence() const {
 
 const std::optional<ast::BlockStatement> &ast::IfExpression::alternative() const {
     return _alternative;
+}
+
+std::unique_ptr<objects::Object> ast::IfExpression::visit(eval::Visitor &visitor) const {
+    return nullptr;
 }
