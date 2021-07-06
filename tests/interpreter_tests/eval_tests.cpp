@@ -41,10 +41,25 @@ TEST(Evaluator, BangOperator) {
         {"!!true",  true},
         {"!!false", false},
         {"!!5",     true},
+        {"!0",      true},
     };
 
     for (const auto&[input, output]: test_data) {
         auto object = evaluate(input);
         assert_bool_literal(object.get(), output);
+    }
+}
+
+TEST(Evaluator, MinusOperator) {
+    std::vector<std::pair<std::string, int64_t>> test_data{
+        {"5",    5},
+        {"-5",   -5},
+        {"10",   10},
+        {"-100", -100},
+    };
+
+    for (const auto&[input, output]: test_data) {
+        auto object = evaluate(input);
+        assert_int_literal(object.get(), output);
     }
 }

@@ -4,6 +4,8 @@
 
 #include "object.h"
 
+#include "eval.h"
+
 ast::PrefixExpression::PrefixExpression(token::Token token, std::string prefix_operator,
                                         std::unique_ptr<Expression> right) : _token(std::move(token)),
                                                                              _prefix_operator(std::move(
@@ -30,5 +32,5 @@ std::ostream &ast::PrefixExpression::repr(std::ostream &os) const {
 }
 
 std::unique_ptr<objects::Object> ast::PrefixExpression::visit(eval::Visitor &visitor) const {
-    return nullptr;
+    return visitor.visit(*this);
 }
