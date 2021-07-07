@@ -2,6 +2,7 @@
 
 #include <utility>
 
+#include "eval.h"
 #include "object.h"
 
 ast::InfixExpression::InfixExpression(token::Token token, std::unique_ptr<Expression> left,
@@ -35,5 +36,5 @@ std::ostream &ast::InfixExpression::repr(std::ostream &os) const {
 }
 
 std::unique_ptr<objects::Object> ast::InfixExpression::visit(eval::Visitor &visitor) const {
-    return nullptr;
+    return eval::Visitor::visit(*this);
 }
