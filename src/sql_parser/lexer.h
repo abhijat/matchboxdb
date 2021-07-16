@@ -20,6 +20,10 @@ protected:
     int _position{};
     int _read_position{};
     unsigned char _character{};
+
+    token::Token read_identifier();
+
+    void slurp_ws();
 };
 
 }

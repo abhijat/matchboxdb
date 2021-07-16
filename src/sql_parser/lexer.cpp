@@ -18,6 +18,8 @@ void lexer::Lexer::read_character() {
 }
 
 token::Token lexer::Lexer::next_token() {
+    slurp_ws();
+
     token::Kind kind;
     std::string literal(1, static_cast<char>(_character));
 
@@ -45,8 +47,34 @@ token::Token lexer::Lexer::next_token() {
             literal = "";
         }
             break;
+        default: {
+            if (std::isalpha(_character)) {
+                return read_identifier();
+            } else {
+                kind = token::Kind::Illegal;
+            }
+        }
     }
 
     read_character();
     return {kind, literal};
+}
+
+token::Token lexer::Lexer::read_identifier() {
+    auto start = _position;
+
+    // we know the first character is isalpha (that is how we reached here). anything after can be a number or _
+    while (std::isalnum(_character) || _character == '_') {
+        read_character();
+    }
+
+    std::string literal(_input, start, _position - start);
+    auto kind = token::lookup_identifier(literal);
+    return token::Token{kind, std::string(_input, start, _position - start)};
+}
+
+void lexer::Lexer::slurp_ws() {
+    while (std::isspace(_character)) {
+        read_character();
+    }
 }
