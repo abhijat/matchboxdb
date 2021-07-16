@@ -2,6 +2,7 @@
 #define MATCHBOXDB_LEXER_H
 
 #include <string>
+#include <functional>
 #include "token.h"
 
 namespace lexer {
@@ -24,6 +25,10 @@ protected:
     token::Token read_identifier();
 
     void slurp_ws();
+
+    std::string read_token_while(const std::function<bool(unsigned char)> &predicate);
+
+    token::Token read_number();
 };
 
 }

@@ -51,9 +51,20 @@ TEST(Lexer, Identifiers) {
     }
 }
 
-TEST(Lexer, IllegalIdentifier) {
-    std::string input{"1_foobar"};
-    lexer::Lexer l{input};
+TEST(Lexer, Integers) {
+    std::string input{"x 123 0 95 432"};
+    std::vector<std::pair<token::Kind, std::string>> expected{
+        {token::Kind::Identifier, "x"},
+        {token::Kind::Integer,    "123"},
+        {token::Kind::Integer,    "0"},
+        {token::Kind::Integer,    "95"},
+        {token::Kind::Integer,    "432"},
+    };
 
-    ASSERT_EQ(l.next_token().kind(), token::Kind::Illegal);
+    lexer::Lexer l{input};
+    for (const auto&[kind, literal] : expected) {
+        auto n = l.next_token();
+        ASSERT_EQ(n.literal(), literal);
+        ASSERT_EQ(n.kind(), kind);
+    }
 }

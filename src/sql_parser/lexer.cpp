@@ -1,6 +1,7 @@
 #include "lexer.h"
 
 #include <utility>
+#include <functional>
 
 lexer::Lexer::Lexer(std::string input) : _input(std::move(input)) {
     read_character();
@@ -50,6 +51,8 @@ token::Token lexer::Lexer::next_token() {
         default: {
             if (std::isalpha(_character)) {
                 return read_identifier();
+            } else if (std::isdigit(_character)) {
+                return read_number();
             } else {
                 kind = token::Kind::Illegal;
             }
@@ -61,20 +64,32 @@ token::Token lexer::Lexer::next_token() {
 }
 
 token::Token lexer::Lexer::read_identifier() {
-    auto start = _position;
-
-    // we know the first character is isalpha (that is how we reached here). anything after can be a number or _
-    while (std::isalnum(_character) || _character == '_') {
-        read_character();
-    }
-
-    std::string literal(_input, start, _position - start);
+    auto literal = read_token_while([](auto ch) {
+        return std::isalnum(ch) || ch == '_';
+    });
     auto kind = token::lookup_identifier(literal);
-    return token::Token{kind, std::string(_input, start, _position - start)};
+    return {kind, literal};
 }
 
 void lexer::Lexer::slurp_ws() {
     while (std::isspace(_character)) {
         read_character();
     }
+}
+
+std::string lexer::Lexer::read_token_while(const std::function<bool(unsigned char)> &predicate) {
+    auto start = _position;
+
+    while (predicate(_character)) {
+        read_character();
+    }
+
+    return std::string(_input, start, _position - start);
+}
+
+token::Token lexer::Lexer::read_number() {
+    auto literal = read_token_while([](auto ch) {
+        return std::isdigit(ch);
+    });
+    return {token::Kind::Integer, literal};
 }
