@@ -23,7 +23,8 @@ TEST(Lexer, BasicTokens) {
 }
 
 TEST(Lexer, Identifiers) {
-    std::string input{"SELECT name FROM CREATE TABLE person; UPDATE person WHERE name_123 DELETE AND x OR y"};
+    std::string input{
+        "SELECT name FROM CREATE TABLE person; UPDATE person WHERE name_123 DELETE AND x OR y true false"};
     std::vector<std::pair<token::Kind, std::string>> expected{
         {token::Kind::Select,     "SELECT"},
         {token::Kind::Identifier, "name"},
@@ -41,6 +42,8 @@ TEST(Lexer, Identifiers) {
         {token::Kind::Identifier, "x"},
         {token::Kind::Or,         "OR"},
         {token::Kind::Identifier, "y"},
+        {token::Kind::True,       "true"},
+        {token::Kind::False,      "false"},
     };
 
     lexer::Lexer l{input};
@@ -70,12 +73,13 @@ TEST(Lexer, Integers) {
 }
 
 TEST(Lexer, SpecialChars) {
-    lexer::Lexer l{"<>!\""};
+    lexer::Lexer l{"<>!\"!="};
     std::vector<std::pair<token::Kind, std::string>> expected{
         {token::Kind::LT,           "<"},
         {token::Kind::GT,           ">"},
         {token::Kind::Bang,         "!"},
         {token::Kind::DoubleQuotes, "\""},
+        {token::Kind::NE,           "!="},
     };
 
     for (const auto&[kind, literal]: expected) {

@@ -46,8 +46,15 @@ token::Token lexer::Lexer::next_token() {
         case '"':
             kind = token::Kind::DoubleQuotes;
             break;
-        case '!':
-            kind = token::Kind::Bang;
+        case '!': {
+            if (peek_character() == '=') {
+                // we need to do another read_character to eat up the = which is used in this token.
+                read_character();
+                return {token::Kind::NE, "!="};
+            } else {
+                kind = token::Kind::Bang;
+            }
+        }
             break;
         case '<':
             kind = token::Kind::LT;
@@ -104,4 +111,12 @@ token::Token lexer::Lexer::read_number() {
         return std::isdigit(ch);
     });
     return {token::Kind::Integer, literal};
+}
+
+unsigned char lexer::Lexer::peek_character() const {
+    if (_position >= _input.size()) {
+        return 0;
+    } else {
+        return _input[_read_position];
+    }
 }

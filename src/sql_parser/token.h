@@ -31,6 +31,9 @@ enum class Kind {
     Bang,
     LT,
     GT,
+    True,
+    False,
+    NE,
 };
 
 static std::map<std::string, Kind> k_keywords{
@@ -43,6 +46,8 @@ static std::map<std::string, Kind> k_keywords{
     {"FROM",   Kind::From},
     {"AND",    Kind::And},
     {"OR",     Kind::Or},
+    {"true",   Kind::True},
+    {"false",  Kind::False},
 };
 
 class Token {
