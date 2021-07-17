@@ -17,8 +17,11 @@ enum class Kind {
     Boolean,
 };
 
+std::ostream &operator<<(std::ostream &os, Kind kind);
+
 struct Metadata {
     Metadata(std::vector<std::string> names, std::vector<metadata::Kind> types);
+
     std::vector<std::string> names;
     std::vector<metadata::Kind> types;
 };

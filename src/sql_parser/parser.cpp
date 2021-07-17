@@ -7,6 +7,8 @@
 #include "Identifier.h"
 #include "infix_expression.h"
 #include "boolean_literal.h"
+#include "field_definition.h"
+#include "create_statement.h"
 
 #include <utility>
 #include <sstream>
@@ -67,6 +69,8 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_statement() {
     switch (_current_token.kind()) {
         case token::Kind::Select:
             return parse_select_statement();
+        case token::Kind::Create:
+            return parse_create_statement();
         default:
             return parse_expression_statement();
     }
@@ -230,4 +234,60 @@ void parser::Parser::peek_error(token::Kind kind) {
     std::stringstream ss;
     ss << "expected token kind " << kind << ", found token kind " << _peek_token.kind();
     _errors.push_back(ss.str());
+}
+
+std::unique_ptr<ast::Statement> parser::Parser::parse_create_statement() {
+    next_token();
+
+    auto table = parse_table_name();
+
+    if (!table) {
+        throw std::invalid_argument{"bad table name"};
+    }
+
+    if (!expect_peek(token::Kind::LParen)) {
+        throw std::invalid_argument{"no lparen after table name"};
+    }
+
+    next_token();
+    auto field_definitions = parse_field_definitions();
+
+    if (!expect_peek(token::Kind::RParen)) {
+        throw std::invalid_argument{"no rparen after fields"};
+    }
+
+    return std::make_unique<ast::CreateStatement>(*table, field_definitions);
+}
+
+std::vector<ast::FieldDefinition> parser::Parser::parse_field_definitions() {
+    std::vector<ast::FieldDefinition> field_definitions{};
+    auto field_definition = parse_field_definition();
+
+    if (!field_definition) {
+        throw std::invalid_argument{"bad field definition: " + _current_token.literal()};
+    }
+
+    field_definitions.push_back(*field_definition);
+
+    while (peek_token_is(token::Kind::Comma)) {
+        next_token();
+        next_token();
+
+        field_definition = parse_field_definition();
+
+        if (!field_definition) {
+            throw std::invalid_argument{"bad field definition: " + _current_token.literal()};
+        }
+
+        field_definitions.push_back(*field_definition);
+    }
+
+    return field_definitions;
+}
+
+std::optional<ast::FieldDefinition> parser::Parser::parse_field_definition() {
+    // ... username STRING, ...
+    auto field_name = _current_token.literal();
+    next_token();
+    return ast::FieldDefinition{field_name, _current_token.kind()};
 }

@@ -15,6 +15,8 @@ class Expression;
 class IntegerLiteral;
 
 class ExpressionStatement;
+
+class FieldDefinition;
 }
 
 namespace {
@@ -52,7 +54,6 @@ public:
     explicit Parser(lexer::Lexer lexer);
 
     std::unique_ptr<ast::Statement> parse();
-
 
 
 protected:
@@ -107,6 +108,12 @@ protected:
     ExpressionP parse_grouped_expression();
 
     bool expect_peek(token::Kind kind);
+
+    std::unique_ptr<ast::Statement> parse_create_statement();
+
+    std::vector<ast::FieldDefinition> parse_field_definitions();
+
+    std::optional<ast::FieldDefinition> parse_field_definition();
 };
 
 }

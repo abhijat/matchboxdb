@@ -9,6 +9,7 @@
 #include "../../src/sql_parser/infix_expression.h"
 #include "../../src/sql_parser/boolean_literal.h"
 #include "../../src/sql_parser/select_statement.h"
+#include "../../src/sql_parser/create_statement.h"
 
 std::unique_ptr<ast::Statement> parse(const std::string &s) {
     return parser::Parser{lexer::Lexer{s}}.parse();
@@ -133,11 +134,22 @@ TEST(Parser, GroupedExpressions) {
     }
 }
 
-TEST(Parser, SelectSimple) {
-    auto statement = parse("SELECT name, author FROM western_canon WHERE foo = 1 AND bar = 22 OR x = FALSE AND name != 47;");
+TEST(Parser, SelectStatement) {
+    auto statement = parse(
+        "SELECT name, author FROM western_canon WHERE foo = 1 AND bar = 22 OR x = FALSE AND name != 47;");
     const auto select_statement = dynamic_cast<const ast::SelectStatement *>(statement.get());
     ASSERT_NE(select_statement, nullptr);
     std::stringstream ss;
     ss << *select_statement;
-    ASSERT_EQ(ss.str(), "SELECT {name, author} FROM [western_canon] WHERE (((foo = 1) AND (bar = 22)) OR ((x = FALSE) AND (name != 47)))");
+    ASSERT_EQ(ss.str(),
+              "SELECT {name, author} FROM [western_canon] WHERE (((foo = 1) AND (bar = 22)) OR ((x = FALSE) AND (name != 47)))");
+}
+
+TEST(Parser, CreateStatement) {
+    auto statement = parse("CREATE TABLE person (name STRING, age UNSIGNED_INT, is_replicant BOOLEAN);");
+    const auto create_statement = dynamic_cast<const ast::CreateStatement *>(statement.get());
+    ASSERT_NE(create_statement, nullptr);
+    std::stringstream ss;
+    ss << *create_statement;
+    ASSERT_EQ(ss.str(), "CREATE TABLE person( {name: String} {age: UnsignedInt} {is_replicant: Boolean} )");
 }

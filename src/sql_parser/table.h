@@ -9,7 +9,6 @@ class Table : public Node {
 public:
     explicit Table(std::string table_name);
 
-private:
     void repr(std::ostream &os) const override;
 
 protected:

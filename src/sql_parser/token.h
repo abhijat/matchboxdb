@@ -35,22 +35,28 @@ enum class Kind {
     True,
     False,
     NE,
+    ColumnKindString,
+    ColumnKindUnsignedInteger,
+    ColumnKindBoolean,
 };
 
 std::ostream &operator<<(std::ostream &os, Kind kind);
 
 static std::map<std::string, Kind> k_keywords{
-    {"SELECT", Kind::Select},
-    {"UPDATE", Kind::Update},
-    {"DELETE", Kind::Delete},
-    {"CREATE", Kind::Create},
-    {"TABLE",  Kind::Table},
-    {"WHERE",  Kind::Where},
-    {"FROM",   Kind::From},
-    {"AND",    Kind::And},
-    {"OR",     Kind::Or},
-    {"true",   Kind::True},
-    {"false",  Kind::False},
+    {"SELECT",       Kind::Select},
+    {"UPDATE",       Kind::Update},
+    {"DELETE",       Kind::Delete},
+    {"CREATE",       Kind::Create},
+    {"TABLE",        Kind::Table},
+    {"WHERE",        Kind::Where},
+    {"FROM",         Kind::From},
+    {"AND",          Kind::And},
+    {"OR",           Kind::Or},
+    {"true",         Kind::True},
+    {"false",        Kind::False},
+    {"STRING",       Kind::ColumnKindString},
+    {"UNSIGNED_INT", Kind::ColumnKindUnsignedInteger},
+    {"BOOLEAN",      Kind::ColumnKindBoolean},
 };
 
 class Token {
