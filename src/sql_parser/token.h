@@ -27,6 +27,10 @@ enum class Kind {
     Or,
     Colon,
     Equals,
+    DoubleQuotes,
+    Bang,
+    LT,
+    GT,
 };
 
 static std::map<std::string, Kind> k_keywords{

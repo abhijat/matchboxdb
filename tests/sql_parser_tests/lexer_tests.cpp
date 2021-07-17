@@ -68,3 +68,19 @@ TEST(Lexer, Integers) {
         ASSERT_EQ(n.kind(), kind);
     }
 }
+
+TEST(Lexer, SpecialChars) {
+    lexer::Lexer l{"<>!\""};
+    std::vector<std::pair<token::Kind, std::string>> expected{
+        {token::Kind::LT,           "<"},
+        {token::Kind::GT,           ">"},
+        {token::Kind::Bang,         "!"},
+        {token::Kind::DoubleQuotes, "\""},
+    };
+
+    for (const auto&[kind, literal]: expected) {
+        auto n = l.next_token();
+        ASSERT_EQ(n.kind(), kind);
+        ASSERT_EQ(n.literal(), literal);
+    }
+}

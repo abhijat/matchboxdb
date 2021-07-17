@@ -43,6 +43,18 @@ token::Token lexer::Lexer::next_token() {
         case '=':
             kind = token::Kind::Equals;
             break;
+        case '"':
+            kind = token::Kind::DoubleQuotes;
+            break;
+        case '!':
+            kind = token::Kind::Bang;
+            break;
+        case '<':
+            kind = token::Kind::LT;
+            break;
+        case '>':
+            kind = token::Kind::GT;
+            break;
         case 0: {
             kind = token::Kind::EndOfInput;
             literal = "";
