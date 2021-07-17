@@ -23,6 +23,10 @@ void assert_int_literal(const ast::Statement *statement, int64_t value) {
     assert_int_literal(expression, value);
 }
 
+void assert_infix_expression(const ast::Statement *statement) {
+
+}
+
 void assert_infix_expression(const ast::Statement *statement, const std::string &op, int64_t lhs, int64_t rhs) {
     auto expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement);
     ASSERT_NE(expression_statement, nullptr);
@@ -75,5 +79,26 @@ TEST(Parser, InfixExpressionsSimple) {
     for (const auto &td: test_data) {
         auto statement = parser::Parser{lexer::Lexer{td.input}}.parse();
         assert_infix_expression(statement.get(), td.op, td.lhs, td.rhs);
+    }
+}
+
+TEST(Parser, Grouping) {
+    for (const auto &[input, output]: std::vector<std::pair<std::string, std::string>>{
+        {"a AND b OR c",  "((a AND b) OR c)"},
+        {"a OR b AND c",  "(a OR (b AND c))"},
+        {"a AND b AND c", "((a AND b) AND c)"},
+        {"a OR b OR c",   "((a OR b) OR c)"},
+    }) {
+        auto statement = parser::Parser{lexer::Lexer{input}}.parse();
+        auto expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement.get());
+        ASSERT_NE(expression_statement, nullptr);
+
+        auto infix_expression = dynamic_cast<const ast::InfixExpression *>(expression_statement->expression().get());
+        ASSERT_NE(infix_expression, nullptr);
+
+        std::stringstream ss;
+        ss << *infix_expression;
+
+        ASSERT_EQ(ss.str(), output) << input;
     }
 }

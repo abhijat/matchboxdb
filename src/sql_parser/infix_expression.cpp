@@ -22,9 +22,9 @@ const std::string &ast::InfixExpression::infix_operator() const {
 }
 
 void ast::InfixExpression::repr(std::ostream &os) const {
-    os << "( ";
+    os << "(";
     _left->repr(os);
-    os << " " << _infix_operator;
+    os << " " << _infix_operator << " ";
     _right->repr(os);
-    os << " )";
+    os << ")";
 }

@@ -173,4 +173,3 @@ ExpressionP parser::Parser::parse_infix_expression(ExpressionP expression) {
     auto rhs = parse_expression(precedence);
     return std::make_unique<ast::InfixExpression>(token, std::move(expression), std::move(*rhs), token.literal());
 }
-

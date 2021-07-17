@@ -10,5 +10,5 @@ const std::string &ast::Identifier::value() const {
 }
 
 void ast::Identifier::repr(std::ostream &os) const {
-    os << "token: " << _token << ", value: " << _value;
+    os << _value;
 }
