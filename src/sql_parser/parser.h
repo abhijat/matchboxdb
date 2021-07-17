@@ -95,6 +95,8 @@ protected:
     [[nodiscard]] static Precedence precedence_for_token(const token::Token &token);
 
     ExpressionP parse_infix_expression(ExpressionP expression);
+
+    ExpressionP parse_boolean_literal();
 };
 
 }

@@ -7,6 +7,11 @@
 #include "../../src/sql_parser/integer_literal.h"
 #include "../../src/sql_parser/Identifier.h"
 #include "../../src/sql_parser/infix_expression.h"
+#include "../../src/sql_parser/boolean_literal.h"
+
+std::unique_ptr<ast::Statement> parse(const std::string &s) {
+    return parser::Parser{lexer::Lexer{s}}.parse();
+}
 
 void assert_int_literal(const ast::Expression *expression, int64_t value) {
     auto integer_literal = dynamic_cast<const ast::IntegerLiteral *>(expression);
@@ -23,10 +28,6 @@ void assert_int_literal(const ast::Statement *statement, int64_t value) {
     assert_int_literal(expression, value);
 }
 
-void assert_infix_expression(const ast::Statement *statement) {
-
-}
-
 void assert_infix_expression(const ast::Statement *statement, const std::string &op, int64_t lhs, int64_t rhs) {
     auto expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement);
     ASSERT_NE(expression_statement, nullptr);
@@ -40,16 +41,12 @@ void assert_infix_expression(const ast::Statement *statement, const std::string 
 }
 
 TEST(Parser, IntLiteral) {
-    parser::Parser p{lexer::Lexer{"123"}};
-    auto statement = p.parse();
-
+    auto statement = parse("123");
     assert_int_literal(statement.get(), 123);
 }
 
 TEST(Parser, Identifiers) {
-    parser::Parser p{lexer::Lexer{"foobar;"}};
-
-    auto statement = p.parse();
+    auto statement = parse("foobar");
     const auto s = dynamic_cast<ast::ExpressionStatement *>(statement.get());
     ASSERT_NE(s, nullptr);
 
@@ -77,7 +74,7 @@ TEST(Parser, InfixExpressionsSimple) {
     };
 
     for (const auto &td: test_data) {
-        auto statement = parser::Parser{lexer::Lexer{td.input}}.parse();
+        auto statement = parse(td.input);
         assert_infix_expression(statement.get(), td.op, td.lhs, td.rhs);
     }
 }
@@ -89,7 +86,7 @@ TEST(Parser, Grouping) {
         {"a AND b AND c", "((a AND b) AND c)"},
         {"a OR b OR c",   "((a OR b) OR c)"},
     }) {
-        auto statement = parser::Parser{lexer::Lexer{input}}.parse();
+        auto statement = parse(input);
         auto expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement.get());
         ASSERT_NE(expression_statement, nullptr);
 
@@ -100,5 +97,24 @@ TEST(Parser, Grouping) {
         ss << *infix_expression;
 
         ASSERT_EQ(ss.str(), output) << input;
+    }
+}
+
+void assert_boolean_literal(const ast::Statement *statement, bool value) {
+    auto expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement);
+    ASSERT_NE(expression_statement, nullptr);
+
+    auto bool_expression = dynamic_cast<const ast::BooleanLiteral *>(expression_statement->expression().get());
+    ASSERT_NE(bool_expression, nullptr);
+
+    ASSERT_EQ(bool_expression->value(), value);
+}
+
+TEST(Parser, Booleans) {
+    for (const auto &[input, output]: std::vector<std::pair<std::string, bool>>{
+        {"true",  true},
+        {"false", false},
+    }) {
+        assert_boolean_literal(parse(input).get(), output);
     }
 }

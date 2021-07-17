@@ -6,6 +6,7 @@
 #include "expression_statement.h"
 #include "Identifier.h"
 #include "infix_expression.h"
+#include "boolean_literal.h"
 
 #include <utility>
 
@@ -21,6 +22,15 @@ parser::Parser::Parser(lexer::Lexer lexer)
     register_prefix(token::Kind::Identifier, [&]() {
         return parse_identifier();
     });
+
+    for (const auto kind: {
+        token::Kind::True,
+        token::Kind::False,
+    }) {
+        register_prefix(kind, [&]() {
+            return parse_boolean_literal();
+        });
+    }
 
     for (const auto kind: {
         token::Kind::NE,
@@ -172,4 +182,8 @@ ExpressionP parser::Parser::parse_infix_expression(ExpressionP expression) {
     next_token();
     auto rhs = parse_expression(precedence);
     return std::make_unique<ast::InfixExpression>(token, std::move(expression), std::move(*rhs), token.literal());
+}
+
+ExpressionP parser::Parser::parse_boolean_literal() {
+    return std::make_unique<ast::BooleanLiteral>(_current_token, _current_token.kind() == token::Kind::True);
 }
