@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <ostream>
 
 namespace token {
 
@@ -36,6 +37,8 @@ enum class Kind {
     NE,
 };
 
+std::ostream &operator<<(std::ostream &os, Kind kind);
+
 static std::map<std::string, Kind> k_keywords{
     {"SELECT", Kind::Select},
     {"UPDATE", Kind::Update},
@@ -62,6 +65,8 @@ protected:
     Kind _kind;
     std::string _literal;
 };
+
+std::ostream &operator<<(std::ostream &os, const Token &t);
 
 token::Kind lookup_identifier(const std::string &literal);
 

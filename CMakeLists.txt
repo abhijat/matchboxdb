@@ -104,3 +104,14 @@ add_executable(
 )
 target_link_libraries(sql_tests gtest gmock gtest_main)
 add_test(NAME sql_tests COMMAND sql_tests)
+
+add_executable(
+        repl
+        src/repl.cpp
+        src/sql_parser/lexer.h
+        src/sql_parser/lexer.cpp
+        src/sql_parser/token.h
+        src/sql_parser/token.cpp
+        src/sql_parser/ast.h
+        src/sql_parser/ast.cpp
+)

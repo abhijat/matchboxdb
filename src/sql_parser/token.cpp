@@ -20,3 +20,92 @@ token::Kind token::lookup_identifier(const std::string &literal) {
         return search->second;
     }
 }
+
+std::ostream &token::operator<<(std::ostream &os, const token::Token &t) {
+    os << "{ Kind: " << t.kind() << ", Literal: " << t.literal() << " }";
+    return os;
+}
+
+std::ostream &token::operator<<(std::ostream &os, token::Kind kind) {
+    switch (kind) {
+        case Kind::Illegal:
+            os << "Kind::Illegal";
+            break;
+        case Kind::EndOfInput:
+            os << "Kind::EndOfInput";
+            break;
+        case Kind::Identifier:
+            os << "Kind::Identifier";
+            break;
+        case Kind::Integer:
+            os << "Kind::Integer";
+            break;
+        case Kind::Comma:
+            os << "Kind::Comma";
+            break;
+        case Kind::Semicolon:
+            os << "Kind::Semicolon";
+            break;
+        case Kind::LParen:
+            os << "Kind::LParen";
+            break;
+        case Kind::RParen:
+            os << "Kind::RParen";
+            break;
+        case Kind::Select:
+            os << "Kind::Select";
+            break;
+        case Kind::Update:
+            os << "Kind::Update";
+            break;
+        case Kind::Create:
+            os << "Kind::Create";
+            break;
+        case Kind::Delete:
+            os << "Kind::Delete";
+            break;
+        case Kind::Table:
+            os << "Kind::Table";
+            break;
+        case Kind::Where:
+            os << "Kind::Where";
+            break;
+        case Kind::From:
+            os << "Kind::From";
+            break;
+        case Kind::And:
+            os << "Kind::And";
+            break;
+        case Kind::Or:
+            os << "Kind::Or";
+            break;
+        case Kind::Colon:
+            os << "Kind::Colon";
+            break;
+        case Kind::Equals:
+            os << "Kind::Equals";
+            break;
+        case Kind::DoubleQuotes:
+            os << "Kind::DoubleQuotes";
+            break;
+        case Kind::Bang:
+            os << "Kind::Bang";
+            break;
+        case Kind::LT:
+            os << "Kind::LT";
+            break;
+        case Kind::GT:
+            os << "Kind::GT";
+            break;
+        case Kind::True:
+            os << "Kind::True";
+            break;
+        case Kind::False:
+            os << "Kind::False";
+            break;
+        case Kind::NE:
+            os << "Kind::NE";
+            break;
+    }
+    return os;
+}
