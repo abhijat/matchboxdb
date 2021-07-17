@@ -50,7 +50,8 @@ token::Token lexer::Lexer::next_token() {
             if (peek_character() == '=') {
                 // we need to do another read_character to eat up the = which is used in this token.
                 read_character();
-                return {token::Kind::NE, "!="};
+                kind = token::Kind::NE;
+                literal = "!=";
             } else {
                 kind = token::Kind::Bang;
             }
