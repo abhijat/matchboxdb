@@ -73,12 +73,19 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_statement() {
 }
 
 std::unique_ptr<ast::SelectStatement> parser::Parser::parse_select_statement() {
+    next_token();
     auto expressions = parse_expression_list();
+
     std::optional<ast::Table> table{};
     std::optional<std::unique_ptr<ast::Expression>> where_clause{};
+
     if (peek_token_is(token::Kind::From)) {
+        next_token();
         table = parse_table_name();
+
         if (peek_token_is(token::Kind::Where)) {
+            next_token();
+            next_token();
             where_clause = parse_expression(Precedence::Lowest);
         }
     }
@@ -88,18 +95,24 @@ std::unique_ptr<ast::SelectStatement> parser::Parser::parse_select_statement() {
 
 std::vector<std::unique_ptr<ast::Expression>> parser::Parser::parse_expression_list() {
     std::vector<std::unique_ptr<ast::Expression>> expressions{};
-
     auto expression = parse_expression(Precedence::Lowest);
     if (!expression) {
-        return expressions;
+        throw std::invalid_argument{"bad input: " + _current_token.literal()};
     }
 
     expressions.push_back(std::move(*expression));
 
-    while (current_token_is(token::Kind::Comma)) {
+    while (peek_token_is(token::Kind::Comma)) {
+
+        // move to comma
+        next_token();
+
+        // move ahead of comma
+        next_token();
+
         expression = parse_expression(Precedence::Lowest);
         if (!expression) {
-            return expressions;
+            throw std::invalid_argument{"bad input: " + _current_token.literal()};
         }
 
         expressions.push_back(std::move(*expression));

@@ -18,7 +18,6 @@ public:
                     std::optional<ast::Table> table,
                     std::optional<std::unique_ptr<ast::Expression>> where);
 
-private:
     void repr(std::ostream &os) const override;
 
 protected:
