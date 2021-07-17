@@ -79,6 +79,19 @@ TEST(Parser, InfixExpressionsSimple) {
     }
 }
 
+void assert_infix_is_string(const ast::Statement *statement, const std::string &repr) {
+    auto expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement);
+    ASSERT_NE(expression_statement, nullptr);
+
+    auto infix_expression = dynamic_cast<const ast::InfixExpression *>(expression_statement->expression().get());
+    ASSERT_NE(infix_expression, nullptr);
+
+    std::stringstream ss;
+    ss << *infix_expression;
+
+    ASSERT_EQ(ss.str(), repr) << repr;
+}
+
 TEST(Parser, Grouping) {
     for (const auto &[input, output]: std::vector<std::pair<std::string, std::string>>{
         {"a AND b OR c",  "((a AND b) OR c)"},
@@ -87,16 +100,7 @@ TEST(Parser, Grouping) {
         {"a OR b OR c",   "((a OR b) OR c)"},
     }) {
         auto statement = parse(input);
-        auto expression_statement = dynamic_cast<const ast::ExpressionStatement *>(statement.get());
-        ASSERT_NE(expression_statement, nullptr);
-
-        auto infix_expression = dynamic_cast<const ast::InfixExpression *>(expression_statement->expression().get());
-        ASSERT_NE(infix_expression, nullptr);
-
-        std::stringstream ss;
-        ss << *infix_expression;
-
-        ASSERT_EQ(ss.str(), output) << input;
+        assert_infix_is_string(statement.get(), output);
     }
 }
 
@@ -116,5 +120,14 @@ TEST(Parser, Booleans) {
         {"false", false},
     }) {
         assert_boolean_literal(parse(input).get(), output);
+    }
+}
+
+TEST(Parser, GroupedExpressions) {
+    for (const auto &[input, output]: std::vector<std::pair<std::string, std::string>>{
+        {"a AND (b OR c)", "(a AND (b OR c))"},
+    }) {
+        auto statement = parse(input);
+        assert_infix_is_string(statement.get(), output);
     }
 }

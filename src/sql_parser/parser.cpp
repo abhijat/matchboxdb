@@ -9,6 +9,7 @@
 #include "boolean_literal.h"
 
 #include <utility>
+#include <sstream>
 
 parser::Parser::Parser(lexer::Lexer lexer)
     : _lexer(std::move(lexer)),
@@ -31,6 +32,10 @@ parser::Parser::Parser(lexer::Lexer lexer)
             return parse_boolean_literal();
         });
     }
+
+    register_prefix(token::Kind::LParen, [&]() {
+        return parse_grouped_expression();
+    });
 
     for (const auto kind: {
         token::Kind::NE,
@@ -186,4 +191,30 @@ ExpressionP parser::Parser::parse_infix_expression(ExpressionP expression) {
 
 ExpressionP parser::Parser::parse_boolean_literal() {
     return std::make_unique<ast::BooleanLiteral>(_current_token, _current_token.kind() == token::Kind::True);
+}
+
+ExpressionP parser::Parser::parse_grouped_expression() {
+    next_token();
+    auto expression = parse_expression(Precedence::Lowest);
+    if (!expect_peek(token::Kind::RParen)) {
+        return {};
+    }
+
+    return std::move(*expression);
+}
+
+bool parser::Parser::expect_peek(token::Kind kind) {
+    if (peek_token_is(kind)) {
+        next_token();
+        return true;
+    } else {
+        peek_error(kind);
+        return false;
+    }
+}
+
+void parser::Parser::peek_error(token::Kind kind) {
+    std::stringstream ss;
+    ss << "expected token kind " << kind << ", found token kind " << _peek_token.kind();
+    _errors.push_back(ss.str());
 }

@@ -53,6 +53,8 @@ public:
 
     std::unique_ptr<ast::Statement> parse();
 
+
+
 protected:
     void next_token();
 
@@ -63,6 +65,10 @@ protected:
 
     std::map<token::Kind, PrefixFn> _prefix_parsers{};
     std::map<token::Kind, InfixFn> _infix_parsers{};
+
+    std::vector<std::string> _errors{};
+
+    void peek_error(token::Kind kind);
 
     void register_prefix(token::Kind kind, PrefixFn prefix_fn);
 
@@ -97,6 +103,10 @@ protected:
     ExpressionP parse_infix_expression(ExpressionP expression);
 
     ExpressionP parse_boolean_literal();
+
+    ExpressionP parse_grouped_expression();
+
+    bool expect_peek(token::Kind kind);
 };
 
 }
