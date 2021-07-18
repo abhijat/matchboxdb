@@ -3,7 +3,7 @@
 - [ ] Add documentation comments to header files
 - [ ] Add comments to function implementations
 - [ ] Figure out eval strategy for where clause
-- [ ] Support the update statement
+- [x] Support the update statement
 - [ ] Support the insert statement
 - [ ] Support the delete statement
 - [ ] Pass statement objects into execution system
