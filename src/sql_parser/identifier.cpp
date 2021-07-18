@@ -1,4 +1,4 @@
-#include "Identifier.h"
+#include "identifier.h"
 
 #include <utility>
 
@@ -11,4 +11,12 @@ const std::string &ast::Identifier::value() const {
 
 void ast::Identifier::repr(std::ostream &os) const {
     os << _value;
+}
+
+const token::Token &ast::Identifier::token() const {
+    return _token;
+}
+
+bool ast::operator<(const ast::Identifier &lhs, const ast::Identifier &rhs) {
+    return lhs.value() < rhs.value();
 }

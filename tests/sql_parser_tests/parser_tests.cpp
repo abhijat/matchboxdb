@@ -5,11 +5,12 @@
 #include "../../src/sql_parser/statement.h"
 #include "../../src/sql_parser/expression_statement.h"
 #include "../../src/sql_parser/integer_literal.h"
-#include "../../src/sql_parser/Identifier.h"
+#include "../../src/sql_parser/identifier.h"
 #include "../../src/sql_parser/infix_expression.h"
 #include "../../src/sql_parser/boolean_literal.h"
 #include "../../src/sql_parser/select_statement.h"
 #include "../../src/sql_parser/create_statement.h"
+#include "../../src/sql_parser/update_statement.h"
 
 std::unique_ptr<ast::Statement> parse(const std::string &s) {
     return parser::Parser{lexer::Lexer{s}}.parse();
@@ -152,4 +153,13 @@ TEST(Parser, CreateStatement) {
     std::stringstream ss;
     ss << *create_statement;
     ASSERT_EQ(ss.str(), "CREATE TABLE person( {name: String} {age: UnsignedInt} {is_replicant: Boolean} )");
+}
+
+TEST(Parser, UpdateStatement) {
+    auto statement = parse("UPDATE person SET name = 123, age = 11111, is_replicant = FALSE;");
+    const auto update_statement = dynamic_cast<const ast::UpdateStatement *>(statement.get());
+    ASSERT_NE(update_statement, nullptr);
+    std::stringstream ss;
+    ss << *update_statement;
+    ASSERT_EQ(ss.str(), "UPDATE [person] SET {name = 123, age = 11111, is_replicant = FALSE}");
 }

@@ -6,11 +6,11 @@
 ast::CreateStatement::CreateStatement(
     ast::Table table_name,
     std::vector<ast::FieldDefinition> field_definitions
-) : _table_name(std::move(table_name)),
+) : _table(std::move(table_name)),
     _field_definitions(std::move(field_definitions)) {}
 
 const ast::Table &ast::CreateStatement::table_name() const {
-    return _table_name;
+    return _table;
 }
 
 const std::vector<ast::FieldDefinition> &ast::CreateStatement::field_definitions() const {
@@ -19,7 +19,7 @@ const std::vector<ast::FieldDefinition> &ast::CreateStatement::field_definitions
 
 void ast::CreateStatement::repr(std::ostream &os) const {
     os << "CREATE TABLE ";
-    _table_name.repr(os);
+    _table.repr(os);
     os << "( ";
     for (const auto &fd: _field_definitions) {
         fd.repr(os);

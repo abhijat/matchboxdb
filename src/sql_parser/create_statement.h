@@ -20,7 +20,7 @@ public:
     void repr(std::ostream &os) const override;
 
 protected:
-    ast::Table _table_name;
+    Table _table;
     std::vector<ast::FieldDefinition> _field_definitions;
 };
 }

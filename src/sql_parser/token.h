@@ -26,6 +26,7 @@ enum class Kind {
     From,
     And,
     Or,
+    Set,
     Colon,
     Equals,
     DoubleQuotes,
@@ -57,6 +58,7 @@ static std::map<std::string, Kind> k_keywords{
     {"STRING",       Kind::ColumnKindString},
     {"UNSIGNED_INT", Kind::ColumnKindUnsignedInteger},
     {"BOOLEAN",      Kind::ColumnKindBoolean},
+    {"SET",          Kind::Set},
 };
 
 class Token {

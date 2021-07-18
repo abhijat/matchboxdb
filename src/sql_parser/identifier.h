@@ -11,13 +11,18 @@ public:
 
     [[nodiscard]] const std::string &value() const;
 
-private:
+    [[nodiscard]] const token::Token &token() const;
+
     void repr(std::ostream &os) const override;
+
 
 protected:
     token::Token _token;
     std::string _value;
 };
+
+bool operator<(const Identifier &lhs, const Identifier &rhs);
+
 }
 
 #endif //MATCHBOXDB_IDENTIFIER_H

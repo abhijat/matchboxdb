@@ -11,7 +11,7 @@ public:
 
     void repr(std::ostream &os) const override;
 
-    bool value() const;
+    [[nodiscard]] bool value() const;
 
 protected:
     token::Token _token;

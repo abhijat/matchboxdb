@@ -4,6 +4,7 @@
 #include <memory>
 #include "lexer.h"
 #include "table.h"
+#include "identifier.h"
 
 namespace ast {
 class Statement;
@@ -114,6 +115,10 @@ protected:
     std::vector<ast::FieldDefinition> parse_field_definitions();
 
     std::optional<ast::FieldDefinition> parse_field_definition();
+
+    std::unique_ptr<ast::Statement> parse_update_statement();
+
+    std::pair<ast::Identifier, std::unique_ptr<ast::Expression>> parse_field_update();
 };
 
 }
