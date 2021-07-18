@@ -99,6 +99,7 @@ add_executable(
         src/sql_parser/token.cpp
         src/sql_parser/parser.cpp src/sql_parser/parser.h src/sql_parser/node.cpp src/sql_parser/node.h src/sql_parser/select_statement.cpp src/sql_parser/select_statement.h src/sql_parser/table.cpp src/sql_parser/table.h src/sql_parser/expression.h src/sql_parser/identifier.cpp src/sql_parser/identifier.h src/sql_parser/integer_literal.cpp src/sql_parser/integer_literal.h tests/sql_parser_tests/parser_tests.cpp src/sql_parser/expression_statement.cpp src/sql_parser/expression_statement.h src/sql_parser/infix_expression.cpp src/sql_parser/infix_expression.h src/sql_parser/boolean_literal.cpp src/sql_parser/boolean_literal.h src/sql_parser/create_statement.cpp src/sql_parser/create_statement.h src/sql_parser/field_definition.cpp src/sql_parser/field_definition.h src/sql_parser/update_statement.cpp src/sql_parser/update_statement.h)
 target_link_libraries(sql_tests gtest gmock gtest_main)
+target_include_directories(sql_tests PRIVATE .)
 add_test(NAME sql_tests COMMAND sql_tests)
 
 add_executable(
