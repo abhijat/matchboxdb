@@ -43,8 +43,9 @@ token::Token lexer::Lexer::next_token() {
         case '=':
             kind = token::Kind::Equals;
             break;
-        case '"':
-            kind = token::Kind::DoubleQuotes;
+        case '"': {
+            return read_string_literal();
+        }
             break;
         case '!': {
             if (peek_character() == '=') {
@@ -120,4 +121,22 @@ unsigned char lexer::Lexer::peek_character() const {
     } else {
         return _input[_read_position];
     }
+}
+
+token::Token lexer::Lexer::read_string_literal() {
+    // advance over opening "
+    read_character();
+
+    auto literal = read_token_while([](auto ch) {
+        return ch != '"';
+    });
+
+    if (_character != '"') {
+        throw std::invalid_argument{"String does not close correctly: expected \" found " + std::string(1, _character)};
+    }
+
+    // advance over closing "
+    read_character();
+
+    return {token::Kind::String, literal};
 }

@@ -73,13 +73,32 @@ TEST(Lexer, Integers) {
 }
 
 TEST(Lexer, SpecialChars) {
-    lexer::Lexer l{"<>!\"!="};
+    lexer::Lexer l{"<>!!="};
     std::vector<std::pair<token::Kind, std::string>> expected{
-        {token::Kind::LT,           "<"},
-        {token::Kind::GT,           ">"},
-        {token::Kind::Bang,         "!"},
-        {token::Kind::DoubleQuotes, "\""},
-        {token::Kind::NE,           "!="},
+        {token::Kind::LT,   "<"},
+        {token::Kind::GT,   ">"},
+        {token::Kind::Bang, "!"},
+        {token::Kind::NE,   "!="},
+    };
+
+    for (const auto&[kind, literal]: expected) {
+        auto n = l.next_token();
+        ASSERT_EQ(n.kind(), kind);
+        ASSERT_EQ(n.literal(), literal);
+    }
+}
+
+TEST(Lexer, Strings) {
+    lexer::Lexer l{R"("foo" is "bar" and "123-bar" is ":?:?foo")"};
+
+    std::vector<std::pair<token::Kind, std::string>> expected{
+        {token::Kind::String,     "foo"},
+        {token::Kind::Identifier, "is"},
+        {token::Kind::String,     "bar"},
+        {token::Kind::Identifier, "and"},
+        {token::Kind::String,     "123-bar"},
+        {token::Kind::Identifier, "is"},
+        {token::Kind::String,     ":?:?foo"},
     };
 
     for (const auto&[kind, literal]: expected) {

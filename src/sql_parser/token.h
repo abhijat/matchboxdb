@@ -21,7 +21,10 @@ enum class Kind {
     Update,
     Create,
     Delete,
+    Insert,
+    Into,
     Table,
+    Values,
     Where,
     From,
     And,
@@ -39,6 +42,7 @@ enum class Kind {
     ColumnKindString,
     ColumnKindUnsignedInteger,
     ColumnKindBoolean,
+    String,
 };
 
 std::ostream &operator<<(std::ostream &os, Kind kind);
@@ -48,7 +52,10 @@ static std::map<std::string, Kind> k_keywords{
     {"UPDATE",       Kind::Update},
     {"DELETE",       Kind::Delete},
     {"CREATE",       Kind::Create},
+    {"INSERT",       Kind::Insert},
+    {"INTO",         Kind::Into},
     {"TABLE",        Kind::Table},
+    {"VALUES",       Kind::Values},
     {"WHERE",        Kind::Where},
     {"FROM",         Kind::From},
     {"AND",          Kind::And},

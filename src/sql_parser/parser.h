@@ -119,6 +119,10 @@ protected:
     std::unique_ptr<ast::Statement> parse_update_statement();
 
     std::pair<ast::Identifier, std::unique_ptr<ast::Expression>> parse_field_update();
+
+    std::unique_ptr<ast::Statement> parse_insert_statement();
+
+    ExpressionP parse_string_literal();
 };
 
 }

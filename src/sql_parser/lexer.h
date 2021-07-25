@@ -30,6 +30,8 @@ protected:
     std::string read_token_while(const std::function<bool(unsigned char)> &predicate);
 
     token::Token read_number();
+
+    token::Token read_string_literal();
 };
 
 }

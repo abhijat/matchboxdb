@@ -105,6 +105,29 @@ std::ostream &token::operator<<(std::ostream &os, token::Kind kind) {
             break;
         case Kind::NE:
             os << "Kind::NE";
+        case Kind::String:
+            os << "Kind::String";
+            break;
+        case Kind::Insert:
+            os << "Kind::Insert";
+            break;
+        case Kind::Into:
+            os << "Kind::Into";
+            break;
+        case Kind::Values:
+            os << "Kind::Values";
+            break;
+        case Kind::Set:
+            os << "Kind::Set";
+            break;
+        case Kind::ColumnKindString:
+            os << "Kind::ColumnKindString";
+            break;
+        case Kind::ColumnKindUnsignedInteger:
+            os << "Kind::ColumnKindUnsignedInteger";
+            break;
+        case Kind::ColumnKindBoolean:
+            os << "Kind::ColumnKindBoolean";
             break;
     }
     return os;

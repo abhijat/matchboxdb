@@ -10,9 +10,10 @@
 #include "field_definition.h"
 #include "create_statement.h"
 #include "update_statement.h"
+#include "insert_statement.h"
+#include "string_literal.h"
 
 #include <utility>
-#include <sstream>
 
 parser::Parser::Parser(lexer::Lexer lexer)
     : _lexer(std::move(lexer)),
@@ -21,6 +22,10 @@ parser::Parser::Parser(lexer::Lexer lexer)
 
     register_prefix(token::Kind::Integer, [&]() {
         return parse_integer_literal();
+    });
+
+    register_prefix(token::Kind::String, [&]() {
+        return parse_string_literal();
     });
 
     register_prefix(token::Kind::Identifier, [&]() {
@@ -74,6 +79,8 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_statement() {
             return parse_create_statement();
         case token::Kind::Update:
             return parse_update_statement();
+        case token::Kind::Insert:
+            return parse_insert_statement();
         default:
             return parse_expression_statement();
     }
@@ -175,7 +182,7 @@ void parser::Parser::register_infix(token::Kind kind, InfixFn infix_fn) {
 }
 
 std::unique_ptr<ast::IntegerLiteral> parser::Parser::parse_integer_literal() {
-    return std::make_unique<ast::IntegerLiteral>(std::stoi(_current_token.literal()), _current_token);
+    return std::make_unique<ast::IntegerLiteral>(std::stoi(_current_token.literal()));
 }
 
 std::unique_ptr<ast::ExpressionStatement> parser::Parser::parse_expression_statement() {
@@ -214,7 +221,7 @@ ExpressionP parser::Parser::parse_infix_expression(ExpressionP expression) {
 }
 
 ExpressionP parser::Parser::parse_boolean_literal() {
-    return std::make_unique<ast::BooleanLiteral>(_current_token, _current_token.kind() == token::Kind::True);
+    return std::make_unique<ast::BooleanLiteral>(_current_token.kind() == token::Kind::True);
 }
 
 ExpressionP parser::Parser::parse_grouped_expression() {
@@ -233,6 +240,9 @@ bool parser::Parser::expect_peek(token::Kind kind) {
         return true;
     } else {
         peek_error(kind);
+        std::stringstream ss;
+        ss << "Expected token " << kind << ", found token " << _peek_token.kind();
+        throw std::invalid_argument{ss.str()};
         return false;
     }
 }
@@ -322,9 +332,7 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_update_statement() {
         throw std::invalid_argument{"bad table: " + _current_token.literal()};
     }
 
-    if (!expect_peek(token::Kind::Set)) {
-        throw std::invalid_argument{"No SET clause in update: " + _peek_token.literal()};
-    }
+    expect_peek(token::Kind::Set);
 
     next_token();
 
@@ -358,9 +366,7 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_update_statement() {
 
 std::pair<ast::Identifier, std::unique_ptr<ast::Expression>> parser::Parser::parse_field_update() {
     auto identifier = ast::Identifier{_current_token, _current_token.literal()};
-    if (!expect_peek(token::Kind::Equals)) {
-        throw std::invalid_argument{"expected =, found " + _peek_token.literal()};
-    }
+    expect_peek(token::Kind::Equals);
 
     next_token();
     auto expression = parse_expression(Precedence::Lowest);
@@ -369,4 +375,29 @@ std::pair<ast::Identifier, std::unique_ptr<ast::Expression>> parser::Parser::par
     }
 
     return {identifier, std::move(*expression)};
+}
+
+std::unique_ptr<ast::Statement> parser::Parser::parse_insert_statement() {
+    expect_peek(token::Kind::Into);
+    next_token();
+    auto table = parse_table_name();
+    if (!table) {
+        throw std::invalid_argument{"Failed to parse table name"};
+    }
+
+    expect_peek(token::Kind::Values);
+
+    expect_peek(token::Kind::LParen);
+
+    next_token();
+
+    auto expressions = parse_expression_list();
+
+    expect_peek(token::Kind::RParen);
+
+    return std::make_unique<ast::InsertStatement>(std::move(*table), std::move(expressions));
+}
+
+ExpressionP parser::Parser::parse_string_literal() {
+    return std::make_unique<ast::StringLiteral>(_current_token.literal());
 }

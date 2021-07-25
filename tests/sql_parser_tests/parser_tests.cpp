@@ -7,6 +7,7 @@
 #include <src/sql_parser/parser.h>
 #include <src/sql_parser/select_statement.h>
 #include <src/sql_parser/update_statement.h>
+#include <src/sql_parser/insert_statement.h>
 
 std::unique_ptr<ast::Statement> parse(const std::string &s) {
     return parser::Parser{lexer::Lexer{s}}.parse();
@@ -177,4 +178,14 @@ TEST(Parser, UpdateStatement) {
     ASSERT_EQ(
         ss.str(),
         "UPDATE [person] SET {name = 123, age = 11111, is_replicant = FALSE}");
+}
+
+TEST(Parser, InsertStatement) {
+    auto statement = parse(R"(INSERT INTO person VALUES ("cujo", 7, FALSE))");
+    const auto insert_statement = dynamic_cast<const ast::InsertStatement *>(statement.get());
+    ASSERT_NE(insert_statement, nullptr);
+
+    std::stringstream ss;
+    ss << *insert_statement;
+    ASSERT_EQ(ss.str(), R"(INSERT INTO [person] VALUES {"cujo", 7, FALSE})");
 }
