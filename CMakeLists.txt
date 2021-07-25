@@ -35,7 +35,7 @@ add_executable(
         src/sql_parser/lexer.cpp
         src/sql_parser/token.h
         src/sql_parser/token.cpp
-)
+        src/page_scanner.cpp src/page_scanner.h src/page_visitors.cpp src/page_visitors.h)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -83,7 +83,7 @@ add_executable(
         src/sql_parser/lexer.cpp
         src/sql_parser/token.h
         src/sql_parser/token.cpp
-)
+        src/page_scanner.cpp src/page_scanner.h src/page_visitors.cpp src/page_visitors.h tests/page_scanner_tests.cpp)
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)

@@ -1,9 +1,10 @@
 #include <fstream>
+#include <utility>
 #include "page_creator.h"
 #include "page_cache.h"
 
-page::PageCreator::PageCreator(const std::string &table_name, page::MetadataPage *metadata_page) : _table_name(
-    table_name), _metadata_page(metadata_page) {}
+page::PageCreator::PageCreator(std::string table_name, page::MetadataPage *metadata_page) :
+    _table_name(std::move(table_name)), _metadata_page(metadata_page) {}
 
 page::PageId page::PageCreator::create_page(page::PageType page_type) {
     if (!_metadata_page->has_pages_available()) {

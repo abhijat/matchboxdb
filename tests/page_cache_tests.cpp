@@ -24,25 +24,17 @@ protected:
 
 };
 
-class PageCacheTests : public ::testing::Test {
-protected:
-    void SetUp() override {
-        testutils::create_test_table();
-    }
-
-    void TearDown() override {
-        testutils::cleanup_test_table();
-    }
+class PageCacheTestSuite : public testutils::TestsWithRealTable {
 };
 
 
-TEST_F(PageCacheTests, MetadataPageForTable) {
+TEST_F(PageCacheTestSuite, MetadataPageForTable) {
     page_cache::PageCache pc{5, {testutils::k_table_name}};
     auto metdata_page = pc.metadata_page_for_table(testutils::k_table_name);
     ASSERT_EQ(metdata_page->table_name(), testutils::k_table_name);
 }
 
-TEST_F(PageCacheTests, FirstCallCreatesPages) {
+TEST_F(PageCacheTestSuite, FirstCallCreatesPages) {
     page_cache::PageCache pc{5, {testutils::k_table_name}};
     auto metdata_page = pc.metadata_page_for_table(testutils::k_table_name);
 
@@ -56,7 +48,7 @@ TEST_F(PageCacheTests, FirstCallCreatesPages) {
     ASSERT_EQ(r->page_type(), page::PageType::RowMap);
 }
 
-TEST_F(PageCacheTests, WriteDirtyPagesToDisk) {
+TEST_F(PageCacheTestSuite, WriteDirtyPagesToDisk) {
     TestPageCache pc{5, {testutils::k_table_name}};
     const auto&[r, d] = pc.get_pages_for_data_size(testutils::k_table_name, 32);
 
@@ -74,7 +66,7 @@ TEST_F(PageCacheTests, WriteDirtyPagesToDisk) {
     ASSERT_EQ(page::page_type_from_buffer(buffer), page::PageType::RowMap);
 }
 
-TEST_F(PageCacheTests, WriteDirtyPagesUpdatesTableMetadata) {
+TEST_F(PageCacheTestSuite, WriteDirtyPagesUpdatesTableMetadata) {
     page_cache::PageCache pc{5, {testutils::k_table_name}};
     auto metadata_page = pc.metadata_page_for_table(testutils::k_table_name);
     const auto&[r, d] = pc.get_pages_for_data_size(testutils::k_table_name, 32);
@@ -99,7 +91,7 @@ TEST_F(PageCacheTests, WriteDirtyPagesUpdatesTableMetadata) {
     }
 }
 
-TEST_F(PageCacheTests, CacheEviction) {
+TEST_F(PageCacheTestSuite, CacheEviction) {
     TestPageCache pc{2, {testutils::k_table_name}};
     ASSERT_TRUE(pc.last_evicted.empty());
 

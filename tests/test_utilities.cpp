@@ -14,3 +14,11 @@ void testutils::cleanup_test_table() {
         std::filesystem::remove(k_file_name);
     }
 }
+
+void testutils::TestsWithRealTable::SetUp() {
+    create_test_table();
+}
+
+void testutils::TestsWithRealTable::TearDown() {
+    cleanup_test_table();
+}

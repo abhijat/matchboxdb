@@ -3,6 +3,7 @@
 #include "page.h"
 #include "row_mapping_page.h"
 #include "page_creator.h"
+#include "page_scanner.h"
 
 #include <utility>
 #include <fstream>
@@ -85,6 +86,7 @@ page_cache::PageCache::make_page_from_buffer(const page::PageType &page_type,
 }
 
 std::string page_cache::PageCache::evict() {
+    // TODO lock here
     auto page_id_to_evict = _page_ids.back().first;
     _page_ids.pop_back();
     _pages.erase(page_id_to_evict);
@@ -139,8 +141,7 @@ page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, ui
 }
 
 uint32_t page_cache::PageCache::row_id_for_table(const std::string &table_name) {
-    auto *metadata_page = dynamic_cast<page::MetadataPage *>(get_page_id(0, table_name, page::PageType::Metadata));
-    return metadata_page->next_row_id();
+    return metadata_page_for_table(table_name)->next_row_id();
 }
 
 void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
@@ -171,38 +172,13 @@ page::MetadataPage *page_cache::PageCache::metadata_page_for_table(const std::st
 
 void page_cache::PageCache::scan_free_pages_in_table_stream(const std::string &table_name, std::istream &is,
                                                             uint32_t n_pages_to_scan) {
-    // skip ahead of the metadata page
-    is.seekg(page::k_page_size, std::ios::beg);
+    page_visitors::FreePageCollector free_page_collector{};
+    page_scan_utils::PageScanner page_scanner{is, free_page_collector};
 
-    std::vector<page::FreePageInfo> free_data_pages{};
-    std::vector<page::FreePageInfo> free_row_map_pages{};
+    page_scanner.scan_pages();
 
-    for (auto i = 0; i < n_pages_to_scan; ++i) {
-        // TODO - read only the header here. we can get page id and free space from there.
-        //  No need to load up the entire buffer in memory.
-        //  Then we also need to advance the stream manually to next page offset.
-        auto buffer = stream_utils::read_page_from_stream(is);
-        auto free_space = page::free_space_from_buffer(buffer);
-        if (free_space > 0) {
-            switch (page::page_type_from_buffer(buffer)) {
-                case page::PageType::Data: {
-                    auto data_page = page::SlottedDataPage{buffer};
-                    free_data_pages.emplace_back(data_page.page_id(), free_space);
-                    break;
-                }
-                case page::PageType::RowMap: {
-                    auto rowmap_page = page::RowMappingPage{buffer};
-                    free_row_map_pages.emplace_back(rowmap_page.page_id(), free_space);
-                    break;
-                }
-                case page::PageType::Metadata:
-                    break;
-            }
-        }
-    }
-
-    _free_data_pages.insert({table_name, free_data_pages});
-    _free_rowmap_pages.insert({table_name, free_row_map_pages});
+    _free_data_pages.emplace(table_name, free_page_collector.free_data_pages());
+    _free_rowmap_pages.emplace(table_name, free_page_collector.free_row_map_pages());
 }
 
 std::optional<page::PageId>

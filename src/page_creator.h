@@ -8,7 +8,7 @@ namespace page {
 
 class PageCreator {
 public:
-    PageCreator(const std::string &table_name, MetadataPage *metadata_page);
+    PageCreator(std::string table_name, MetadataPage *metadata_page);
     PageId create_page(page::PageType page_type);
 
 protected:
