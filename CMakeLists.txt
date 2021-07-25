@@ -124,7 +124,7 @@ add_executable(
         src/sql_parser/update_statement.cpp
         src/sql_parser/update_statement.h
         src/sql_parser/insert_statement.cpp
-        src/sql_parser/insert_statement.h src/sql_parser/string_literal.cpp src/sql_parser/string_literal.h)
+        src/sql_parser/insert_statement.h src/sql_parser/string_literal.cpp src/sql_parser/string_literal.h src/sql_parser/delete_statement.cpp src/sql_parser/delete_statement.h)
 target_link_libraries(sql_tests gtest gmock gtest_main)
 target_include_directories(sql_tests PRIVATE .)
 add_test(NAME sql_tests COMMAND sql_tests)
@@ -163,4 +163,4 @@ add_executable(
         src/sql_parser/update_statement.cpp
         src/sql_parser/update_statement.h
         src/sql_parser/insert_statement.cpp
-        src/sql_parser/insert_statement.h src/sql_parser/string_literal.cpp src/sql_parser/string_literal.h)
+        src/sql_parser/insert_statement.h src/sql_parser/string_literal.cpp src/sql_parser/string_literal.h src/sql_parser/delete_statement.cpp src/sql_parser/delete_statement.h)

@@ -12,6 +12,7 @@
 #include "update_statement.h"
 #include "insert_statement.h"
 #include "string_literal.h"
+#include "delete_statement.h"
 
 #include <utility>
 
@@ -81,6 +82,8 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_statement() {
             return parse_update_statement();
         case token::Kind::Insert:
             return parse_insert_statement();
+        case token::Kind::Delete:
+            return parse_delete_statement();
         default:
             return parse_expression_statement();
     }
@@ -400,4 +403,24 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_insert_statement() {
 
 ExpressionP parser::Parser::parse_string_literal() {
     return std::make_unique<ast::StringLiteral>(_current_token.literal());
+}
+
+std::unique_ptr<ast::Statement> parser::Parser::parse_delete_statement() {
+    expect_peek(token::Kind::From);
+
+    next_token();
+    auto table = parse_table_name();
+    if (!table) {
+        throw std::invalid_argument{"bad table name: " + _current_token.literal()};
+    }
+
+    std::optional<std::unique_ptr<ast::Expression>> where{};
+    if (peek_token_is(token::Kind::Where)) {
+        next_token();
+        next_token();
+
+        where = parse_expression(Precedence::Lowest);
+    }
+
+    return std::make_unique<ast::DeleteStatement>(std::move(*table), std::move(where));
 }

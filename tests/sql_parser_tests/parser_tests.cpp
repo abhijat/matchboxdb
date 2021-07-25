@@ -8,6 +8,7 @@
 #include <src/sql_parser/select_statement.h>
 #include <src/sql_parser/update_statement.h>
 #include <src/sql_parser/insert_statement.h>
+#include <src/sql_parser/delete_statement.h>
 
 std::unique_ptr<ast::Statement> parse(const std::string &s) {
     return parser::Parser{lexer::Lexer{s}}.parse();
@@ -188,4 +189,14 @@ TEST(Parser, InsertStatement) {
     std::stringstream ss;
     ss << *insert_statement;
     ASSERT_EQ(ss.str(), R"(INSERT INTO [person] VALUES {"cujo", 7, FALSE})");
+}
+
+TEST(Parser, DeleteStatement) {
+    auto statement = parse(R"(DELETE FROM person WHERE name = "cujo" AND age = 7)");
+    const auto delete_statement = dynamic_cast<const ast::DeleteStatement *>(statement.get());
+    ASSERT_NE(delete_statement, nullptr);
+
+    std::stringstream ss;
+    ss << *delete_statement;
+    ASSERT_EQ(ss.str(), R"(DELETE FROM [person] WHERE ((name = "cujo") AND (age = 7)))");
 }

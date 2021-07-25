@@ -123,6 +123,8 @@ protected:
     std::unique_ptr<ast::Statement> parse_insert_statement();
 
     ExpressionP parse_string_literal();
+
+    std::unique_ptr<ast::Statement> parse_delete_statement();
 };
 
 }
