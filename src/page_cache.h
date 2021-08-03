@@ -23,7 +23,7 @@ public:
     std::pair<page::RowMappingPage *, page::SlottedDataPage *>
     get_pages_for_data_size(const std::string &table_name, uint32_t data_size);
 
-    uint32_t row_id_for_table(const std::string &table_name);
+    uint32_t next_row_id_for_table(const std::string &table_name);
 
     page::RowMappingPage *rowmap_page_for_row_id(const std::string &table_name, uint32_t row_id);
 

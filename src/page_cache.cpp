@@ -117,7 +117,7 @@ std::pair<page::RowMappingPage *, page::SlottedDataPage *>
 page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, uint32_t data_size) {
     auto data_page_id_maybe = get_page_id_for_size(table_name, data_size, page::PageType::Data);
     auto row_map_page_id_maybe = get_page_id_for_size(table_name, page::k_record_width, page::PageType::RowMap);
-    auto *metadata_page = metadata_page_for_table(table_name);
+    auto metadata_page = metadata_page_for_table(table_name);
 
     page::PageCreator page_creator{table_name, metadata_page};
     uint32_t data_page_id = data_page_id_maybe ? *data_page_id_maybe : page_creator.create_page(page::PageType::Data);
@@ -140,7 +140,7 @@ page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, ui
     return std::make_pair(row_map_page, data_page);
 }
 
-uint32_t page_cache::PageCache::row_id_for_table(const std::string &table_name) {
+uint32_t page_cache::PageCache::next_row_id_for_table(const std::string &table_name) {
     return metadata_page_for_table(table_name)->next_row_id();
 }
 
