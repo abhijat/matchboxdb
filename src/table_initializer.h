@@ -3,12 +3,17 @@
 
 #include <string>
 #include "metadata.h"
+#include "sql_parser/create_statement.h"
+
+namespace ast {
+class CreateStatement;
+}
 
 namespace initializers {
 
 class TableInitializer {
 public:
-    TableInitializer(std::string table_name, std::string file_name, uint32_t file_size, metadata::Metadata metadata);
+    TableInitializer(const ast::CreateStatement &create_statement, uint32_t file_size);
 
     void initialize();
 
@@ -20,9 +25,9 @@ protected:
     [[nodiscard]] uint32_t calculate_total_pages() const;
 
 protected:
-    metadata::Metadata _metadata;
-    std::string _table_name;
     std::string _file_name;
+    std::string _table_name;
+    metadata::Metadata _metadata;
     uint32_t _file_size;
 };
 

@@ -11,6 +11,8 @@ public:
 
     void repr(std::ostream &os) const override;
 
+    std::string table_name() const;
+
 protected:
     std::string _table_name;
 };

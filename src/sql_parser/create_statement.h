@@ -4,6 +4,7 @@
 #include <vector>
 #include "statement.h"
 #include "table.h"
+#include "../metadata.h"
 
 namespace ast {
 
@@ -16,6 +17,8 @@ public:
     [[nodiscard]] const Table &table_name() const;
 
     [[nodiscard]] const std::vector<ast::FieldDefinition> &field_definitions() const;
+
+    [[nodiscard]] metadata::Metadata metadata() const;
 
     void repr(std::ostream &os) const override;
 

@@ -7,3 +7,7 @@ void ast::Table::repr(std::ostream &os) const {
 }
 
 ast::Table::Table(std::string table_name) : _table_name(std::move(table_name)) {}
+
+std::string ast::Table::table_name() const {
+    return _table_name;
+}

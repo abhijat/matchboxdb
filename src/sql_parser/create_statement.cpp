@@ -27,3 +27,18 @@ void ast::CreateStatement::repr(std::ostream &os) const {
     }
     os << ")";
 }
+
+metadata::Metadata ast::CreateStatement::metadata() const {
+    std::vector<std::string> names(_field_definitions.size());
+    std::vector<metadata::Kind> kinds(_field_definitions.size());
+
+    std::transform(_field_definitions.cbegin(), _field_definitions.cend(), names.begin(), [](const auto &fd) {
+        return fd.field_name();
+    });
+
+    std::transform(_field_definitions.cbegin(), _field_definitions.cend(), kinds.begin(), [](const auto &fd) {
+        return fd.field_kind();
+    });
+
+    return {names, kinds};
+}

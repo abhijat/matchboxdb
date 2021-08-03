@@ -83,6 +83,12 @@ add_executable(
         src/sql_parser/lexer.cpp
         src/sql_parser/token.h
         src/sql_parser/token.cpp
+        src/sql_parser/create_statement.cpp
+        src/sql_parser/create_statement.h
+        src/sql_parser/table.cpp
+        src/sql_parser/table.h
+        src/sql_parser/field_definition.cpp
+        src/sql_parser/field_definition.h
         src/page_scanner.cpp src/page_scanner.h src/page_visitors.cpp src/page_visitors.h tests/page_scanner_tests.cpp)
 target_link_libraries(alltests gtest gmock gtest_main)
 

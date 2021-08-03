@@ -1,20 +1,16 @@
 #include "table_initializer.h"
 #include "metadata_page.h"
 #include "page.h"
-#include "slotted_data_page.h"
-#include "row_mapping_page.h"
+#include "sql_parser/create_statement.h"
 
-#include <utility>
 #include <fstream>
 #include <vector>
 #include <iostream>
 
-initializers::TableInitializer::TableInitializer(std::string table_name, std::string file_name, uint32_t file_size,
-                                                 metadata::Metadata metadata) :
-    _metadata{std::move(metadata)},
-    _table_name(std::move(table_name)),
-    _file_name(std::move(file_name)),
-    _file_size(file_size) {
+initializers::TableInitializer::TableInitializer(const ast::CreateStatement &create_statement, uint32_t file_size) :
+    _file_size(file_size), _metadata(create_statement.metadata()),
+    _table_name(create_statement.table_name().table_name()) {
+    _file_name = _table_name + ".mbx";
 }
 
 std::ofstream initializers::TableInitializer::initialize_file() {
@@ -29,19 +25,9 @@ std::ofstream initializers::TableInitializer::initialize_file() {
 }
 
 std::ofstream &initializers::TableInitializer::write_metadata_page(std::ofstream &ofs) {
-    page::MetadataPage metadata_page{
-        _table_name,
-        _metadata.names,
-        _metadata.types,
-        0,
-        0,
-        0,
-        calculate_total_pages(),
-    };
-
-    auto buffer = metadata_page.buffer();
+    page::MetadataPage metadata_page{_table_name, _metadata.names, _metadata.types, 0, 0, 0, calculate_total_pages()};
     ofs.seekp(0, std::ios::beg);
-    ofs.write(reinterpret_cast<const char *>(buffer.data()), page::k_page_size);
+    ofs.write(reinterpret_cast<const char *>(metadata_page.buffer().data()), page::k_page_size);
     return ofs;
 }
 

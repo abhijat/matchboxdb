@@ -2,11 +2,15 @@
 #include "test_utilities.h"
 #include "../src/metadata.h"
 #include "../src/table_initializer.h"
+#include "../src/sql_parser/token.h"
+#include "../src/sql_parser/field_definition.h"
 
 void testutils::create_test_table() {
-    metadata::Metadata md{{"name",                 "age"},
-                          {metadata::Kind::String, metadata::Kind::UnsignedInt}};
-    initializers::TableInitializer{k_table_name, k_file_name, k_table_size_mb, md}.initialize();
+    ast::CreateStatement create_statement{ast::Table{k_table_name}, {
+        {"name", token::Kind::ColumnKindString},
+        {"age", token::Kind::ColumnKindUnsignedInteger},
+    }};
+    initializers::TableInitializer{create_statement, k_table_size_mb}.initialize();
 }
 
 void testutils::cleanup_test_table() {

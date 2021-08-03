@@ -4,13 +4,13 @@
 
 #include "../src/table_initializer.h"
 #include "../src/page_creator.h"
+#include "../src/sql_parser/field_definition.h"
 
 class PageCreatorTests : public ::testing::Test {
 protected:
     static void SetUpTestSuite() {
-        metadata::Metadata m{{"name"},
-                             {metadata::Kind::String}};
-        initializers::TableInitializer t{"employee", "employee.mbx", 1, m};
+        ast::CreateStatement create_statement{ast::Table{"employee"}, {{"name", token::Kind::ColumnKindString}}};
+        initializers::TableInitializer t{create_statement, 1};
         t.initialize();
     }
 
