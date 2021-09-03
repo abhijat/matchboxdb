@@ -1,12 +1,12 @@
 #ifndef MATCHBOXDB_METADATA_H
 #define MATCHBOXDB_METADATA_H
 
-#include <variant>
-#include <utility>
+#include <ostream>
 #include <sstream>
 #include <string>
+#include <utility>
+#include <variant>
 #include <vector>
-#include <ostream>
 
 namespace metadata {
 using DataType = std::variant<std::string, uint32_t, bool>;
@@ -28,4 +28,4 @@ struct Metadata {
 
 }
 
-#endif //MATCHBOXDB_METADATA_H
+#endif // MATCHBOXDB_METADATA_H
