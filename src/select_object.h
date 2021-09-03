@@ -6,7 +6,7 @@
 namespace actions {
 class SelectObject {
 public:
-    SelectObject(page_cache::PageCache &page_cache, const std::string &table_name, uint32_t row_id);
+    SelectObject(page_cache::PageCache &page_cache, std::string table_name, uint32_t row_id);
 
     tuple::Tuple get();
 
