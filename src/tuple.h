@@ -1,14 +1,13 @@
 #ifndef MATCHBOXDB_TUPLE_H
 #define MATCHBOXDB_TUPLE_H
 
-#include <variant>
-#include <string>
-#include <vector>
-#include <ostream>
 #include "metadata.h"
+#include <ostream>
+#include <string>
+#include <variant>
+#include <vector>
 
 namespace tuple {
-
 
 class Tuple {
 public:
@@ -61,5 +60,4 @@ struct OstreamVisitor {
 
 }
 
-
-#endif //MATCHBOXDB_TUPLE_H
+#endif // MATCHBOXDB_TUPLE_H
