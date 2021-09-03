@@ -34,9 +34,9 @@ namespace parser {
 
 enum class Precedence {
     Lowest,
-    LessGreater,
     Or,
     And,
+    LessGreater,
     Equals,
     Prefix,
 };

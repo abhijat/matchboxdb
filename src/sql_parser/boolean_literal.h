@@ -13,6 +13,10 @@ public:
 
     [[nodiscard]] bool value() const;
 
+    std::optional<metadata::DataType> evaluate() const override;
+
+    std::optional<metadata::DataType> accept(ExpressionVisitor &expression_visitor) const override;
+
 protected:
     bool _value;
 };

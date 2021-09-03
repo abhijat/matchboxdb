@@ -2,6 +2,7 @@
 
 #include "expression.h"
 #include "insert_statement.h"
+#include "statement_visitor.h"
 
 ast::InsertStatement::InsertStatement(Table table, std::vector<std::unique_ptr<Expression>> inserts)
     : _table(std::move(table)), _inserts(std::move(inserts)) {}
@@ -30,4 +31,8 @@ void ast::InsertStatement::repr(std::ostream &os) const {
     os << s.substr(0, s.size() - 2);
 
     os << "}";
+}
+
+void ast::InsertStatement::accept(ast::StatementVisitor &visitor) const {
+    visitor.visit(*this);
 }

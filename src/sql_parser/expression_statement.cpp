@@ -12,3 +12,7 @@ ast::ExpressionStatement::ExpressionStatement(token::Token token, std::unique_pt
 const std::unique_ptr<ast::Expression> &ast::ExpressionStatement::expression() const {
     return _expression;
 }
+
+void ast::ExpressionStatement::accept(ast::StatementVisitor &visitor) const {
+
+}

@@ -20,8 +20,10 @@ public:
 
     void repr(std::ostream &os) const override;
 
+    void accept(StatementVisitor &visitor) const override;
+
 protected:
-    // what we are selecting (eg the foo in SELECT foo)
+    // what we are selecting (e.g. the foo in SELECT foo)
     std::vector<std::unique_ptr<ast::Expression>> _selected;
 
     // where we are selecting it from. the table is not an expression, for now just one table at a time.

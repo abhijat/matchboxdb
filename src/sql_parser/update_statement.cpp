@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "expression.h"
+#include "statement_visitor.h"
 
 ast::UpdateStatement::UpdateStatement(ast::Table table, std::map<Identifier, std::unique_ptr<Expression>> update,
                                       std::optional<std::unique_ptr<Expression>> where,
@@ -54,4 +55,8 @@ std::vector<std::pair<ast::Identifier, ast::Expression *>> ast::UpdateStatement:
         updates.emplace_back(ordered, _update.at(ordered).get());
     }
     return updates;
+}
+
+void ast::UpdateStatement::accept(ast::StatementVisitor &visitor) const {
+    visitor.visit(*this);
 }

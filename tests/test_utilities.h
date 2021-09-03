@@ -3,6 +3,7 @@
 
 
 #include <gtest/gtest.h>
+#include "../src/sql_parser/statement.h"
 
 namespace testutils {
 
@@ -20,6 +21,9 @@ protected:
 
     void TearDown() override;
 };
+
+std::unique_ptr<ast::Statement> parse(const std::string &s);
+
 
 }
 

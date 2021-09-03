@@ -1,5 +1,6 @@
 #include "delete_statement.h"
 #include "expression.h"
+#include "statement_visitor.h"
 
 ast::DeleteStatement::DeleteStatement(ast::Table table, std::optional<std::unique_ptr<Expression>> where)
     : _table(std::move(table)), _where(std::move(where)) {
@@ -23,4 +24,8 @@ void ast::DeleteStatement::repr(std::ostream &os) const {
         os << " WHERE ";
         (*_where)->repr(os);
     }
+}
+
+void ast::DeleteStatement::accept(ast::StatementVisitor &visitor) const {
+    visitor.visit(*this);
 }

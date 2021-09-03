@@ -14,6 +14,10 @@ public:
 
     [[nodiscard]] int64_t value() const;
 
+    std::optional<metadata::DataType> evaluate() const override;
+
+    std::optional<metadata::DataType> accept(ExpressionVisitor &expression_visitor) const override;
+
 protected:
     int64_t _value;
 };

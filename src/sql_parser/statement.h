@@ -4,7 +4,12 @@
 #include "node.h"
 
 namespace ast {
+
+class StatementVisitor;
+
 class Statement : public Node {
+public:
+    virtual void accept(StatementVisitor &visitor) const = 0;
 };
 }
 

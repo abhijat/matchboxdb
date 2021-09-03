@@ -22,6 +22,8 @@ public:
 
     void repr(std::ostream &os) const override;
 
+    void accept(StatementVisitor &visitor) const override;
+
 protected:
     Table _table;
     std::optional<std::unique_ptr<Expression>> _where;

@@ -1,4 +1,5 @@
 #include "infix_expression.h"
+#include "expression_visitor.h"
 
 #include <utility>
 
@@ -27,4 +28,12 @@ void ast::InfixExpression::repr(std::ostream &os) const {
     os << " " << _infix_operator << " ";
     _right->repr(os);
     os << ")";
+}
+
+std::optional<metadata::DataType> ast::InfixExpression::evaluate() const {
+    return {};
+}
+
+std::optional<metadata::DataType> ast::InfixExpression::accept(ast::ExpressionVisitor &expression_visitor) const {
+    return expression_visitor.visit(*this);
 }

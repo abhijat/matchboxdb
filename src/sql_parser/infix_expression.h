@@ -19,6 +19,10 @@ public:
 
     void repr(std::ostream &os) const override;
 
+    std::optional<metadata::DataType> evaluate() const override;
+
+    std::optional<metadata::DataType> accept(ExpressionVisitor &expression_visitor) const override;
+
 protected:
     token::Token _token;
     std::unique_ptr<ast::Expression> _left;

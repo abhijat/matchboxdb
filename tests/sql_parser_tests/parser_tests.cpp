@@ -1,18 +1,15 @@
 #include <gtest/gtest.h>
-#include <src/sql_parser/boolean_literal.h>
-#include <src/sql_parser/create_statement.h>
-#include <src/sql_parser/expression_statement.h>
-#include <src/sql_parser/infix_expression.h>
-#include <src/sql_parser/integer_literal.h>
-#include <src/sql_parser/parser.h>
-#include <src/sql_parser/select_statement.h>
-#include <src/sql_parser/update_statement.h>
-#include <src/sql_parser/insert_statement.h>
-#include <src/sql_parser/delete_statement.h>
-
-std::unique_ptr<ast::Statement> parse(const std::string &s) {
-    return parser::Parser{lexer::Lexer{s}}.parse();
-}
+#include "../../src/sql_parser/boolean_literal.h"
+#include "../../src/sql_parser/create_statement.h"
+#include "../../src/sql_parser/expression_statement.h"
+#include "../../src/sql_parser/infix_expression.h"
+#include "../../src/sql_parser/integer_literal.h"
+#include "../../src/sql_parser/parser.h"
+#include "../../src/sql_parser/select_statement.h"
+#include "../../src/sql_parser/update_statement.h"
+#include "../../src/sql_parser/insert_statement.h"
+#include "../../src/sql_parser/delete_statement.h"
+#include "../test_utilities.h"
 
 void assert_int_literal(const ast::Expression *expression, int64_t value) {
     auto integer_literal = dynamic_cast<const ast::IntegerLiteral *>(expression);
@@ -45,12 +42,12 @@ void assert_infix_expression(const ast::Statement *statement,
 }
 
 TEST(Parser, IntLiteral) {
-    auto statement = parse("123");
+    auto statement = testutils::parse("123");
     assert_int_literal(statement.get(), 123);
 }
 
 TEST(Parser, Identifiers) {
-    auto statement = parse("foobar");
+    auto statement = testutils::parse("foobar");
     const auto s = dynamic_cast<ast::ExpressionStatement *>(statement.get());
     ASSERT_NE(s, nullptr);
 
@@ -78,7 +75,7 @@ TEST(Parser, InfixExpressionsSimple) {
     };
 
     for (const auto &td : test_data) {
-        auto statement = parse(td.input);
+        auto statement = testutils::parse(td.input);
         assert_infix_expression(statement.get(), td.op, td.lhs, td.rhs);
     }
 }
@@ -107,7 +104,7 @@ TEST(Parser, Grouping) {
             {"a AND b AND c", "((a AND b) AND c)"},
             {"a OR b OR c",   "((a OR b) OR c)"},
         }) {
-        auto statement = parse(input);
+        auto statement = testutils::parse(input);
         assert_infix_is_string(statement.get(), output);
     }
 }
@@ -129,7 +126,7 @@ TEST(Parser, Booleans) {
         {"true",  true},
         {"false", false},
     }) {
-        assert_boolean_literal(parse(input).get(), output);
+        assert_boolean_literal(testutils::parse(input).get(), output);
     }
 }
 
@@ -138,13 +135,13 @@ TEST(Parser, GroupedExpressions) {
         std::vector<std::pair<std::string, std::string>>{
             {"a AND (b OR c)", "(a AND (b OR c))"},
         }) {
-        auto statement = parse(input);
+        auto statement = testutils::parse(input);
         assert_infix_is_string(statement.get(), output);
     }
 }
 
 TEST(Parser, SelectStatement) {
-    auto statement = parse("SELECT name, author FROM western_canon WHERE foo = 1 "
+    auto statement = testutils::parse("SELECT name, author FROM western_canon WHERE foo = 1 "
                            "AND bar = 22 OR x = FALSE AND name != 47;");
     const auto select_statement =
         dynamic_cast<const ast::SelectStatement *>(statement.get());
@@ -157,7 +154,7 @@ TEST(Parser, SelectStatement) {
 }
 
 TEST(Parser, CreateStatement) {
-    auto statement = parse("CREATE TABLE person (name STRING, age UNSIGNED_INT, "
+    auto statement = testutils::parse("CREATE TABLE person (name STRING, age UNSIGNED_INT, "
                            "is_replicant BOOLEAN);");
     const auto create_statement =
         dynamic_cast<const ast::CreateStatement *>(statement.get());
@@ -170,7 +167,7 @@ TEST(Parser, CreateStatement) {
 
 TEST(Parser, UpdateStatement) {
     auto statement =
-        parse("UPDATE person SET name = 123, age = 11111, is_replicant = FALSE;");
+        testutils::parse("UPDATE person SET name = 123, age = 11111, is_replicant = FALSE;");
     const auto update_statement =
         dynamic_cast<const ast::UpdateStatement *>(statement.get());
     ASSERT_NE(update_statement, nullptr);
@@ -182,7 +179,7 @@ TEST(Parser, UpdateStatement) {
 }
 
 TEST(Parser, InsertStatement) {
-    auto statement = parse(R"(INSERT INTO person VALUES ("cujo", 7, FALSE))");
+    auto statement = testutils::parse(R"(INSERT INTO person VALUES ("cujo", 7, FALSE))");
     const auto insert_statement = dynamic_cast<const ast::InsertStatement *>(statement.get());
     ASSERT_NE(insert_statement, nullptr);
 
@@ -192,7 +189,7 @@ TEST(Parser, InsertStatement) {
 }
 
 TEST(Parser, DeleteStatement) {
-    auto statement = parse(R"(DELETE FROM person WHERE name = "cujo" AND age = 7)");
+    auto statement = testutils::parse(R"(DELETE FROM person WHERE name = "cujo" AND age = 7)");
     const auto delete_statement = dynamic_cast<const ast::DeleteStatement *>(statement.get());
     ASSERT_NE(delete_statement, nullptr);
 

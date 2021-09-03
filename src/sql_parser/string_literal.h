@@ -13,6 +13,10 @@ public:
 
     void repr(std::ostream &os) const override;
 
+    std::optional<metadata::DataType> evaluate() const override;
+
+    std::optional<metadata::DataType> accept(ExpressionVisitor &expression_visitor) const override;
+
 protected:
     std::string _value{};
 };

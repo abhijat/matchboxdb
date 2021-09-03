@@ -15,6 +15,8 @@ public:
 
     [[nodiscard]] const std::unique_ptr<Expression> &expression() const;
 
+    void accept(StatementVisitor &visitor) const override;
+
 protected:
     token::Token _token;
     std::unique_ptr<Expression> _expression;

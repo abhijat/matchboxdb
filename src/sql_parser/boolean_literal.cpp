@@ -1,4 +1,5 @@
 #include "boolean_literal.h"
+#include "expression_visitor.h"
 
 #include <utility>
 
@@ -10,4 +11,12 @@ void ast::BooleanLiteral::repr(std::ostream &os) const {
 
 bool ast::BooleanLiteral::value() const {
     return _value;
+}
+
+std::optional<metadata::DataType> ast::BooleanLiteral::evaluate() const {
+    return {_value};
+}
+
+std::optional<metadata::DataType> ast::BooleanLiteral::accept(ast::ExpressionVisitor &expression_visitor) const {
+    return expression_visitor.visit(*this);
 }

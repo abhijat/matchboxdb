@@ -1,5 +1,6 @@
 #include "create_statement.h"
 #include "field_definition.h"
+#include "statement_visitor.h"
 
 #include <utility>
 
@@ -41,4 +42,8 @@ metadata::Metadata ast::CreateStatement::metadata() const {
     });
 
     return {names, kinds};
+}
+
+void ast::CreateStatement::accept(ast::StatementVisitor &visitor) const {
+    visitor.visit(*this);
 }

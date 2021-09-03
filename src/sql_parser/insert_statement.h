@@ -21,6 +21,8 @@ public:
 
     void repr(std::ostream &os) const override;
 
+    void accept(StatementVisitor &visitor) const override;
+
 protected:
     Table _table;
     std::vector<std::unique_ptr<Expression>> _inserts;

@@ -1,4 +1,5 @@
 #include "select_statement.h"
+#include "statement_visitor.h"
 
 #include <utility>
 #include <iterator>
@@ -32,4 +33,8 @@ void ast::SelectStatement::repr(std::ostream &os) const {
         os << " WHERE ";
         _where->get()->repr(os);
     }
+}
+
+void ast::SelectStatement::accept(ast::StatementVisitor &visitor) const {
+    visitor.visit(*this);
 }
