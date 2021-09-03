@@ -1,8 +1,9 @@
 #include "insert_object.h"
 
-actions::InsertObject::InsertObject(page_cache::PageCache &page_cache, const std::string &table_name,
-                                    const tuple::Tuple &tuple) : _page_cache(page_cache), _table_name(table_name),
-                                                                 _tuple(tuple) {
+#include <utility>
+
+actions::InsertObject::InsertObject(page_cache::PageCache &page_cache, std::string table_name, tuple::Tuple tuple)
+    : _page_cache(page_cache), _table_name(std::move(table_name)), _tuple(std::move(tuple)) {
 }
 
 uint32_t actions::InsertObject::save() {

@@ -7,7 +7,7 @@ namespace actions {
 
 class InsertObject {
 public:
-    InsertObject(page_cache::PageCache &page_cache, const std::string &table_name, const tuple::Tuple &tuple);
+    InsertObject(page_cache::PageCache &page_cache, std::string table_name, tuple::Tuple tuple);
 
     uint32_t save();
 
