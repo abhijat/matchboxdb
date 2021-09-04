@@ -95,7 +95,7 @@ add_executable(
         tests/test_utilities.cpp
         tests/test_utilities.h
         tests/tests.cpp
-        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h tests/sql_parser_tests/evaluator_tests.cpp)
+        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h tests/sql_parser_tests/evaluator_tests.cpp src/actions/select_action.cpp src/actions/select_action.h)
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)
@@ -145,4 +145,4 @@ add_executable(
         src/sql_parser/token.h
         src/sql_parser/update_statement.cpp
         src/sql_parser/update_statement.h
-        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h)
+        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h src/actions/select_action.cpp src/actions/select_action.h)

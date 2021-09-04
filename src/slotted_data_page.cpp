@@ -131,3 +131,37 @@ uint32_t page::SlottedDataPage::slot_end_marker() const {
 uint32_t page::SlottedDataPage::tuple_begin_marker() const {
     return _tuple_begin_marker;
 }
+
+std::vector<stream_utils::ByteBuffer> page::SlottedDataPage::enumerate_tuples() {
+    std::vector<stream_utils::ByteBuffer> tuple_buffers{};
+
+    std::vector<uint32_t> offsets{};
+    _stream.seekg(header_size(), std::ios::beg);
+
+    // store all the tuple locations first
+    while (_stream.tellg() != _slot_end_marker) {
+        auto offset = stream_utils::read_data_from_stream<uint32_t>(_stream);
+        if (offset != 0) {
+            // TODO use a better check here for tombstones
+            offsets.push_back(offset);
+        }
+    }
+
+    std::reverse(offsets.begin(), offsets.end());
+
+    for (const auto &offset: offsets) {
+        _stream.seekg(offset, std::ios::beg);
+
+        auto tuple_size = stream_utils::read_data_from_stream<uint32_t>(_stream);
+
+        char buf[tuple_size];
+        _stream.read(buf, tuple_size);
+        if (!_stream) {
+            std::cout << "_stream.gcount() " << _stream.gcount() << "\n";
+        }
+
+        tuple_buffers.emplace_back(std::vector<unsigned char>{buf, buf + tuple_size});
+    }
+
+    return tuple_buffers;
+}

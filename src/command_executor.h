@@ -22,13 +22,16 @@ class UpdateStatement;
 } // namespace ast
 
 namespace command_executor {
+
+using CommandExecutionResult = std::variant<uint32_t, std::vector<tuple::Tuple>>;
+
 class CommandExecutor : public ast::StatementVisitor {
 public:
     explicit CommandExecutor(page_cache::PageCache& page_cache);
 
-    void execute(const ast::Statement& statement);
+    CommandExecutionResult execute(const ast::Statement& statement);
 
-    uint32_t visit(const ast::InsertStatement& insert_statement) override;
+    void visit(const ast::InsertStatement& insert_statement) override;
 
     void visit(const ast::DeleteStatement& delete_statement) override;
 
@@ -40,6 +43,7 @@ public:
 
 private:
     page_cache::PageCache& _page_cache;
+    CommandExecutionResult _command_execution_result;
 };
 } // namespace command_executor
 

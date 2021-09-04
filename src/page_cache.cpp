@@ -120,9 +120,22 @@ page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, ui
     auto metadata_page = metadata_page_for_table(table_name);
 
     page::PageCreator page_creator{table_name, metadata_page};
-    uint32_t data_page_id = data_page_id_maybe ? *data_page_id_maybe : page_creator.create_page(page::PageType::Data);
-    uint32_t row_map_page_id = row_map_page_id_maybe ? *row_map_page_id_maybe : page_creator.create_page(
-        page::PageType::RowMap);
+
+    uint32_t data_page_id;
+    if (data_page_id_maybe) {
+        data_page_id = *data_page_id_maybe;
+    } else {
+        data_page_id = page_creator.create_page(page::PageType::Data);
+        _page_directories[table_name][page::PageType::Data].push_back(data_page_id);
+    }
+
+    uint32_t row_map_page_id;
+    if (row_map_page_id_maybe) {
+        row_map_page_id = *row_map_page_id_maybe;
+    } else {
+        row_map_page_id = page_creator.create_page(page::PageType::RowMap);
+        _page_directories[table_name][page::PageType::RowMap].push_back(row_map_page_id);
+    }
 
     auto *data_page = dynamic_cast<page::SlottedDataPage *>(get_page_id(data_page_id, table_name,
                                                                         page::PageType::Data));
@@ -175,10 +188,11 @@ void page_cache::PageCache::scan_free_pages_in_table_stream(const std::string &t
     page_visitors::FreePageCollector free_page_collector{};
     page_scan_utils::PageScanner page_scanner{is, free_page_collector};
 
-    page_scanner.scan_pages();
+    auto page_directory = page_scanner.scan_pages();
 
     _free_data_pages.emplace(table_name, free_page_collector.free_data_pages());
     _free_rowmap_pages.emplace(table_name, free_page_collector.free_row_map_pages());
+    _page_directories.emplace(table_name, page_directory);
 }
 
 std::optional<page::PageId>
@@ -219,6 +233,18 @@ page_cache::PageCache::get_page_id_for_size(const std::string &table_name, uint3
     }
 
     return {};
+}
+
+std::vector<page::Page *>
+page_cache::PageCache::enumerate_pages(const std::string &table_name, page::PageType page_type) {
+    auto page_ids = _page_directories[table_name][page_type];
+    std::vector<page::Page *> pages{};
+
+    std::transform(page_ids.cbegin(), page_ids.cend(), std::back_inserter(pages), [&](auto page_id) {
+        return get_page_id(page_id, table_name, page_type);
+    });
+
+    return pages;
 }
 
 std::string

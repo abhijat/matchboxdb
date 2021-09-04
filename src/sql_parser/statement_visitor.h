@@ -2,6 +2,8 @@
 #define MATCHBOXDB_STATEMENT_VISITOR_H
 
 #include <cstdint>
+#include <vector>
+#include "../tuple.h"
 
 namespace ast {
 
@@ -17,7 +19,7 @@ class SelectStatement;
 
 class StatementVisitor {
 public:
-    virtual uint32_t visit(const ast::InsertStatement &insert_statement) = 0;
+    virtual void visit(const ast::InsertStatement &insert_statement) = 0;
 
     virtual void visit(const ast::DeleteStatement &insert_statement) = 0;
 

@@ -32,6 +32,8 @@ public:
         return k_base_header_size + sizeof(_slot_end_marker) + sizeof(_tuple_begin_marker);
     }
 
+    std::vector<stream_utils::ByteBuffer> enumerate_tuples();
+
 protected:
 
     uint32_t _slot_end_marker{};

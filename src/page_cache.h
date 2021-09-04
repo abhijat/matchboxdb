@@ -31,6 +31,8 @@ public:
 
     void write_dirty_pages(const std::string &table_name);
 
+    std::vector<page::Page*> enumerate_pages(const std::string &table_name, page::PageType page_type);
+
 protected:
     void scan_tables();
 
@@ -49,6 +51,8 @@ protected:
     std::unordered_map<std::string, std::vector<page::FreePageInfo>> _free_rowmap_pages{};
     std::list<std::pair<std::string, std::unique_ptr<page::Page>>> _page_ids{};
     std::unordered_map<std::string, decltype(_page_ids.begin())> _pages{};
+
+    std::unordered_map<std::string, std::unordered_map<page::PageType, std::vector<page::PageId>>> _page_directories{};
 
     void scan_free_pages_in_table_stream(const std::string &table_name, std::istream &is, uint32_t n_pages_to_scan);
 

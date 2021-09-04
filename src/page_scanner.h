@@ -11,7 +11,7 @@ class PageScanner {
 public:
     PageScanner(std::istream &table_stream, page_visitors::PageVisitor &page_visitor);
 
-    void scan_pages();
+    std::unordered_map<page::PageType, std::vector<page::PageId>> scan_pages();
 
 protected:
     std::istream &_table_stream;

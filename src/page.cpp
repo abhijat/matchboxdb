@@ -163,7 +163,13 @@ page::PageType page::page_type_from_buffer(const stream_utils::ByteBuffer &buffe
 }
 
 uint32_t page::free_space_from_buffer(const stream_utils::ByteBuffer &buffer) {
-    auto *p = reinterpret_cast<const uint32_t *>(buffer.data()) + 6;
+    auto *p = reinterpret_cast<const uint32_t *>(buffer.data()) + 5;
     uint32_t free_space{*p};
     return free_space;
+}
+
+page::PageId page::page_id_from_buffer(const stream_utils::ByteBuffer &buffer) {
+    auto *p = reinterpret_cast<const uint32_t *>(buffer.data()) + 1;
+    PageId page_id{*p};
+    return page_id;
 }

@@ -2,7 +2,6 @@
 #include "statement_visitor.h"
 
 #include <utility>
-#include <iterator>
 #include <sstream>
 
 ast::SelectStatement::SelectStatement(
@@ -37,4 +36,16 @@ void ast::SelectStatement::repr(std::ostream &os) const {
 
 void ast::SelectStatement::accept(ast::StatementVisitor &visitor) const {
     visitor.visit(*this);
+}
+
+const std::vector<std::unique_ptr<ast::Expression>> &ast::SelectStatement::selected() const {
+    return _selected;
+}
+
+const std::optional<ast::Table> &ast::SelectStatement::table() const {
+    return _table;
+}
+
+const std::optional<std::unique_ptr<ast::Expression>> &ast::SelectStatement::where() const {
+    return _where;
 }

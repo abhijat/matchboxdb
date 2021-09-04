@@ -8,12 +8,13 @@
 #include "sql_parser/insert_statement.h"
 #include "sql_parser/update_statement.h"
 #include "sql_parser/select_statement.h"
+#include "actions/select_action.h"
 
 command_executor::CommandExecutor::CommandExecutor(page_cache::PageCache &page_cache)
     : _page_cache(page_cache) {
 }
 
-uint32_t command_executor::CommandExecutor::visit(const ast::InsertStatement &insert_statement) {
+void command_executor::CommandExecutor::visit(const ast::InsertStatement &insert_statement) {
     std::vector<metadata::DataType> attributes(insert_statement.inserts().size());
 
     std::cout << "executing insert statement: " << insert_statement << "\n";
@@ -37,7 +38,7 @@ uint32_t command_executor::CommandExecutor::visit(const ast::InsertStatement &in
         insert_statement.table().table_name(),
         tuple::Tuple{attributes}
     };
-    return insert_object.save();
+    _command_execution_result = insert_object.save();
 }
 
 void command_executor::CommandExecutor::visit(const ast::DeleteStatement &delete_statement) {}
@@ -46,10 +47,13 @@ void command_executor::CommandExecutor::visit(const ast::CreateStatement &create
 
 void command_executor::CommandExecutor::visit(const ast::UpdateStatement &update_statement) {}
 
-void command_executor::CommandExecutor::execute(const ast::Statement &statement) {
+command_executor::CommandExecutionResult command_executor::CommandExecutor::execute(const ast::Statement &statement) {
     statement.accept(*this);
+    return _command_execution_result;
 }
 
 void command_executor::CommandExecutor::visit(const ast::SelectStatement &select_statement) {
     std::cout << "executing select statement: " << select_statement << "\n";
+    actions::SelectAction select_action{_page_cache, select_statement};
+    _command_execution_result = select_action.list();
 }
