@@ -95,7 +95,16 @@ add_executable(
         tests/test_utilities.cpp
         tests/test_utilities.h
         tests/tests.cpp
-        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h tests/sql_parser_tests/evaluator_tests.cpp src/actions/select_action.cpp src/actions/select_action.h src/tuple_filter.cpp src/tuple_filter.h src/actions/delete_action.cpp src/actions/delete_action.h tests/delete_statement_tests.cpp)
+        src/sql_parser/expression_visitor.cpp
+        src/sql_parser/expression_visitor.h tests/sql_parser_tests/evaluator_tests.cpp
+        src/actions/select_action.cpp
+        src/actions/select_action.h
+        src/tuple_filter.cpp
+        src/tuple_filter.h
+        src/actions/delete_action.cpp
+        src/actions/delete_action.h tests/delete_statement_tests.cpp
+        src/actions/update_action.cpp
+        src/actions/update_action.h tests/update_statement_tests.cpp)
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)

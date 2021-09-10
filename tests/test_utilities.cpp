@@ -31,3 +31,9 @@ void testutils::TestsWithRealTable::TearDown() {
 std::unique_ptr<ast::Statement> testutils::parse(const std::string &s) {
     return parser::Parser{lexer::Lexer{s}}.parse();
 }
+
+command_executor::CommandExecutionResult testutils::execute(command_executor::CommandExecutor &executor,
+                                                 const std::string &statement) {
+    auto parsed = parser::Parser{lexer::Lexer{statement}}.parse();
+    return executor.execute(*parsed);
+}

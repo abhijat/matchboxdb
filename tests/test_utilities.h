@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 #include "../src/sql_parser/statement.h"
+#include "../src/command_executor.h"
 
 namespace testutils {
 
@@ -23,6 +24,9 @@ protected:
 };
 
 std::unique_ptr<ast::Statement> parse(const std::string &s);
+
+command_executor::CommandExecutionResult execute(command_executor::CommandExecutor &executor,
+                                                 const std::string &statement);
 
 
 }

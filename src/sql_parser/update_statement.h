@@ -26,7 +26,7 @@ public:
 
     [[nodiscard]] std::vector<std::pair<Identifier, Expression*>> field_updates() const;
 
-    [[nodiscard]] const Expression *where() const;
+    const std::optional<std::unique_ptr<Expression>> &where() const;
 
     void repr(std::ostream &os) const override;
 

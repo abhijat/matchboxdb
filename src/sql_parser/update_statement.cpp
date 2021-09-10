@@ -22,10 +22,6 @@ const std::map<ast::Identifier, std::unique_ptr<ast::Expression>> &ast::UpdateSt
     return _update;
 }
 
-const ast::Expression *ast::UpdateStatement::where() const {
-    return _where->get();
-}
-
 void ast::UpdateStatement::repr(std::ostream &os) const {
     os << "UPDATE [";
     _table.repr(os);
@@ -59,4 +55,8 @@ std::vector<std::pair<ast::Identifier, ast::Expression *>> ast::UpdateStatement:
 
 void ast::UpdateStatement::accept(ast::StatementVisitor &visitor) const {
     visitor.visit(*this);
+}
+
+const std::optional<std::unique_ptr<ast::Expression>> &ast::UpdateStatement::where() const {
+    return _where;
 }
