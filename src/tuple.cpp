@@ -32,7 +32,7 @@ tuple::Tuple::Tuple(const std::vector<unsigned char> &buffer, const metadata::Me
 
 std::ostream &tuple::operator<<(std::ostream &os, const tuple::Tuple &t) {
     OstreamVisitor v{os};
-    for (const auto &attribute: t._attributes) {
+    for (const auto &attribute: t.attributes()) {
         std::visit(v, attribute);
     }
     return os;
@@ -77,6 +77,14 @@ metadata::DataType tuple::deserialize(std::stringstream &s, metadata::Kind kind)
         default:
             throw std::invalid_argument{"invalid kind"};
     }
+}
+
+std::ostream &tuple::operator<<(std::ostream &os, const tuple::TupleView &tuple_view) {
+    OstreamVisitor v{os};
+    for (const auto &attribute: tuple_view.values()) {
+        std::visit(v, attribute);
+    }
+    return os;
 }
 
 tuple::SerializationVisitor::SerializationVisitor(std::stringstream &s) : s(s) {}

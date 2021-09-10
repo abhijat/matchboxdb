@@ -26,7 +26,6 @@ public:
 
     bool operator!=(const Tuple &rhs) const;
 
-    friend std::ostream &operator<<(std::ostream &os, const Tuple &t);
 
     [[nodiscard]] const std::vector<metadata::DataType> &attributes() const;
 
@@ -36,6 +35,8 @@ protected:
     std::vector<metadata::DataType> _attributes;
     std::vector<unsigned char> _data;
 };
+
+std::ostream &operator<<(std::ostream &os, const Tuple &t);
 
 
 class TupleView {
@@ -53,6 +54,8 @@ protected:
     std::unordered_map<std::string, metadata::DataType> _attribute_view;
     std::optional<std::unordered_set<std::string>> _columns{};
 };
+
+std::ostream &operator<<(std::ostream &os, const TupleView &tuple_view);
 
 metadata::DataType deserialize(std::stringstream &s, metadata::Kind kind);
 
