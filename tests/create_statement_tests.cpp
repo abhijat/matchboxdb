@@ -17,7 +17,7 @@ TEST(CreateTableTests, CreateTable) {
 
     auto tuple = std::get<std::vector<tuple::Tuple>>(result)[0];
 
-    ASSERT_TRUE(std::get<bool>(tuple.attributes()[0]));
+    ASSERT_TRUE(std::get<bool>(tuple.attributes()[2]));
 
     ASSERT_TRUE(std::filesystem::exists("automobiles.mbx"));
     std::filesystem::remove("automobiles.mbx");
