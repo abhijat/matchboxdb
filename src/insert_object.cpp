@@ -1,5 +1,7 @@
 #include "insert_object.h"
 
+#include "page/page_cache.h"
+
 #include <utility>
 
 actions::InsertObject::InsertObject(page_cache::PageCache &page_cache, std::string table_name, tuple::Tuple tuple)

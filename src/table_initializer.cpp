@@ -1,6 +1,6 @@
 #include "table_initializer.h"
-#include "metadata_page.h"
-#include "page.h"
+#include "page/metadata_page.h"
+#include "page/page.h"
 #include "sql_parser/create_statement.h"
 
 #include <fstream>

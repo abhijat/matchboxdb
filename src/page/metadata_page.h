@@ -2,9 +2,9 @@
 #define MATCHBOXDB_METADATA_PAGE_H
 
 #include "page.h"
-#include "tuple.h"
-#include "metadata.h"
-#include "streamutils.h"
+#include "../tuple.h"
+#include "../metadata.h"
+#include "../streamutils.h"
 
 namespace page {
 

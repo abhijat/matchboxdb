@@ -3,7 +3,7 @@
 #include <fstream>
 
 #include "../src/table_initializer.h"
-#include "../src/page_creator.h"
+#include "../src/page/page_creator.h"
 #include "../src/sql_parser/field_definition.h"
 
 class PageCreatorTests : public ::testing::Test {

@@ -5,7 +5,7 @@
 
 #include "../src/table_initializer.h"
 #include "../src/streamutils.h"
-#include "../src/metadata_page.h"
+#include "../src/page/metadata_page.h"
 #include "../src/sql_parser/token.h"
 #include "../src/sql_parser/field_definition.h"
 

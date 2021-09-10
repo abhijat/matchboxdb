@@ -2,7 +2,7 @@
 
 #include "test_utilities.h"
 #include "../src/command_executor.h"
-#include "../src/page_cache.h"
+#include "../src/page/page_cache.h"
 #include "../src/sql_parser/parser.h"
 
 

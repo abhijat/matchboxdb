@@ -22,22 +22,22 @@ add_executable(
         src/insert_object.h
         src/metadata.cpp
         src/metadata.h
-        src/metadata_page.cpp
-        src/metadata_page.h
-        src/page.cpp
-        src/page.h
-        src/page_cache.cpp
-        src/page_cache.h
-        src/page_creator.cpp
-        src/page_creator.h
-        src/page_scanner.cpp
-        src/page_scanner.h
-        src/page_visitors.cpp
-        src/page_visitors.h
-        src/row_mapping_page.cpp
-        src/row_mapping_page.h
-        src/slotted_data_page.cpp
-        src/slotted_data_page.h
+        src/page/metadata_page.cpp
+        src/page/metadata_page.h
+        src/page/page.cpp
+        src/page/page.h
+        src/page/page_cache.cpp
+        src/page/page_cache.h
+        src/page/page_creator.cpp
+        src/page/page_creator.h
+        src/page/page_scanner.cpp
+        src/page/page_scanner.h
+        src/page/page_visitors.cpp
+        src/page/page_visitors.h
+        src/page/row_mapping_page.cpp
+        src/page/row_mapping_page.h
+        src/page/slotted_data_page.cpp
+        src/page/slotted_data_page.h
         src/sql_parser/boolean_literal.cpp
         src/sql_parser/boolean_literal.h
         src/sql_parser/create_statement.cpp
@@ -95,7 +95,7 @@ add_executable(
         tests/test_utilities.cpp
         tests/test_utilities.h
         tests/tests.cpp
-        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h tests/sql_parser_tests/evaluator_tests.cpp src/actions/select_action.cpp src/actions/select_action.h)
+        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h tests/sql_parser_tests/evaluator_tests.cpp src/actions/select_action.cpp src/actions/select_action.h src/tuple_filter.cpp src/tuple_filter.h)
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)

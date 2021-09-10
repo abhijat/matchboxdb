@@ -1,7 +1,7 @@
 #include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
-#include "../src/page_cache.h"
+#include "../src/page/page_cache.h"
 
 TEST(MetadataPageTests, PageToBufferToPage) {
     std::vector<std::string> columns{"name", "age"};

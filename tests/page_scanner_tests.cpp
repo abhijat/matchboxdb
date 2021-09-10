@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include "test_utilities.h"
-#include "../src/page_scanner.h"
-#include "../src/page_creator.h"
+#include "../src/page/page_scanner.h"
+#include "../src/page/page_creator.h"
 
 class ScannerTests : public testutils::TestsWithRealTable {
 };

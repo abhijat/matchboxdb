@@ -1,6 +1,6 @@
 #include <iostream>
 #include "slotted_data_page.h"
-#include "streamutils.h"
+#include "../streamutils.h"
 
 page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer) : Page(buffer) {
     // since the parent constructor has run, we should be at the right offset in the stream to read our fields.
@@ -132,18 +132,24 @@ uint32_t page::SlottedDataPage::tuple_begin_marker() const {
     return _tuple_begin_marker;
 }
 
-std::vector<stream_utils::ByteBuffer> page::SlottedDataPage::enumerate_tuples() {
+std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
     std::vector<stream_utils::ByteBuffer> tuple_buffers{};
 
     std::vector<uint32_t> offsets{};
+    std::vector<uint32_t> slot_ids{};
+
     _stream.seekg(header_size(), std::ios::beg);
 
     // store all the tuple locations first
+    auto slot_id = 0;
     while (_stream.tellg() != _slot_end_marker) {
         auto offset = stream_utils::read_data_from_stream<uint32_t>(_stream);
         if (offset != 0) {
             // TODO use a better check here for tombstones
             offsets.push_back(offset);
+
+            slot_ids.push_back(slot_id);
+            slot_id += 1;
         }
     }
 
@@ -163,5 +169,26 @@ std::vector<stream_utils::ByteBuffer> page::SlottedDataPage::enumerate_tuples() 
         tuple_buffers.emplace_back(std::vector<unsigned char>{buf, buf + tuple_size});
     }
 
-    return tuple_buffers;
+    std::vector<page::TupleWithSlotId> tuple_with_slot_id(slot_ids.size());
+
+    std::transform(std::cbegin(slot_ids), std::cend(slot_ids), std::cbegin(tuple_buffers),
+                   std::begin(tuple_with_slot_id),
+                   [](auto slot, auto buffer) {
+                       return page::TupleWithSlotId{slot, buffer};
+                   });
+
+    return tuple_with_slot_id;
+}
+
+void page::SlottedDataPage::delete_tuple_at_slot_id(uint32_t slot_id) {
+    uint32_t offset = header_size() + (slot_id * sizeof(uint32_t));
+    _stream.seekp(offset, std::ios::beg);
+
+    auto current_position = _stream.tellp();
+    if (!_stream || _stream.tellp() >= _slot_end_marker) {
+        throw std::out_of_range{"deleting slot id will overwrite data in page: " + std::to_string(slot_id)};
+    }
+
+    // TODO write the real tombstone value here
+    stream_utils::write_data_to_stream<uint32_t>(_stream, 0);
 }

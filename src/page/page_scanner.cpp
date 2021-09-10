@@ -1,5 +1,5 @@
 #include "page_scanner.h"
-#include "streamutils.h"
+#include "../streamutils.h"
 #include "metadata_page.h"
 
 page_scan_utils::PageScanner::PageScanner(std::istream &table_stream, page_visitors::PageVisitor &page_visitor)

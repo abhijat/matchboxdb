@@ -1,9 +1,10 @@
 #include "select_action.h"
 
-#include "../page_cache.h"
+#include "../page/page_cache.h"
 #include "../sql_parser/select_statement.h"
 #include "../tuple.h"
 #include "../sql_parser/expression_visitor.h"
+#include "../tuple_filter.h"
 
 actions::SelectAction::SelectAction(page_cache::PageCache &page_cache, const ast::SelectStatement &select_statement) :
     _page_cache(page_cache),
@@ -23,8 +24,8 @@ std::vector<tuple::Tuple> actions::SelectAction::list() {
     std::vector<tuple::Tuple> tuples{};
     for (auto page: _page_cache.enumerate_pages(table_name, page::PageType::Data)) {
         auto data_page = dynamic_cast<page::SlottedDataPage *>(page);
-        for (auto &&buffer: data_page->enumerate_tuples()) {
-            tuple::Tuple tuple{buffer, metadata};
+        for (auto &&tuple_with_slot_id: data_page->enumerate_tuples()) {
+            tuple::Tuple tuple{tuple_with_slot_id.byte_buffer, metadata};
             if (matches(tuple, metadata)) {
                 tuples.push_back(tuple);
             }
@@ -34,23 +35,5 @@ std::vector<tuple::Tuple> actions::SelectAction::list() {
 }
 
 bool actions::SelectAction::matches(const tuple::Tuple &t, const metadata::Metadata &m) const {
-    if (!_where) {
-        return true;
-    }
-
-    ast::EvaluatingExpressionVisitor v{t, m};
-    auto result = v.evaluate(*_where);
-
-    if (!result) {
-        // TODO define exception here
-        throw std::invalid_argument("failed to eval expression for tuple");
-    }
-
-    // A where clause must necessarily eval to a boolean value
-    try {
-        return std::get<bool>(*result);
-    } catch (const std::bad_variant_access &) {
-        // TODO define exception here
-        throw std::invalid_argument("SELECT where clause not evaluating to boolean");
-    }
+    return tuple_filter::matches(t, m, _where);
 }

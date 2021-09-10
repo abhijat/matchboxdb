@@ -2,7 +2,7 @@
 #define MATCHBOXDB_SLOTTED_DATA_PAGE_H
 
 #include "page.h"
-#include "tuple.h"
+#include "../tuple.h"
 
 namespace page {
 
@@ -32,7 +32,9 @@ public:
         return k_base_header_size + sizeof(_slot_end_marker) + sizeof(_tuple_begin_marker);
     }
 
-    std::vector<stream_utils::ByteBuffer> enumerate_tuples();
+    std::vector<TupleWithSlotId> enumerate_tuples();
+
+    void delete_tuple_at_slot_id(uint32_t slot_id);
 
 protected:
 

@@ -3,9 +3,9 @@
 #include <fstream>
 
 #include "streamutils.h"
-#include "metadata_page.h"
-#include "slotted_data_page.h"
-#include "row_mapping_page.h"
+#include "page/metadata_page.h"
+#include "page/slotted_data_page.h"
+#include "page/row_mapping_page.h"
 
 std::stringstream stream_utils::build_binary_stream() {
     return std::stringstream{std::ios::binary | std::ios::in | std::ios::out};

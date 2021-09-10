@@ -5,11 +5,11 @@
 #include <vector>
 #include <sstream>
 
-#include "slotted_data_page.h"
+#include "page/slotted_data_page.h"
 #include "streamutils.h"
-#include "metadata_page.h"
+#include "page/metadata_page.h"
 #include "table_initializer.h"
-#include "page_cache.h"
+#include "page/page_cache.h"
 #include "insert_object.h"
 #include "select_object.h"
 

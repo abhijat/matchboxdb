@@ -9,7 +9,7 @@
 #include <list>
 #include <unordered_map>
 
-#include "streamutils.h"
+#include "../streamutils.h"
 
 namespace page {
 
@@ -41,6 +41,11 @@ struct Record {
     std::stringstream &write_to_stream(std::stringstream &s) const;
 
     [[nodiscard]] std::string to_string() const;
+};
+
+struct TupleWithSlotId {
+    uint32_t slot_id;
+    stream_utils::ByteBuffer byte_buffer;
 };
 
 class Page {

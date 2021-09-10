@@ -1,7 +1,7 @@
 #ifndef MATCHBOXDB_SELECT_OBJECT_H
 #define MATCHBOXDB_SELECT_OBJECT_H
 
-#include "page_cache.h"
+#include "page/page_cache.h"
 
 namespace actions {
 class SelectObject {

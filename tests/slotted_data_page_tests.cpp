@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/slotted_data_page.h"
+#include "../src/page/slotted_data_page.h"
 
 tuple::Tuple make_test_tuple() {
     return tuple::Tuple{{std::string{"abhijat"}, uint32_t{38}, true}};
@@ -50,4 +50,29 @@ TEST(SlottedDataPageTests, FailWhenNoSpace) {
     auto p = make_empty_page(page::SlottedDataPage::header_size());
     auto tuple = make_test_tuple();
     EXPECT_THROW(p.store_tuple(tuple), std::out_of_range);
+}
+
+TEST(SlottedDataPageTests, DeleteTuple) {
+    auto p = make_empty_page();
+    auto tuple = make_test_tuple();
+    p.store_tuple(tuple);
+    ASSERT_EQ(p.enumerate_tuples().size(), 1);
+
+    p.delete_tuple_at_slot_id(0);
+    ASSERT_EQ(p.enumerate_tuples().size(), 0);
+}
+
+TEST(SlottedDataPageTests, DeleteTupleDoesNotChangeSize) {
+    auto p = make_empty_page();
+    auto tuple = make_test_tuple();
+    p.store_tuple(tuple);
+    auto free_space_before = p.free_space();
+
+    p.delete_tuple_at_slot_id(0);
+    ASSERT_EQ(p.free_space(), free_space_before);
+}
+
+TEST(SlottedDataPageTests, FailWhenDeletedSlotIdOverrunsSlotMarker) {
+    auto p = make_empty_page();
+    EXPECT_THROW(p.delete_tuple_at_slot_id(100), std::out_of_range);
 }

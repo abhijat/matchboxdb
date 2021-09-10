@@ -1,7 +1,12 @@
 #ifndef MATCHBOXDB_INSERT_OBJECT_H
 #define MATCHBOXDB_INSERT_OBJECT_H
 
-#include "page_cache.h"
+#include <string>
+#include "tuple.h"
+
+namespace page_cache {
+class PageCache;
+}
 
 namespace actions {
 
