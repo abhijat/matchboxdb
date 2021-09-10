@@ -73,6 +73,13 @@ ast::EvaluationResult ast::EvaluatingExpressionVisitor::visit(const ast::Identif
     return value->second;
 }
 
+ast::EvaluatingExpressionVisitor ast::EvaluatingExpressionVisitor::context_less_evaluating_expression_visitor() {
+    metadata::Metadata m{{},
+                         {}};
+    tuple::Tuple t{{}, m};
+    return EvaluatingExpressionVisitor{t, m};
+}
+
 ast::EvaluationResult ast::evaluate_infix_expression(
     const metadata::DataType &lhs,
     const metadata::DataType &rhs,

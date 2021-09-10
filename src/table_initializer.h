@@ -11,6 +11,8 @@ class CreateStatement;
 
 namespace initializers {
 
+static const uint32_t k_table_size_in_mb{64};
+
 class TableInitializer {
 public:
     TableInitializer(const ast::CreateStatement &create_statement, uint32_t file_size);

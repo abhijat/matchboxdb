@@ -55,6 +55,10 @@ bool tuple::Tuple::operator!=(const tuple::Tuple &rhs) const {
     return !(rhs == *this);
 }
 
+uint32_t tuple::Tuple::storage_size_required_for_tuple() const {
+    return size() + (2 * sizeof(uint32_t));
+}
+
 metadata::DataType tuple::deserialize(std::stringstream &s, metadata::Kind kind) {
     switch (kind) {
         case metadata::Kind::String: {

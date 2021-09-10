@@ -258,6 +258,12 @@ metadata::Metadata page_cache::PageCache::metadata_for_table(const std::string &
     return metadata::Metadata{page->column_names(), page->column_kinds()};
 }
 
+void page_cache::PageCache::add_new_table(const std::string &table_name) {
+    auto file_name = file_name_from_table_name(table_name);
+    _table_file_names.insert({table_name, file_name});
+    scan_table_file(table_name, file_name);
+}
+
 std::string
 page_cache::generate_cache_key(page::PageId page_id, const std::string &table_name, page::PageType page_type) {
     auto key = table_name + "::" + std::to_string(page_id);

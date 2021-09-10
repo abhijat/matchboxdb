@@ -44,6 +44,8 @@ class EvaluatingExpressionVisitor : public ExpressionVisitor {
 public:
     explicit EvaluatingExpressionVisitor(tuple::Tuple tuple, metadata::Metadata metadata);
 
+    static EvaluatingExpressionVisitor context_less_evaluating_expression_visitor();
+
     EvaluationResult evaluate(const Expression &expression);
 
     EvaluationResult visit(const Expression &expression) override;

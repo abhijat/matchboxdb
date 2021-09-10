@@ -27,6 +27,8 @@ public:
 
     [[nodiscard]] const std::vector<metadata::DataType> &attributes() const;
 
+    [[nodiscard]] uint32_t storage_size_required_for_tuple() const;
+
 protected:
     std::vector<metadata::DataType> _attributes;
     std::vector<unsigned char> _data;

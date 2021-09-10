@@ -10,6 +10,7 @@
 initializers::TableInitializer::TableInitializer(const ast::CreateStatement &create_statement, uint32_t file_size) :
     _file_size(file_size), _metadata(create_statement.metadata()),
     _table_name(create_statement.table_name().table_name()) {
+    // TODO this and the file_name_from_table_name - should use the same logic
     _file_name = _table_name + ".mbx";
 }
 

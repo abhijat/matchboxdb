@@ -37,6 +37,8 @@ public:
 
     void mark_page_dirty(const std::string &table_name, page::Page *page);
 
+    void add_new_table(const std::string &table_name);
+
 protected:
     void scan_tables();
 

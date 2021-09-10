@@ -15,7 +15,7 @@ public:
 
 protected:
     void read_character();
-    unsigned char peek_character() const;
+    [[nodiscard]] unsigned char peek_character() const;
 
 protected:
     std::string _input;

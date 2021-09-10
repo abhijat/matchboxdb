@@ -11,36 +11,17 @@
 #include "actions/select_action.h"
 #include "actions/delete_action.h"
 #include "actions/update_action.h"
+#include "table_initializer.h"
+#include "actions/insert_action.h"
 
 command_executor::CommandExecutor::CommandExecutor(page_cache::PageCache &page_cache)
     : _page_cache(page_cache) {
 }
 
 void command_executor::CommandExecutor::visit(const ast::InsertStatement &insert_statement) {
-    std::vector<metadata::DataType> attributes(insert_statement.inserts().size());
-
     std::cout << "executing insert statement: " << insert_statement << "\n";
-
-    std::transform(
-        std::cbegin(insert_statement.inserts()),
-        std::cend(insert_statement.inserts()),
-        std::begin(attributes),
-        [](const auto &expression) {
-            auto evaluated = expression->evaluate();
-            if (!evaluated) {
-                std::stringstream ss;
-                ss << "failed to convert input to a usable value: [" << *expression << "]";
-                throw std::invalid_argument(ss.str());
-            }
-            return *evaluated;
-        });
-
-    actions::InsertObject insert_object{
-        _page_cache,
-        insert_statement.table().table_name(),
-        tuple::Tuple{attributes}
-    };
-    _command_execution_result = insert_object.save();
+    actions::InsertAction insert_action{_page_cache, insert_statement};
+    _command_execution_result = insert_action.save();
 }
 
 void command_executor::CommandExecutor::visit(const ast::DeleteStatement &delete_statement) {
@@ -49,7 +30,12 @@ void command_executor::CommandExecutor::visit(const ast::DeleteStatement &delete
     _command_execution_result = delete_action.apply_delete();
 }
 
-void command_executor::CommandExecutor::visit(const ast::CreateStatement &create_statement) {}
+void command_executor::CommandExecutor::visit(const ast::CreateStatement &create_statement) {
+    std::cout << "executing create table statement: " << create_statement << "\n";
+    initializers::TableInitializer table_initializer{create_statement, initializers::k_table_size_in_mb};
+    table_initializer.initialize();
+    _page_cache.add_new_table(create_statement.table_name().table_name());
+}
 
 void command_executor::CommandExecutor::visit(const ast::UpdateStatement &update_statement) {
     std::cout << "executing update statement: " << update_statement << "\n";
