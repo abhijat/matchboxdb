@@ -22,10 +22,10 @@ TEST_F(InsertStatementTestSuite, SimpleInsertTest) {
 
     auto result = executor.execute(*statement);
 
-    auto tuples = std::get<std::vector<tuple::Tuple>>(result);
+    auto tuples = std::get<std::vector<tuple::TupleView>>(result);
     ASSERT_EQ(tuples.size(), 1);
 
-    auto attrs = tuples[0].attributes();
-    ASSERT_EQ(std::get<std::string>(attrs[0]), "cujo");
-    ASSERT_EQ(std::get<uint32_t>(attrs[1]), 7);
+    auto t = tuples[0];
+    ASSERT_EQ("cujo", std::get<std::string>(t["name"]));
+    ASSERT_EQ(7, std::get<uint32_t>(t["age"]));
 }

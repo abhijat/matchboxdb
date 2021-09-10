@@ -15,9 +15,9 @@ TEST(CreateTableTests, CreateTable) {
     testutils::execute(executor, R"(INSERT INTO automobiles VALUES ("horse buggy", 10, true, 6);)");
     auto result = testutils::execute(executor, R"(SELECT fuel_capacity FROM automobiles)");
 
-    auto tuple = std::get<std::vector<tuple::Tuple>>(result)[0];
+    auto tuple = std::get<std::vector<tuple::TupleView>>(result)[0];
 
-    ASSERT_TRUE(std::get<bool>(tuple.attributes()[2]));
+    ASSERT_TRUE(std::get<bool>(tuple["is_manual"]));
 
     ASSERT_TRUE(std::filesystem::exists("automobiles.mbx"));
     std::filesystem::remove("automobiles.mbx");

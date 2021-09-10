@@ -1,7 +1,6 @@
 #include <iostream>
 #include "command_executor.h"
 
-#include "insert_object.h"
 #include "page/page_cache.h"
 #include "sql_parser/create_statement.h"
 #include "sql_parser/delete_statement.h"

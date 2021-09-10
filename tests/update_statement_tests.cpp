@@ -17,10 +17,12 @@ TEST_F(UpdateStatementTestSuite, SimpleUpdateTest) {
     ASSERT_EQ(std::get<uint32_t>(result), 2);
 
     result = testutils::execute(executor, R"(SELECT name, age FROM employee)");
-    const auto& tuples = std::get<std::vector<tuple::Tuple>>(result);
-    for (const auto& tuple: tuples) {
-        ASSERT_EQ(std::get<std::string>(tuple.attributes()[0]), "linoleum floors");
-        ASSERT_EQ(std::get<uint32_t>(tuple.attributes()[1]), 0);
+    const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
+    for (const auto &tuple: tuples) {
+        auto name = tuple["name"];
+        auto age = tuple["age"];
+        ASSERT_EQ(std::get<std::string>(name), "linoleum floors");
+        ASSERT_EQ(std::get<uint32_t>(age), 0);
     }
 
     ASSERT_EQ(tuples.size(), 2);
@@ -32,15 +34,16 @@ TEST_F(UpdateStatementTestSuite, UpdateWithFilter) {
 
     testutils::execute(executor, R"(INSERT INTO employee VALUES ("cujo", 7);)");
     testutils::execute(executor, R"(INSERT INTO employee VALUES ("alucard", 1000);)");
-    auto result = testutils::execute(executor, R"(UPDATE employee SET name = "linoleum floors", age = 0 WHERE age > 500;)");
+    auto result = testutils::execute(executor,
+                                     R"(UPDATE employee SET name = "linoleum floors", age = 0 WHERE age > 500;)");
     ASSERT_EQ(std::get<uint32_t>(result), 1);
 
     {
         result = testutils::execute(executor, R"(SELECT name, age FROM employee WHERE age = 0)");
-        const auto& tuples = std::get<std::vector<tuple::Tuple>>(result);
-        for (const auto& tuple: tuples) {
-            ASSERT_EQ(std::get<std::string>(tuple.attributes()[0]), "linoleum floors");
-            ASSERT_EQ(std::get<uint32_t>(tuple.attributes()[1]), 0);
+        const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
+        for (const auto &tuple: tuples) {
+            ASSERT_EQ(std::get<std::string>(tuple["name"]), "linoleum floors");
+            ASSERT_EQ(std::get<uint32_t>(tuple["age"]), 0);
         }
 
         ASSERT_EQ(tuples.size(), 1);
@@ -48,10 +51,10 @@ TEST_F(UpdateStatementTestSuite, UpdateWithFilter) {
 
     {
         result = testutils::execute(executor, R"(SELECT name, age FROM employee WHERE age != 0)");
-        const auto& tuples = std::get<std::vector<tuple::Tuple>>(result);
-        for (const auto& tuple: tuples) {
-            ASSERT_EQ(std::get<std::string>(tuple.attributes()[0]), "cujo");
-            ASSERT_EQ(std::get<uint32_t>(tuple.attributes()[1]), 7);
+        const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
+        for (const auto &tuple: tuples) {
+            ASSERT_EQ(std::get<std::string>(tuple["name"]), "cujo");
+            ASSERT_EQ(std::get<uint32_t>(tuple["age"]), 7);
         }
 
         ASSERT_EQ(tuples.size(), 1);

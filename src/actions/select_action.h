@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../metadata.h"
+#include "../tuple.h"
 
 namespace page_cache {
 class PageCache;
@@ -26,7 +27,7 @@ class SelectAction {
 public:
     SelectAction(page_cache::PageCache &page_cache, const ast::SelectStatement &select_statement);
 
-    std::vector<tuple::Tuple> list();
+    std::vector<tuple::TupleView> list();
 
 protected:
     page_cache::PageCache &_page_cache;

@@ -6,8 +6,11 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace tuple {
+
 
 class Tuple {
 public:
@@ -32,6 +35,23 @@ public:
 protected:
     std::vector<metadata::DataType> _attributes;
     std::vector<unsigned char> _data;
+};
+
+
+class TupleView {
+public:
+    TupleView(metadata::Metadata metadata, tuple::Tuple tuple,
+              std::optional<std::unordered_set<std::string>> columns);
+
+    metadata::DataType operator[](const std::string& key) const;
+
+    std::vector<metadata::DataType> values() const;
+
+protected:
+    metadata::Metadata _metadata;
+    tuple::Tuple _tuple;
+    std::unordered_map<std::string, metadata::DataType> _attribute_view;
+    std::optional<std::unordered_set<std::string>> _columns{};
 };
 
 metadata::DataType deserialize(std::stringstream &s, metadata::Kind kind);

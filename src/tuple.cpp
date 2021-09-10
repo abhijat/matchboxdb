@@ -109,3 +109,30 @@ void tuple::OstreamVisitor::operator()(bool data) {
     s << " [" << std::boolalpha << data << "] ";
 }
 
+tuple::TupleView::TupleView(metadata::Metadata metadata, tuple::Tuple tuple,
+                            std::optional<std::unordered_set<std::string>> columns) : _metadata(std::move(metadata)),
+                                                                                      _tuple(std::move(tuple)),
+                                                                                      _columns(std::move(columns)) {
+    for (auto i = 0; i < _metadata.names.size(); ++i) {
+        _attribute_view[_metadata.names[i]] = _tuple.attributes()[i];
+    }
+}
+
+metadata::DataType tuple::TupleView::operator[](const std::string &key) const {
+    return _attribute_view.at(key);
+}
+
+std::vector<metadata::DataType> tuple::TupleView::values() const {
+    if (!_columns) {
+        return _tuple.attributes();
+    }
+
+    std::vector<metadata::DataType> values{};
+    for (const auto &name: _metadata.names) {
+        if (_columns->contains(name)) {
+            values.push_back(_attribute_view.at(name));
+        }
+    }
+
+    return values;
+}

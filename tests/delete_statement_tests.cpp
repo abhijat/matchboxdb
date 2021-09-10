@@ -17,7 +17,7 @@ TEST_F(DeleteStatementTestSuite, SimpleDeleteTest) {
     ASSERT_EQ(std::get<uint32_t>(result), 2);
 
     result = testutils::execute(executor, R"(SELECT name, age FROM employee)");
-    ASSERT_EQ(std::get<std::vector<tuple::Tuple>>(result).size(), 0);
+    ASSERT_EQ(std::get<std::vector<tuple::TupleView>>(result).size(), 0);
 }
 
 TEST_F(DeleteStatementTestSuite, DeleteWithWhereClause) {
@@ -30,11 +30,11 @@ TEST_F(DeleteStatementTestSuite, DeleteWithWhereClause) {
     ASSERT_EQ(std::get<uint32_t>(result), 1);
 
     result = testutils::execute(executor, R"(SELECT name, age FROM employee)");
-    auto tuples = std::get<std::vector<tuple::Tuple>>(result);
+    auto tuples = std::get<std::vector<tuple::TupleView>>(result);
     ASSERT_EQ(tuples.size(), 1);
-    auto attrs = tuples[0].attributes();
-    ASSERT_EQ(std::get<std::string>(attrs[0]), "cujo");
-    ASSERT_EQ(std::get<uint32_t>(attrs[1]), 7);
+    auto tuple = tuples[0];
+    ASSERT_EQ(std::get<std::string>(tuple["name"]), "cujo");
+    ASSERT_EQ(std::get<uint32_t>(tuple["age"]), 7);
 
     result = testutils::execute(executor, R"(DELETE FROM employee WHERE age > 500)");
     ASSERT_EQ(std::get<uint32_t>(result), 0);
