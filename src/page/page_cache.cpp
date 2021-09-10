@@ -143,12 +143,9 @@ page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, ui
     auto *row_map_page = dynamic_cast<page::RowMappingPage *>(get_page_id(row_map_page_id, table_name,
                                                                           page::PageType::RowMap));
 
-    auto pos = _dirty_pages.find(table_name);
-    if (pos == _dirty_pages.end()) {
-        _dirty_pages[table_name] = {{row_map_page, data_page, metadata_page}};
-    } else {
-        pos->second.insert({row_map_page, data_page, metadata_page});
-    }
+    mark_page_dirty(table_name, row_map_page);
+    mark_page_dirty(table_name, data_page);
+    mark_page_dirty(table_name, metadata_page);
 
     return std::make_pair(row_map_page, data_page);
 }
@@ -245,6 +242,20 @@ page_cache::PageCache::enumerate_pages(const std::string &table_name, page::Page
     });
 
     return pages;
+}
+
+void page_cache::PageCache::mark_page_dirty(const std::string &table_name, page::Page *page) {
+    auto pos = _dirty_pages.find(table_name);
+    if (pos == _dirty_pages.end()) {
+        _dirty_pages[table_name] = {page};
+    } else {
+        _dirty_pages[table_name].emplace(page);
+    }
+}
+
+metadata::Metadata page_cache::PageCache::metadata_for_table(const std::string &table_name) {
+    auto page = metadata_page_for_table(table_name);
+    return metadata::Metadata{page->column_names(), page->column_kinds()};
 }
 
 std::string

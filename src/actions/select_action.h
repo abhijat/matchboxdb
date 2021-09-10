@@ -29,9 +29,6 @@ public:
     std::vector<tuple::Tuple> list();
 
 protected:
-    [[nodiscard]] bool matches(const tuple::Tuple &t, const metadata::Metadata& m) const;
-
-protected:
     page_cache::PageCache &_page_cache;
     ast::Expression *_where;
     const ast::SelectStatement &_select_statement;

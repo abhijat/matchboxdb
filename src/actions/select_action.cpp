@@ -18,22 +18,17 @@ actions::SelectAction::SelectAction(page_cache::PageCache &page_cache, const ast
 
 std::vector<tuple::Tuple> actions::SelectAction::list() {
     auto table_name = _select_statement.table()->table_name();
-    auto metadata_page = _page_cache.metadata_page_for_table(table_name);
-    auto metadata = metadata::Metadata{metadata_page->column_names(), metadata_page->column_kinds()};
+    auto metadata = _page_cache.metadata_for_table(table_name);
 
     std::vector<tuple::Tuple> tuples{};
     for (auto page: _page_cache.enumerate_pages(table_name, page::PageType::Data)) {
         auto data_page = dynamic_cast<page::SlottedDataPage *>(page);
         for (auto &&tuple_with_slot_id: data_page->enumerate_tuples()) {
             tuple::Tuple tuple{tuple_with_slot_id.byte_buffer, metadata};
-            if (matches(tuple, metadata)) {
+            if (tuple_filter::matches(tuple, metadata, _where)) {
                 tuples.push_back(tuple);
             }
         }
     }
     return tuples;
-}
-
-bool actions::SelectAction::matches(const tuple::Tuple &t, const metadata::Metadata &m) const {
-    return tuple_filter::matches(t, m, _where);
 }

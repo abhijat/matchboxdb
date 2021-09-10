@@ -9,6 +9,7 @@
 #include "sql_parser/update_statement.h"
 #include "sql_parser/select_statement.h"
 #include "actions/select_action.h"
+#include "actions/delete_action.h"
 
 command_executor::CommandExecutor::CommandExecutor(page_cache::PageCache &page_cache)
     : _page_cache(page_cache) {
@@ -41,7 +42,11 @@ void command_executor::CommandExecutor::visit(const ast::InsertStatement &insert
     _command_execution_result = insert_object.save();
 }
 
-void command_executor::CommandExecutor::visit(const ast::DeleteStatement &delete_statement) {}
+void command_executor::CommandExecutor::visit(const ast::DeleteStatement &delete_statement) {
+    std::cout << "executing delete statement: " << delete_statement << "\n";
+    actions::DeleteAction delete_action{_page_cache, delete_statement};
+    _command_execution_result = delete_action.apply_delete();
+}
 
 void command_executor::CommandExecutor::visit(const ast::CreateStatement &create_statement) {}
 

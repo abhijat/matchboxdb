@@ -29,9 +29,13 @@ public:
 
     page::MetadataPage *metadata_page_for_table(const std::string &table_name);
 
+    metadata::Metadata metadata_for_table(const std::string &table_name);
+
     void write_dirty_pages(const std::string &table_name);
 
     std::vector<page::Page*> enumerate_pages(const std::string &table_name, page::PageType page_type);
+
+    void mark_page_dirty(const std::string &table_name, page::Page *page);
 
 protected:
     void scan_tables();
