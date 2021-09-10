@@ -21,12 +21,14 @@ void command_executor::CommandExecutor::visit(const ast::InsertStatement &insert
     std::cout << "executing insert statement: " << insert_statement << "\n";
     actions::InsertAction insert_action{_page_cache, insert_statement};
     _command_execution_result = insert_action.save();
+    _page_cache.write_dirty_pages(insert_statement.table().table_name());
 }
 
 void command_executor::CommandExecutor::visit(const ast::DeleteStatement &delete_statement) {
     std::cout << "executing delete statement: " << delete_statement << "\n";
     actions::DeleteAction delete_action{_page_cache, delete_statement};
     _command_execution_result = delete_action.apply_delete();
+    _page_cache.write_dirty_pages(delete_statement.table().table_name());
 }
 
 void command_executor::CommandExecutor::visit(const ast::CreateStatement &create_statement) {
@@ -40,6 +42,7 @@ void command_executor::CommandExecutor::visit(const ast::UpdateStatement &update
     std::cout << "executing update statement: " << update_statement << "\n";
     actions::UpdateAction update_action{_page_cache, update_statement};
     _command_execution_result = update_action.update();
+    _page_cache.write_dirty_pages(update_statement.table().table_name());
 }
 
 command_executor::CommandExecutionResult command_executor::CommandExecutor::execute(const ast::Statement &statement) {

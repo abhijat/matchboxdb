@@ -33,6 +33,7 @@ protected:
     page_cache::PageCache &_page_cache;
     ast::Expression *_where;
     const ast::SelectStatement &_select_statement;
+    std::vector<std::string> _columns{};
 };
 
 }

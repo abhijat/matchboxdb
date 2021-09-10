@@ -104,7 +104,7 @@ add_executable(
         src/actions/delete_action.cpp
         src/actions/delete_action.h tests/delete_statement_tests.cpp
         src/actions/update_action.cpp
-        src/actions/update_action.h tests/update_statement_tests.cpp tests/create_statement_tests.cpp src/actions/insert_action.cpp src/actions/insert_action.h)
+        src/actions/update_action.h tests/update_statement_tests.cpp tests/create_statement_tests.cpp src/actions/insert_action.cpp src/actions/insert_action.h tests/select_statement_tests.cpp)
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)

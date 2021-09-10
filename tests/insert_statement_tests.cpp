@@ -25,7 +25,6 @@ TEST_F(InsertStatementTestSuite, SimpleInsertTest) {
     auto tuples = std::get<std::vector<tuple::TupleView>>(result);
     ASSERT_EQ(tuples.size(), 1);
 
-    auto t = tuples[0];
-    ASSERT_EQ("cujo", std::get<std::string>(t["name"]));
-    ASSERT_EQ(7, std::get<uint32_t>(t["age"]));
+    testutils::assert_value<std::string>(tuples[0]["name"], "cujo");
+    testutils::assert_value<uint32_t>(tuples[0]["age"], 7);
 }

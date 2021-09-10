@@ -28,6 +28,10 @@ std::unique_ptr<ast::Statement> parse(const std::string &s);
 command_executor::CommandExecutionResult execute(command_executor::CommandExecutor &executor,
                                                  const std::string &statement);
 
+template<typename T>
+void assert_value(const metadata::DataType &data_type, const T &t) {
+    ASSERT_EQ(std::get<T>(data_type), t) << "value did not match: " << t;
+}
 
 }
 

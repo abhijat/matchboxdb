@@ -22,11 +22,11 @@ public:
 
     void accept(StatementVisitor &visitor) const override;
 
-    const std::vector<std::unique_ptr<ast::Expression>> &selected() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<ast::Expression>> &selected() const;
 
-    const std::optional<ast::Table> &table() const;
+    [[nodiscard]] const std::optional<ast::Table> &table() const;
 
-    const std::optional<std::unique_ptr<ast::Expression>> &where() const;
+    [[nodiscard]] const std::optional<std::unique_ptr<ast::Expression>> &where() const;
 
 protected:
     // what we are selecting (e.g. the foo in SELECT foo)
