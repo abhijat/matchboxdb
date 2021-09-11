@@ -50,6 +50,8 @@ add_executable(
         src/sql_parser/create_statement.h
         src/sql_parser/delete_statement.cpp
         src/sql_parser/delete_statement.h
+        src/sql_parser/drop_statement.cpp
+        src/sql_parser/drop_statement.h
         src/sql_parser/expression.h
         src/sql_parser/expression_statement.cpp
         src/sql_parser/expression_statement.h
@@ -91,15 +93,19 @@ add_executable(
         src/storage/table_initializer.h
         src/storage/tuple.cpp
         src/storage/tuple.h
+        src/storage/utils.cpp
+        src/storage/utils.h
         src/tuple_filter.cpp
         src/tuple_filter.h
         tests/command_execution/create_statement_tests.cpp
         tests/command_execution/delete_statement_tests.cpp
+        tests/command_execution/drop_statement_tests.cpp
         tests/command_execution/insert_statement_tests.cpp
+        tests/command_execution/select_statement_tests.cpp
+        tests/command_execution/update_statement_tests.cpp
         tests/page_cache_tests.cpp
         tests/page_creator_tests.cpp
         tests/page_scanner_tests.cpp
-        tests/command_execution/select_statement_tests.cpp
         tests/slotted_data_page_tests.cpp
         tests/sql_parser_tests/evaluator_tests.cpp
         tests/sql_parser_tests/lexer_tests.cpp
@@ -110,8 +116,7 @@ add_executable(
         tests/test_utilities.cpp
         tests/test_utilities.h
         tests/tests.cpp
-        tests/command_execution/update_statement_tests.cpp
-        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h src/storage/utils.cpp src/storage/utils.h tests/command_execution/drop_statement_tests.cpp)
+)
 
 target_link_libraries(alltests gtest gmock gtest_main)
 
@@ -132,6 +137,8 @@ add_executable(
         src/actions/update_action.h
         src/command_executor.cpp
         src/command_executor.h
+        src/dependencies/linenoise/linenoise.c
+        src/dependencies/linenoise/linenoise.h
         src/page/metadata_page.cpp
         src/page/metadata_page.h
         src/page/page.cpp
@@ -149,12 +156,16 @@ add_executable(
         src/page/slotted_data_page.cpp
         src/page/slotted_data_page.h
         src/repl.cpp
+        src/result_visitor.cpp
+        src/result_visitor.h
         src/sql_parser/boolean_literal.cpp
         src/sql_parser/boolean_literal.h
         src/sql_parser/create_statement.cpp
         src/sql_parser/create_statement.h
         src/sql_parser/delete_statement.cpp
         src/sql_parser/delete_statement.h
+        src/sql_parser/drop_statement.cpp
+        src/sql_parser/drop_statement.h
         src/sql_parser/expression.h
         src/sql_parser/expression_statement.cpp
         src/sql_parser/expression_statement.h
@@ -198,6 +209,8 @@ add_executable(
         src/storage/table_initializer.h
         src/storage/tuple.cpp
         src/storage/tuple.h
+        src/storage/utils.cpp
+        src/storage/utils.h
         src/tuple_filter.cpp
         src/tuple_filter.h
-        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h src/storage/utils.cpp src/storage/utils.h)
+)
