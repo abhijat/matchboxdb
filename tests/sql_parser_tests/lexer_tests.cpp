@@ -15,7 +15,7 @@ TEST(Lexer, BasicTokens) {
     };
 
     lexer::Lexer l{input};
-    for (const auto&[kind, literal] : expected) {
+    for (const auto&[kind, literal]: expected) {
         auto n = l.next_token();
         ASSERT_EQ(n.literal(), literal);
         ASSERT_EQ(n.kind(), kind);
@@ -24,7 +24,7 @@ TEST(Lexer, BasicTokens) {
 
 TEST(Lexer, Identifiers) {
     std::string input{
-        "SELECT name FROM CREATE TABLE person; UPDATE person WHERE name_123 DELETE AND x OR y true false"};
+        "SELECT name FROM CREATE TABLE person; UPDATE person WHERE name_123 DELETE AND x OR y true false DROP"};
     std::vector<std::pair<token::Kind, std::string>> expected{
         {token::Kind::Select,     "SELECT"},
         {token::Kind::Identifier, "name"},
@@ -44,10 +44,11 @@ TEST(Lexer, Identifiers) {
         {token::Kind::Identifier, "y"},
         {token::Kind::True,       "true"},
         {token::Kind::False,      "false"},
+        {token::Kind::Drop,       "DROP"},
     };
 
     lexer::Lexer l{input};
-    for (const auto&[kind, literal] : expected) {
+    for (const auto&[kind, literal]: expected) {
         auto n = l.next_token();
         ASSERT_EQ(n.literal(), literal);
         ASSERT_EQ(n.kind(), kind);
@@ -65,7 +66,7 @@ TEST(Lexer, Integers) {
     };
 
     lexer::Lexer l{input};
-    for (const auto&[kind, literal] : expected) {
+    for (const auto&[kind, literal]: expected) {
         auto n = l.next_token();
         ASSERT_EQ(n.literal(), literal);
         ASSERT_EQ(n.kind(), kind);

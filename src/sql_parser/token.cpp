@@ -129,6 +129,9 @@ std::ostream &token::operator<<(std::ostream &os, token::Kind kind) {
         case Kind::ColumnKindBoolean:
             os << "Kind::ColumnKindBoolean";
             break;
+        case Kind::Drop:
+            os << "Kind::Drop";
+            break;
     }
     return os;
 }
