@@ -93,13 +93,13 @@ add_executable(
         src/storage/tuple.h
         src/tuple_filter.cpp
         src/tuple_filter.h
-        tests/create_statement_tests.cpp
-        tests/delete_statement_tests.cpp
-        tests/insert_statement_tests.cpp
+        tests/command_execution/create_statement_tests.cpp
+        tests/command_execution/delete_statement_tests.cpp
+        tests/command_execution/insert_statement_tests.cpp
         tests/page_cache_tests.cpp
         tests/page_creator_tests.cpp
         tests/page_scanner_tests.cpp
-        tests/select_statement_tests.cpp
+        tests/command_execution/select_statement_tests.cpp
         tests/slotted_data_page_tests.cpp
         tests/sql_parser_tests/evaluator_tests.cpp
         tests/sql_parser_tests/lexer_tests.cpp
@@ -110,8 +110,8 @@ add_executable(
         tests/test_utilities.cpp
         tests/test_utilities.h
         tests/tests.cpp
-        tests/update_statement_tests.cpp
-        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h src/storage/utils.cpp src/storage/utils.h tests/drop_statement_tests.cpp)
+        tests/command_execution/update_statement_tests.cpp
+        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h src/storage/utils.cpp src/storage/utils.h tests/command_execution/drop_statement_tests.cpp)
 
 target_link_libraries(alltests gtest gmock gtest_main)
 

@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <filesystem>
 
-#include "test_utilities.h"
-#include "../src/page/page_cache.h"
-#include "../src/storage/table_initializer.h"
-#include "../src/storage/utils.h"
+#include "../test_utilities.h"
+#include "../../src/page/page_cache.h"
+#include "../../src/storage/table_initializer.h"
+#include "../../src/storage/utils.h"
 
 TEST(DropTableTests, DropTable) {
     page_cache::PageCache pc{initializers::k_table_size_in_mb, {}};

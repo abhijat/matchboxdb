@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include "test_utilities.h"
-#include "../src/page/page_cache.h"
-#include "../src/sql_parser/parser.h"
+#include "../test_utilities.h"
+#include "../../src/page/page_cache.h"
+#include "../../src/sql_parser/parser.h"
 
 class DeleteStatementTestSuite : public testutils::TestsWithRealTable {
 };
