@@ -111,7 +111,7 @@ add_executable(
         tests/test_utilities.h
         tests/tests.cpp
         tests/update_statement_tests.cpp
-        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h)
+        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h src/storage/utils.cpp src/storage/utils.h tests/drop_statement_tests.cpp)
 
 target_link_libraries(alltests gtest gmock gtest_main)
 
@@ -200,4 +200,4 @@ add_executable(
         src/storage/tuple.h
         src/tuple_filter.cpp
         src/tuple_filter.h
-        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h)
+        src/sql_parser/drop_statement.cpp src/sql_parser/drop_statement.h src/storage/utils.cpp src/storage/utils.h)

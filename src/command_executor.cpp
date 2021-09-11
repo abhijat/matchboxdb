@@ -1,17 +1,20 @@
 #include <iostream>
+#include <filesystem>
 #include "command_executor.h"
 
+#include "actions/delete_action.h"
+#include "actions/insert_action.h"
+#include "actions/select_action.h"
+#include "actions/update_action.h"
 #include "page/page_cache.h"
 #include "sql_parser/create_statement.h"
 #include "sql_parser/delete_statement.h"
+#include "sql_parser/drop_statement.h"
 #include "sql_parser/insert_statement.h"
-#include "sql_parser/update_statement.h"
 #include "sql_parser/select_statement.h"
-#include "actions/select_action.h"
-#include "actions/delete_action.h"
-#include "actions/update_action.h"
+#include "sql_parser/update_statement.h"
 #include "storage/table_initializer.h"
-#include "actions/insert_action.h"
+#include "storage/utils.h"
 
 command_executor::CommandExecutor::CommandExecutor(page_cache::PageCache &page_cache)
     : _page_cache(page_cache) {
@@ -57,5 +60,11 @@ void command_executor::CommandExecutor::visit(const ast::SelectStatement &select
 }
 
 void command_executor::CommandExecutor::visit(const ast::DropStatement &drop_statement) {
-
+    std::cout << "executing drop statement: " << drop_statement << "\n";
+    auto file_name = storage_utils::file_name_from_table_name(drop_statement.table_name());
+    if (std::filesystem::exists(file_name)) {
+        std::filesystem::remove(file_name);
+    } else {
+        std::cout << "Table does not exist: " << drop_statement.table_name();
+    }
 }

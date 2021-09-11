@@ -4,6 +4,7 @@
 
 #include "test_utilities.h"
 #include "../src/page/page_cache.h"
+#include "../src/storage/utils.h"
 
 class TestPageCache : public page_cache::PageCache {
 public:
@@ -103,9 +104,10 @@ TEST_F(PageCacheTestSuite, CacheEviction) {
     ASSERT_EQ(pc.last_evicted, page_cache::generate_cache_key(1, testutils::k_table_name, page::PageType::Data));
 }
 
+// TODO this test needs to be in own unit of compilation
 TEST(PageCacheUtilityTests, FileNameFromTableName) {
     std::string table_name{"foobar"};
-    auto file_name = page_cache::file_name_from_table_name(table_name);
+    auto file_name = storage_utils::file_name_from_table_name(table_name);
     ASSERT_EQ("foobar.mbx", file_name);
 }
 

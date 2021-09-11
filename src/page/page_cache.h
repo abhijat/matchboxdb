@@ -74,8 +74,6 @@ protected:
 
 std::string generate_cache_key(page::PageId page_id, const std::string &table_name, page::PageType page_type);
 
-std::string file_name_from_table_name(const std::string &table_name);
-
 }
 
 

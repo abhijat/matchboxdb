@@ -2,6 +2,7 @@
 #include <utility>
 #include "page_creator.h"
 #include "page_cache.h"
+#include "../storage/utils.h"
 
 page::PageCreator::PageCreator(std::string table_name, page::MetadataPage *metadata_page) :
     _table_name(std::move(table_name)), _metadata_page(metadata_page) {}
@@ -13,7 +14,7 @@ page::PageId page::PageCreator::create_page(page::PageType page_type) {
         throw std::out_of_range{err.str()};
     }
 
-    auto file_name = page_cache::file_name_from_table_name(_table_name);
+    auto file_name = storage_utils::file_name_from_table_name(_table_name);
     auto f = stream_utils::open_db_file(file_name);
 
     // add one extra page to account for the metadata page.

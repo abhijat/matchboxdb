@@ -4,6 +4,7 @@
 #include "row_mapping_page.h"
 #include "page_creator.h"
 #include "page_scanner.h"
+#include "../storage/utils.h"
 
 #include <utility>
 #include <fstream>
@@ -44,7 +45,7 @@ void page_cache::PageCache::handle_missing_cache_entry(
 page_cache::PageCache::PageCache(uint32_t max_size, const std::vector<std::string> &tables)
     : _max_size{max_size} {
     for (const auto &table: tables) {
-        _table_file_names.insert({table, file_name_from_table_name(table)});
+        _table_file_names.insert({table, storage_utils::file_name_from_table_name(table)});
     }
 
     scan_tables();
@@ -155,7 +156,7 @@ uint32_t page_cache::PageCache::next_row_id_for_table(const std::string &table_n
 }
 
 void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
-    std::fstream ofs{file_name_from_table_name(table_name), std::ios::binary | std::ios::in | std::ios::out};
+    std::fstream ofs{storage_utils::file_name_from_table_name(table_name), std::ios::binary | std::ios::in | std::ios::out};
     if (!ofs) {
         throw std::ios::failure{"failed to read table file"};
     }
@@ -259,7 +260,7 @@ metadata::Metadata page_cache::PageCache::metadata_for_table(const std::string &
 }
 
 void page_cache::PageCache::add_new_table(const std::string &table_name) {
-    auto file_name = file_name_from_table_name(table_name);
+    auto file_name = storage_utils::file_name_from_table_name(table_name);
     _table_file_names.insert({table_name, file_name});
     scan_table_file(table_name, file_name);
 }
@@ -281,8 +282,3 @@ page_cache::generate_cache_key(page::PageId page_id, const std::string &table_na
 
     return key;
 }
-
-std::string page_cache::file_name_from_table_name(const std::string &table_name) {
-    return table_name + ".mbx";
-}
-
