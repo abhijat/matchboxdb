@@ -2,7 +2,7 @@
 #define MATCHBOXDB_FIELD_DEFINITION_H
 
 #include "node.h"
-#include "../metadata.h"
+#include "../storage/metadata.h"
 #include "token.h"
 
 namespace {

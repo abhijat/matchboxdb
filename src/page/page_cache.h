@@ -7,7 +7,7 @@
 #include <unordered_set>
 
 #include "page.h"
-#include "../streamutils.h"
+#include "../storage/streamutils.h"
 #include "slotted_data_page.h"
 #include "metadata_page.h"
 #include "row_mapping_page.h"

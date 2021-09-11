@@ -3,8 +3,8 @@
 
 #include <optional>
 #include <unordered_map>
-#include "../metadata.h"
-#include "../tuple.h"
+#include "../storage/metadata.h"
+#include "../storage/tuple.h"
 
 namespace ast {
 

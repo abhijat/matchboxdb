@@ -1,6 +1,6 @@
 #include "metadata_page.h"
-#include "../metadata.h"
-#include "../streamutils.h"
+#include "../storage/metadata.h"
+#include "../storage/streamutils.h"
 
 #include <iostream>
 

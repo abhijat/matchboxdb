@@ -1,7 +1,7 @@
 #ifndef MATCHBOXDB_PAGE_VISITORS_H
 #define MATCHBOXDB_PAGE_VISITORS_H
 
-#include "../streamutils.h"
+#include "../storage/streamutils.h"
 #include "page.h"
 
 namespace page {

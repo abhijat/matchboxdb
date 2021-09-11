@@ -1,7 +1,7 @@
 #include <filesystem>
 #include "test_utilities.h"
-#include "../src/metadata.h"
-#include "../src/table_initializer.h"
+#include "../src/storage/metadata.h"
+#include "../src/storage/table_initializer.h"
 #include "../src/sql_parser/token.h"
 #include "../src/sql_parser/field_definition.h"
 #include "../src/sql_parser/parser.h"

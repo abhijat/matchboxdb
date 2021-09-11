@@ -3,7 +3,7 @@
 
 #include <string>
 #include "metadata.h"
-#include "sql_parser/create_statement.h"
+#include "../sql_parser/create_statement.h"
 
 namespace ast {
 class CreateStatement;

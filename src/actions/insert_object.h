@@ -2,7 +2,7 @@
 #define MATCHBOXDB_INSERT_OBJECT_H
 
 #include <string>
-#include "tuple.h"
+#include "../storage/tuple.h"
 
 namespace page_cache {
 class PageCache;

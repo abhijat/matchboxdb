@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <unordered_set>
 #include <unordered_map>
-#include "../tuple.h"
+#include "../storage/tuple.h"
 #include "../page/slotted_data_page.h"
 
 namespace page_cache {

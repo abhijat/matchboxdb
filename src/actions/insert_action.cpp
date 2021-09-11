@@ -3,7 +3,7 @@
 #include "../sql_parser/expression_visitor.h"
 #include "../sql_parser/expression.h"
 #include "../sql_parser/insert_statement.h"
-#include "../insert_object.h"
+#include "insert_object.h"
 
 actions::InsertAction::InsertAction(page_cache::PageCache &page_cache, const ast::InsertStatement &insert_statement)
     : _page_cache(page_cache), _insert_statement(insert_statement) {

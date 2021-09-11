@@ -3,7 +3,7 @@
 
 #include <cstdint>
 #include <vector>
-#include "../metadata.h"
+#include "../storage/metadata.h"
 
 namespace page_cache {
 class PageCache;

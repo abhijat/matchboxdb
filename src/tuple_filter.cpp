@@ -1,8 +1,8 @@
 #include "tuple_filter.h"
 
-#include "tuple.h"
+#include "storage/tuple.h"
 #include "sql_parser/expression.h"
-#include "metadata.h"
+#include "storage/metadata.h"
 #include "sql_parser/expression_visitor.h"
 
 bool

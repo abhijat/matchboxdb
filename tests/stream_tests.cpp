@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
-#include "../src/streamutils.h"
+#include "../src/storage/streamutils.h"
 
 TEST(Strings, StringSerializeAndDeserialize) {
     auto s = stream_utils::build_binary_stream();

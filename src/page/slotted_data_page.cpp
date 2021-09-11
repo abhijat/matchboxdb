@@ -1,6 +1,6 @@
 #include <iostream>
 #include "slotted_data_page.h"
-#include "../streamutils.h"
+#include "../storage/streamutils.h"
 
 page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer) : Page(buffer) {
     // since the parent constructor has run, we should be at the right offset in the stream to read our fields.

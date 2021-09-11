@@ -16,12 +16,18 @@ ENABLE_TESTING()
 
 add_executable(
         alltests
+        src/actions/delete_action.cpp
+        src/actions/delete_action.h
+        src/actions/insert_action.cpp
+        src/actions/insert_action.h
+        src/actions/insert_object.cpp
+        src/actions/insert_object.h
+        src/actions/select_action.cpp
+        src/actions/select_action.h
+        src/actions/update_action.cpp
+        src/actions/update_action.h
         src/command_executor.cpp
         src/command_executor.h
-        src/insert_object.cpp
-        src/insert_object.h
-        src/metadata.cpp
-        src/metadata.h
         src/page/metadata_page.cpp
         src/page/metadata_page.h
         src/page/page.cpp
@@ -47,6 +53,8 @@ add_executable(
         src/sql_parser/expression.h
         src/sql_parser/expression_statement.cpp
         src/sql_parser/expression_statement.h
+        src/sql_parser/expression_visitor.cpp
+        src/sql_parser/expression_visitor.h
         src/sql_parser/field_definition.cpp
         src/sql_parser/field_definition.h
         src/sql_parser/identifier.cpp
@@ -75,18 +83,25 @@ add_executable(
         src/sql_parser/token.h
         src/sql_parser/update_statement.cpp
         src/sql_parser/update_statement.h
-        src/streamutils.cpp
-        src/streamutils.h
-        src/table_initializer.cpp
-        src/table_initializer.h
-        src/test_utils.h
-        src/tuple.cpp
-        src/tuple.h
+        src/storage/metadata.cpp
+        src/storage/metadata.h
+        src/storage/streamutils.cpp
+        src/storage/streamutils.h
+        src/storage/table_initializer.cpp
+        src/storage/table_initializer.h
+        src/storage/tuple.cpp
+        src/storage/tuple.h
+        src/tuple_filter.cpp
+        src/tuple_filter.h
+        tests/create_statement_tests.cpp
+        tests/delete_statement_tests.cpp
         tests/insert_statement_tests.cpp
         tests/page_cache_tests.cpp
         tests/page_creator_tests.cpp
         tests/page_scanner_tests.cpp
+        tests/select_statement_tests.cpp
         tests/slotted_data_page_tests.cpp
+        tests/sql_parser_tests/evaluator_tests.cpp
         tests/sql_parser_tests/lexer_tests.cpp
         tests/sql_parser_tests/lexer_tests.cpp
         tests/sql_parser_tests/parser_tests.cpp
@@ -95,16 +110,9 @@ add_executable(
         tests/test_utilities.cpp
         tests/test_utilities.h
         tests/tests.cpp
-        src/sql_parser/expression_visitor.cpp
-        src/sql_parser/expression_visitor.h tests/sql_parser_tests/evaluator_tests.cpp
-        src/actions/select_action.cpp
-        src/actions/select_action.h
-        src/tuple_filter.cpp
-        src/tuple_filter.h
-        src/actions/delete_action.cpp
-        src/actions/delete_action.h tests/delete_statement_tests.cpp
-        src/actions/update_action.cpp
-        src/actions/update_action.h tests/update_statement_tests.cpp tests/create_statement_tests.cpp src/actions/insert_action.cpp src/actions/insert_action.h tests/select_statement_tests.cpp)
+        tests/update_statement_tests.cpp
+)
+
 target_link_libraries(alltests gtest gmock gtest_main)
 
 add_test(NAME test COMMAND alltests)
@@ -112,10 +120,34 @@ add_test(NAME test COMMAND alltests)
 
 add_executable(
         repl
+        src/actions/delete_action.cpp
+        src/actions/delete_action.h
+        src/actions/insert_action.cpp
+        src/actions/insert_action.h
+        src/actions/insert_object.cpp
+        src/actions/insert_object.h
+        src/actions/select_action.cpp
+        src/actions/select_action.h
+        src/actions/update_action.cpp
+        src/actions/update_action.h
         src/command_executor.cpp
         src/command_executor.h
-        src/metadata.cpp
-        src/metadata.h
+        src/page/metadata_page.cpp
+        src/page/metadata_page.h
+        src/page/page.cpp
+        src/page/page.h
+        src/page/page_cache.cpp
+        src/page/page_cache.h
+        src/page/page_creator.cpp
+        src/page/page_creator.h
+        src/page/page_scanner.cpp
+        src/page/page_scanner.h
+        src/page/page_visitors.cpp
+        src/page/page_visitors.h
+        src/page/row_mapping_page.cpp
+        src/page/row_mapping_page.h
+        src/page/slotted_data_page.cpp
+        src/page/slotted_data_page.h
         src/repl.cpp
         src/sql_parser/boolean_literal.cpp
         src/sql_parser/boolean_literal.h
@@ -126,6 +158,8 @@ add_executable(
         src/sql_parser/expression.h
         src/sql_parser/expression_statement.cpp
         src/sql_parser/expression_statement.h
+        src/sql_parser/expression_visitor.cpp
+        src/sql_parser/expression_visitor.h
         src/sql_parser/field_definition.cpp
         src/sql_parser/field_definition.h
         src/sql_parser/identifier.cpp
@@ -154,4 +188,16 @@ add_executable(
         src/sql_parser/token.h
         src/sql_parser/update_statement.cpp
         src/sql_parser/update_statement.h
-        src/sql_parser/expression_visitor.cpp src/sql_parser/expression_visitor.h src/actions/select_action.cpp src/actions/select_action.h)
+        src/storage/metadata.cpp
+        src/storage/metadata.cpp
+        src/storage/metadata.h
+        src/storage/metadata.h
+        src/storage/streamutils.cpp
+        src/storage/streamutils.h
+        src/storage/table_initializer.cpp
+        src/storage/table_initializer.h
+        src/storage/tuple.cpp
+        src/storage/tuple.h
+        src/tuple_filter.cpp
+        src/tuple_filter.h
+)

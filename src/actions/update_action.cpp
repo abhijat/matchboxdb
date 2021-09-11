@@ -5,7 +5,7 @@
 #include "../sql_parser/expression.h"
 #include "../tuple_filter.h"
 #include "../sql_parser/expression_visitor.h"
-#include "../insert_object.h"
+#include "insert_object.h"
 
 actions::UpdateAction::UpdateAction(page_cache::PageCache &page_cache, const ast::UpdateStatement &update_statement)
     : _page_cache(page_cache), _update_statement(update_statement) {

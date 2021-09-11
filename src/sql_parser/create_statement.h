@@ -4,7 +4,7 @@
 #include <vector>
 #include "statement.h"
 #include "table.h"
-#include "../metadata.h"
+#include "../storage/metadata.h"
 
 namespace ast {
 

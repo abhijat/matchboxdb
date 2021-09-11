@@ -3,7 +3,7 @@
 
 #include "test_utilities.h"
 #include "../src/page/page_cache.h"
-#include "../src/table_initializer.h"
+#include "../src/storage/table_initializer.h"
 
 TEST(CreateTableTests, CreateTable) {
     page_cache::PageCache pc{initializers::k_table_size_in_mb, {}};

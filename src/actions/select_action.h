@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "../metadata.h"
-#include "../tuple.h"
+#include "../storage/metadata.h"
+#include "../storage/tuple.h"
 
 namespace page_cache {
 class PageCache;

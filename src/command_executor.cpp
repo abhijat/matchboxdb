@@ -10,7 +10,7 @@
 #include "actions/select_action.h"
 #include "actions/delete_action.h"
 #include "actions/update_action.h"
-#include "table_initializer.h"
+#include "storage/table_initializer.h"
 #include "actions/insert_action.h"
 
 command_executor::CommandExecutor::CommandExecutor(page_cache::PageCache &page_cache)

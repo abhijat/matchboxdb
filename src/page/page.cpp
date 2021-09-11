@@ -1,5 +1,5 @@
 #include "page.h"
-#include "../streamutils.h"
+#include "../storage/streamutils.h"
 
 #include <utility>
 #include <sstream>

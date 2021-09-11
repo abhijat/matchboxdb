@@ -2,7 +2,7 @@
 #define MATCHBOXDB_SLOTTED_DATA_PAGE_H
 
 #include "page.h"
-#include "../tuple.h"
+#include "../storage/tuple.h"
 
 namespace page {
 

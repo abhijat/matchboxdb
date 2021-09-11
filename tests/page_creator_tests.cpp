@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "../src/table_initializer.h"
+#include "../src/storage/table_initializer.h"
 #include "../src/page/page_creator.h"
 #include "../src/sql_parser/field_definition.h"
 

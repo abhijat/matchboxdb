@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/table_initializer.h"
-#include "../src/streamutils.h"
+#include "../src/storage/table_initializer.h"
+#include "../src/storage/streamutils.h"
 #include "../src/page/metadata_page.h"
 #include "../src/sql_parser/token.h"
 #include "../src/sql_parser/field_definition.h"
