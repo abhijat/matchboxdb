@@ -3,11 +3,13 @@
 #include "page_creator.h"
 #include "page_cache.h"
 #include "../storage/utils.h"
+#include "../logging.h"
 
 page::PageCreator::PageCreator(std::string table_name, page::MetadataPage *metadata_page) :
     _table_name(std::move(table_name)), _metadata_page(metadata_page) {}
 
 page::PageId page::PageCreator::create_page(page::PageType page_type) {
+    log::info("creating new page", page_type, "for table", _table_name);
     if (!_metadata_page->has_pages_available()) {
         std::stringstream err;
         err << "table space is full for " << _table_name;

@@ -213,4 +213,4 @@ add_executable(
         src/storage/utils.h
         src/tuple_filter.cpp
         src/tuple_filter.h
-)
+        src/logging.h)

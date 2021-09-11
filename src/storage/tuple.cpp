@@ -106,15 +106,15 @@ tuple::OstreamVisitor::OstreamVisitor(std::ostream &s) : s{s} {
 }
 
 void tuple::OstreamVisitor::operator()(const std::string &data) {
-    s << " [" << data << "] ";
+    s << "\t\t" << data << "\t\t";
 }
 
 void tuple::OstreamVisitor::operator()(uint32_t data) {
-    s << " [" << data << "] ";
+    s << "\t\t" << data << "\t\t";
 }
 
 void tuple::OstreamVisitor::operator()(bool data) {
-    s << " [" << std::boolalpha << data << "] ";
+    s << "\t\t" << std::boolalpha << data << "\t\t";
 }
 
 tuple::TupleView::TupleView(metadata::Metadata metadata, tuple::Tuple tuple,

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "slotted_data_page.h"
-#include "../storage/streamutils.h"
+#include "../logging.h"
 
 page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer) : Page(buffer) {
     // since the parent constructor has run, we should be at the right offset in the stream to read our fields.
@@ -9,6 +9,8 @@ page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer)
 }
 
 uint32_t page::SlottedDataPage::store_tuple(const tuple::Tuple &tuple) {
+    log::info("storing tuple", tuple);
+
     uint32_t effective_tuple_width = tuple.size() + sizeof(uint32_t);
 
     uint32_t space_required = effective_tuple_width + sizeof(uint32_t);

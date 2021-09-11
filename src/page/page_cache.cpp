@@ -5,16 +5,19 @@
 #include "page_creator.h"
 #include "page_scanner.h"
 #include "../storage/utils.h"
+#include "../logging.h"
 
 #include <utility>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 
 page::Page *page_cache::PageCache::get_page_id(
     page::PageId page_id,
     const std::string &table_name,
     page::PageType page_type
 ) {
+    log::info("looking for page id [", page_id, "], table name [", table_name, "], page type", page_type);
     auto key = generate_cache_key(page_id, table_name, page_type);
     auto position = _pages.find(key);
     if (position == _pages.end()) {
@@ -117,6 +120,7 @@ void page_cache::PageCache::scan_table_file(const std::string &table_name, const
 
 std::pair<page::RowMappingPage *, page::SlottedDataPage *>
 page_cache::PageCache::get_pages_for_data_size(const std::string &table_name, uint32_t data_size) {
+    log::info("finding pages for table", table_name, "for data size", data_size);
     auto data_page_id_maybe = get_page_id_for_size(table_name, data_size, page::PageType::Data);
     auto row_map_page_id_maybe = get_page_id_for_size(table_name, page::k_record_width, page::PageType::RowMap);
     auto metadata_page = metadata_page_for_table(table_name);
@@ -157,7 +161,8 @@ uint32_t page_cache::PageCache::next_row_id_for_table(const std::string &table_n
 }
 
 void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
-    std::fstream ofs{storage_utils::file_name_from_table_name(table_name), std::ios::binary | std::ios::in | std::ios::out};
+    std::fstream ofs{storage_utils::file_name_from_table_name(table_name),
+                     std::ios::binary | std::ios::in | std::ios::out};
     if (!ofs) {
         throw std::ios::failure{"failed to read table file"};
     }
@@ -268,7 +273,17 @@ void page_cache::PageCache::add_new_table(const std::string &table_name) {
 
 page_cache::PageCache
 page_cache::PageCache::scan_and_build_page_cache(uint32_t max_size, const std::string &data_path_root) {
+    log::info("scanning for tables in path", data_path_root);
     auto tables = storage_utils::scan_table_names_from_files(data_path_root);
+    auto found_tables = std::accumulate(
+        tables.cbegin(),
+        tables.cend(),
+        std::string{},
+        [](auto a, auto b) {
+            return a.empty() ? b : a + ", " + b;
+        }
+    );
+    log::info("found tables: [", found_tables, "]");
     return PageCache{max_size, tables};
 }
 
