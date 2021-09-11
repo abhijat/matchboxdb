@@ -55,3 +55,7 @@ void command_executor::CommandExecutor::visit(const ast::SelectStatement &select
     actions::SelectAction select_action{_page_cache, select_statement};
     _command_execution_result = select_action.list();
 }
+
+void command_executor::CommandExecutor::visit(const ast::DropStatement &drop_statement) {
+
+}

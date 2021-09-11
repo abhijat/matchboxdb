@@ -125,6 +125,8 @@ protected:
     ExpressionP parse_string_literal();
 
     std::unique_ptr<ast::Statement> parse_delete_statement();
+
+    std::unique_ptr<ast::Statement> parse_drop_statement();
 };
 
 }

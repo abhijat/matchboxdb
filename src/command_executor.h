@@ -41,6 +41,8 @@ public:
 
     void visit(const ast::SelectStatement &select_statement) override;
 
+    void visit(const ast::DropStatement &drop_statement) override;
+
 private:
     page_cache::PageCache &_page_cache;
     CommandExecutionResult _command_execution_result;

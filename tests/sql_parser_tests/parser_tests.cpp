@@ -9,6 +9,7 @@
 #include "../../src/sql_parser/update_statement.h"
 #include "../../src/sql_parser/insert_statement.h"
 #include "../../src/sql_parser/delete_statement.h"
+#include "../../src/sql_parser/drop_statement.h"
 #include "../test_utilities.h"
 
 void assert_int_literal(const ast::Expression *expression, int64_t value) {
@@ -74,7 +75,7 @@ TEST(Parser, InfixExpressionsSimple) {
         {"5 < 6",   "<",   5, 6},
     };
 
-    for (const auto &td : test_data) {
+    for (const auto &td: test_data) {
         auto statement = testutils::parse(td.input);
         assert_infix_expression(statement.get(), td.op, td.lhs, td.rhs);
     }
@@ -97,7 +98,7 @@ void assert_infix_is_string(const ast::Statement *statement,
 }
 
 TEST(Parser, Grouping) {
-    for (const auto &[input, output] :
+    for (const auto &[input, output]:
         std::vector<std::pair<std::string, std::string>>{
             {"a AND b OR c",  "((a AND b) OR c)"},
             {"a OR b AND c",  "(a OR (b AND c))"},
@@ -122,7 +123,7 @@ void assert_boolean_literal(const ast::Statement *statement, bool value) {
 }
 
 TEST(Parser, Booleans) {
-    for (const auto &[input, output] : std::vector<std::pair<std::string, bool>>{
+    for (const auto &[input, output]: std::vector<std::pair<std::string, bool>>{
         {"true",  true},
         {"false", false},
     }) {
@@ -131,7 +132,7 @@ TEST(Parser, Booleans) {
 }
 
 TEST(Parser, GroupedExpressions) {
-    for (const auto &[input, output] :
+    for (const auto &[input, output]:
         std::vector<std::pair<std::string, std::string>>{
             {"a AND (b OR c)", "(a AND (b OR c))"},
         }) {
@@ -142,7 +143,7 @@ TEST(Parser, GroupedExpressions) {
 
 TEST(Parser, SelectStatement) {
     auto statement = testutils::parse("SELECT name, author FROM western_canon WHERE foo = 1 "
-                           "AND bar = 22 OR x = FALSE AND name != 47;");
+                                      "AND bar = 22 OR x = FALSE AND name != 47;");
     const auto select_statement =
         dynamic_cast<const ast::SelectStatement *>(statement.get());
     ASSERT_NE(select_statement, nullptr);
@@ -155,7 +156,7 @@ TEST(Parser, SelectStatement) {
 
 TEST(Parser, CreateStatement) {
     auto statement = testutils::parse("CREATE TABLE person (name STRING, age UNSIGNED_INT, "
-                           "is_replicant BOOLEAN);");
+                                      "is_replicant BOOLEAN);");
     const auto create_statement =
         dynamic_cast<const ast::CreateStatement *>(statement.get());
     ASSERT_NE(create_statement, nullptr);
@@ -196,4 +197,12 @@ TEST(Parser, DeleteStatement) {
     std::stringstream ss;
     ss << *delete_statement;
     ASSERT_EQ(ss.str(), R"(DELETE FROM [person] WHERE ((name = "cujo") AND (age = 7)))");
+}
+
+TEST(Parser, DropStatement) {
+    auto statement = testutils::parse(R"(DROP TABLE person)");
+    const auto delete_statement = dynamic_cast<const ast::DropStatement *>(statement.get());
+    ASSERT_NE(delete_statement, nullptr);
+
+    ASSERT_EQ(delete_statement->table_name(), "person");
 }
