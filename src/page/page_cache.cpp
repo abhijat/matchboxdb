@@ -58,6 +58,7 @@ page_cache::PageCache::load_page_from_disk(page::PageId page_id, const std::stri
     std::ifstream i{table_file_name, std::ios::binary};
 
     if (!i) {
+        // TODO - table does not exist error
         throw std::ios::failure("failed to open table file");
     }
 
@@ -263,6 +264,12 @@ void page_cache::PageCache::add_new_table(const std::string &table_name) {
     auto file_name = storage_utils::file_name_from_table_name(table_name);
     _table_file_names.insert({table_name, file_name});
     scan_table_file(table_name, file_name);
+}
+
+page_cache::PageCache
+page_cache::PageCache::scan_and_build_page_cache(uint32_t max_size, const std::string &data_path_root) {
+    auto tables = storage_utils::scan_table_names_from_files(data_path_root);
+    return PageCache{max_size, tables};
 }
 
 std::string
