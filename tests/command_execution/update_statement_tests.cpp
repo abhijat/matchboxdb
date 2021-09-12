@@ -67,18 +67,15 @@ TEST_F(UpdateStatementTestSuite, UpdateDoesNotAddNewRows) {
 
     testutils::execute(executor, R"(INSERT INTO employee VALUES ("cujo", 7);)");
     testutils::execute(executor, R"(INSERT INTO employee VALUES ("alucard", 1000);)");
+
     auto result = testutils::execute(executor, R"(UPDATE employee SET name = "linoleum floors";)");
+    result = testutils::execute(executor, R"(UPDATE employee SET name = "linoleum floors";)");
+    result = testutils::execute(executor, R"(UPDATE employee SET name = "linoleum floors";)");
+    result = testutils::execute(executor, R"(UPDATE employee SET name = "linoleum floors";)");
+    result = testutils::execute(executor, R"(UPDATE employee SET name = "linoleum floors";)");
     ASSERT_EQ(std::get<uint32_t>(result), 2);
 
-    {
-        result = testutils::execute(executor, R"(SELECT name FROM employee)");
-        const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
-        ASSERT_EQ(tuples.size(), 2);
-    }
-
-    {
-        result = testutils::execute(executor, R"(SELECT name FROM employee)");
-        const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
-        ASSERT_EQ(tuples.size(), 2);
-    }
+    result = testutils::execute(executor, R"(SELECT name FROM employee)");
+    const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
+    ASSERT_EQ(tuples.size(), 2);
 }
