@@ -10,7 +10,7 @@ namespace testutils {
 
 const std::string k_table_name{"employee"};
 const std::string k_file_name{"employee.mbx"};
-const uint32_t k_table_size_mb{1};
+const uint32_t k_table_size_mb{8};
 
 void create_test_table();
 

@@ -60,3 +60,25 @@ TEST_F(UpdateStatementTestSuite, UpdateWithFilter) {
         ASSERT_EQ(tuples.size(), 1);
     }
 }
+
+TEST_F(UpdateStatementTestSuite, UpdateDoesNotAddNewRows) {
+    page_cache::PageCache cache{5, std::vector<std::string>{testutils::k_table_name}};
+    command_executor::CommandExecutor executor{cache};
+
+    testutils::execute(executor, R"(INSERT INTO employee VALUES ("cujo", 7);)");
+    testutils::execute(executor, R"(INSERT INTO employee VALUES ("alucard", 1000);)");
+    auto result = testutils::execute(executor, R"(UPDATE employee SET name = "linoleum floors";)");
+    ASSERT_EQ(std::get<uint32_t>(result), 2);
+
+    {
+        result = testutils::execute(executor, R"(SELECT name FROM employee)");
+        const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
+        ASSERT_EQ(tuples.size(), 2);
+    }
+
+    {
+        result = testutils::execute(executor, R"(SELECT name FROM employee)");
+        const auto &tuples = std::get<std::vector<tuple::TupleView>>(result);
+        ASSERT_EQ(tuples.size(), 2);
+    }
+}

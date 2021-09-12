@@ -9,23 +9,23 @@
 namespace log {
 
 template<typename T>
-void unpack_to_string(std::ostream &os, const T &t) {
+void unpack_to_string(std::ostream &os, T &&t) {
     os << t;
 }
 
 template<typename T, typename... P>
-void unpack_to_string(std::ostream &os, const T &t, P&... args) {
+void unpack_to_string(std::ostream &os, T &&t, P&&... args) {
     os << t << " ";
-    unpack_to_string(os, args...);
+    unpack_to_string(os, std::forward<P>(args)...);
 }
 
 template<typename... P>
-void info(P&... args) {
+void info(P&&... args) {
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
 
     std::stringstream ss;
-    unpack_to_string(ss, args...);
+    unpack_to_string(ss, std::forward<P>(args)...);
 
     std::cout << std::put_time(&tm, "[%c %Z]") << " :: " << ss.str() << "\n";
 }

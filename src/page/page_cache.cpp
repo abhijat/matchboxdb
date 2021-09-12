@@ -12,11 +12,17 @@
 #include <numeric>
 #include <utility>
 
-page::Page *page_cache::PageCache::get_page_id(
-    page::PageId page_id,
-    const std::string &table_name,
-    page::PageType page_type
-) {
+page_cache::PageCache::PageCache(uint32_t max_size, const std::vector<std::string> &tables)
+    : _max_size{max_size} {
+    for (const auto &table: tables) {
+        _table_file_names.insert({table, storage_utils::file_name_from_table_name(table)});
+    }
+
+    scan_tables();
+}
+
+page::Page *
+page_cache::PageCache::get_page_id(page::PageId page_id, const std::string &table_name, page::PageType page_type) {
     log::info("looking for page id [", page_id, "], table name [", table_name, "], page type", page_type);
     auto key = generate_cache_key(page_id, table_name, page_type);
     auto position = _pages.find(key);
@@ -43,15 +49,6 @@ void page_cache::PageCache::handle_missing_cache_entry(
 
     _page_ids.push_front(std::make_pair(key, std::move(page)));
     _pages.insert({key, _page_ids.begin()});
-}
-
-page_cache::PageCache::PageCache(uint32_t max_size, const std::vector<std::string> &tables)
-    : _max_size{max_size} {
-    for (const auto &table: tables) {
-        _table_file_names.insert({table, storage_utils::file_name_from_table_name(table)});
-    }
-
-    scan_tables();
 }
 
 std::unique_ptr<page::Page>
@@ -125,11 +122,14 @@ page_cache::PageCache::get_page_for_data_size(const std::string &table_name, uin
     page::PageCreator page_creator{table_name, metadata_page};
 
     uint32_t data_page_id;
+    bool page_created = false;
+
     if (data_page_id_maybe) {
         data_page_id = *data_page_id_maybe;
     } else {
         data_page_id = page_creator.create_page(page::PageType::Data);
         _page_directories[table_name][page::PageType::Data].push_back(data_page_id);
+        page_created = true;
     }
 
     auto *data_page = dynamic_cast<page::SlottedDataPage *>(get_page_id(data_page_id, table_name,
@@ -138,6 +138,9 @@ page_cache::PageCache::get_page_for_data_size(const std::string &table_name, uin
     mark_page_dirty(table_name, data_page);
     mark_page_dirty(table_name, metadata_page);
 
+    if (page_created) {
+        _free_data_pages[table_name].emplace_back(data_page_id, data_page->free_space());
+    }
     return data_page;
 }
 
@@ -153,6 +156,7 @@ void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
     }
 
     for (const auto &page_ptr: _dirty_pages.at(table_name)) {
+        log::info("writing dirty page", page_ptr->page_type(), "to disk for table", table_name);
         ofs.seekp(page_ptr->page_id() * page::k_page_size, std::ios::beg);
         ofs.write(reinterpret_cast<const char *>(page_ptr->buffer().data()), page::k_page_size);
         if (!ofs) {

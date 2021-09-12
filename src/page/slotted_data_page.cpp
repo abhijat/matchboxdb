@@ -132,6 +132,8 @@ uint32_t page::SlottedDataPage::tuple_begin_marker() const {
 }
 
 std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
+    log::info("enumerating tuples...");
+
     std::vector<stream_utils::ByteBuffer> tuple_buffers{};
 
     std::vector<uint32_t> offsets{};
@@ -149,6 +151,8 @@ std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
 
             slot_ids.push_back(slot_id);
             slot_id += 1;
+        } else {
+            log::info("skipping deleted slot id", slot_id);
         }
     }
 
@@ -189,5 +193,6 @@ void page::SlottedDataPage::delete_tuple_at_slot_id(uint32_t slot_id) {
     }
 
     // TODO write the real tombstone value here
+    log::info("marked tuple at slot id", slot_id, "as deleted");
     stream_utils::write_data_to_stream<uint32_t>(_stream, 0);
 }
