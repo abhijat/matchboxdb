@@ -40,8 +40,6 @@ add_executable(
         src/page/page_scanner.h
         src/page/page_visitors.cpp
         src/page/page_visitors.h
-        src/page/row_mapping_page.cpp
-        src/page/row_mapping_page.h
         src/page/slotted_data_page.cpp
         src/page/slotted_data_page.h
         src/sql_parser/boolean_literal.cpp
@@ -151,8 +149,6 @@ add_executable(
         src/page/page_scanner.h
         src/page/page_visitors.cpp
         src/page/page_visitors.h
-        src/page/row_mapping_page.cpp
-        src/page/row_mapping_page.h
         src/page/slotted_data_page.cpp
         src/page/slotted_data_page.h
         src/repl.cpp

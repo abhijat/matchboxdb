@@ -12,14 +12,11 @@ actions::InsertAction::InsertAction(page_cache::PageCache &page_cache, const ast
 uint32_t actions::InsertAction::save() {
     auto table_name = _insert_statement.table().table_name();
     tuple::Tuple t{build_attributes_for_tuple()};
-    auto[row_map_page, data_page] = _page_cache.get_pages_for_data_size(table_name,
-                                                                        t.storage_size_required_for_tuple());
+    auto data_page = _page_cache.get_page_for_data_size(table_name,
+                                                                       t.storage_size_required_for_tuple());
 
     auto slot_id = data_page->store_tuple(t);
-    auto row_id = _page_cache.next_row_id_for_table(table_name);
-
-    row_map_page->store_record({row_id, data_page->page_id(), slot_id});
-    return row_id;
+    return _page_cache.next_row_id_for_table(table_name);
 }
 
 std::vector<metadata::DataType> actions::InsertAction::build_attributes_for_tuple() const {

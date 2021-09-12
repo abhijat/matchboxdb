@@ -1,16 +1,15 @@
 #ifndef MATCHBOXDB_PAGE_CACHE_H
 #define MATCHBOXDB_PAGE_CACHE_H
 
-#include <list>
 #include <cstdint>
+#include <list>
 #include <unordered_map>
 #include <unordered_set>
 
-#include "page.h"
 #include "../storage/streamutils.h"
-#include "slotted_data_page.h"
 #include "metadata_page.h"
-#include "row_mapping_page.h"
+#include "page.h"
+#include "slotted_data_page.h"
 
 namespace page_cache {
 
@@ -22,12 +21,9 @@ public:
 
     page::Page *get_page_id(page::PageId page_id, const std::string &table_name, page::PageType page_type);
 
-    std::pair<page::RowMappingPage *, page::SlottedDataPage *>
-    get_pages_for_data_size(const std::string &table_name, uint32_t data_size);
+    page::SlottedDataPage *get_page_for_data_size(const std::string &table_name, uint32_t data_size);
 
     uint32_t next_row_id_for_table(const std::string &table_name);
-
-    page::RowMappingPage *rowmap_page_for_row_id(const std::string &table_name, uint32_t row_id);
 
     page::MetadataPage *metadata_page_for_table(const std::string &table_name);
 
@@ -56,7 +52,6 @@ protected:
     std::unordered_map<std::string, std::unordered_set<page::Page *>> _dirty_pages{};
     std::unordered_map<std::string, std::string> _table_file_names{};
     std::unordered_map<std::string, std::vector<page::FreePageInfo>> _free_data_pages{};
-    std::unordered_map<std::string, std::vector<page::FreePageInfo>> _free_rowmap_pages{};
     std::list<std::pair<std::string, std::unique_ptr<page::Page>>> _page_ids{};
     std::unordered_map<std::string, decltype(_page_ids.begin())> _pages{};
 

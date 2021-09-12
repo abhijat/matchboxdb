@@ -45,5 +45,4 @@ TEST_F(TableInitializationTests, PageCalculations) {
     auto metadata_page = stream_utils::read_nth_metadata_page(i);
     ASSERT_EQ(metadata_page.page_type(), page::PageType::Metadata);
     ASSERT_EQ(metadata_page.n_data_pages(), 0);
-    ASSERT_EQ(metadata_page.n_rowmap_pages(), 0);
 }

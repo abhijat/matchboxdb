@@ -23,7 +23,6 @@ const uint32_t k_base_header_size{sizeof(uint32_t) * 6};
 
 enum class PageType {
     Data,
-    RowMap,
     Metadata,
 };
 

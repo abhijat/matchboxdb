@@ -53,19 +53,6 @@ TEST_F(PageCreatorTests, CreateMultiplePagesWithSeqPageId) {
     ASSERT_EQ(page_id, 4);
 }
 
-TEST_F(PageCreatorTests, CreateRowMapPage) {
-    std::ifstream i{"employee.mbx", std::ios::binary};
-    page::MetadataPage metadata_page = stream_utils::read_nth_metadata_page(i);
-    uint32_t original_row_map_page_count = metadata_page.n_rowmap_pages();
-    uint32_t original_marked_page_count = metadata_page.n_marked_pages();
-
-    page::PageCreator page_creator{"employee", &metadata_page};
-    auto page_id = page_creator.create_page(page::PageType::RowMap);
-
-    ASSERT_EQ(page_id, 1);
-    ASSERT_EQ(metadata_page.n_rowmap_pages(), original_row_map_page_count + 1);
-    ASSERT_EQ(metadata_page.n_marked_pages(), original_marked_page_count + 1);
-}
 
 TEST_F(PageCreatorTests, ThrowsWhenSpaceIsFull) {
     std::ifstream i{"employee.mbx", std::ios::binary};

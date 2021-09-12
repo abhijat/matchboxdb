@@ -10,12 +10,11 @@
  */
 page::MetadataPage::MetadataPage(std::string table_name, std::vector<std::string> column_names,
                                  std::vector<metadata::Kind> column_kinds, uint32_t n_data_pages,
-                                 uint32_t n_rowmap_pages, uint32_t max_row_id, uint32_t total_pages) :
+                                 uint32_t max_row_id, uint32_t total_pages) :
     _table_name(std::move(table_name)),
     _column_names(std::move(column_names)),
     _column_kinds(std::move(column_kinds)),
     _n_data_pages{n_data_pages},
-    _n_rowmap_pages{n_rowmap_pages},
     _max_row_id{max_row_id},
     _n_total_pages{total_pages},
     _n_marked_pages{0},
@@ -33,7 +32,6 @@ page::MetadataPage::MetadataPage(std::string table_name, std::vector<std::string
     data_size += stream_utils::size_of_strings(_column_names);
     data_size += stream_utils::size_of_kinds(column_kinds);
     data_size += sizeof(_n_data_pages);
-    data_size += sizeof(_n_rowmap_pages);
     data_size += sizeof(_max_row_id);
     data_size += sizeof(_n_total_pages);
     data_size += sizeof(_n_marked_pages);
@@ -46,7 +44,6 @@ page::MetadataPage::MetadataPage(const stream_utils::ByteBuffer &buffer) : Page{
     _column_names = stream_utils::read_strings_from_stream(_stream);
     _column_kinds = stream_utils::read_kinds_from_stream(_stream);
     _n_data_pages = stream_utils::read_data_from_stream<decltype(_n_data_pages)>(_stream);
-    _n_rowmap_pages = stream_utils::read_data_from_stream<decltype(_n_rowmap_pages)>(_stream);
     _max_row_id = stream_utils::read_data_from_stream<decltype(_max_row_id)>(_stream);
     _n_total_pages = stream_utils::read_data_from_stream<decltype(_n_total_pages)>(_stream);
     _n_marked_pages = stream_utils::read_data_from_stream<decltype(_n_marked_pages)>(_stream);
@@ -79,7 +76,6 @@ std::string page::MetadataPage::to_string() const {
 
     ss << "\n";
     ss << " _n_data_pages " << _n_data_pages
-       << " _n_rowmap_pages " << _n_rowmap_pages
        << " _max_row_id " << _max_row_id
        << " _n_total_pages " << _n_total_pages
        << " _n_marked_pages " << _n_marked_pages
@@ -97,7 +93,6 @@ stream_utils::ByteBuffer page::MetadataPage::buffer() {
     stream_utils::write_strings_to_stream(_stream, _column_names);
     stream_utils::write_kinds_to_stream(_stream, _column_kinds);
     stream_utils::write_data_to_stream(_stream, _n_data_pages);
-    stream_utils::write_data_to_stream(_stream, _n_rowmap_pages);
     stream_utils::write_data_to_stream(_stream, _max_row_id);
     stream_utils::write_data_to_stream(_stream, _n_total_pages);
     stream_utils::write_data_to_stream(_stream, _n_marked_pages);
@@ -117,10 +112,6 @@ uint32_t page::MetadataPage::n_data_pages() const {
     return _n_data_pages;
 }
 
-uint32_t page::MetadataPage::n_rowmap_pages() const {
-    return _n_rowmap_pages;
-}
-
 const std::string &page::MetadataPage::table_name() const {
     return _table_name;
 }
@@ -135,7 +126,6 @@ const std::vector<metadata::Kind> &page::MetadataPage::column_kinds() const {
 
 page::MetadataPage::MetadataPage(page::MetadataPage &&m) noexcept: Page(std::move(m)) {
     _n_data_pages = m._n_data_pages;
-    _n_rowmap_pages = m._n_rowmap_pages;
     _table_name = std::move(m._table_name);
     _column_names = std::move(m._column_names);
     _column_kinds = std::move(m._column_kinds);
@@ -156,7 +146,7 @@ uint32_t page::MetadataPage::max_row_id() const {
 }
 
 stream_utils::ByteBuffer page::MetadataPage::empty_page() {
-    return stream_utils::ByteBuffer();
+    return {};
 }
 
 uint32_t page::MetadataPage::n_total_pages() const {
@@ -186,9 +176,5 @@ void page::MetadataPage::increment_marked_pages(PageType page_type) {
 
     if (page_type == PageType::Data) {
         _n_data_pages += 1;
-    }
-
-    if (page_type == PageType::RowMap) {
-        _n_rowmap_pages += 1;
     }
 }

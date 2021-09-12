@@ -10,8 +10,6 @@ class SlottedDataPage;
 
 class MetadataPage;
 
-class RowMappingPage;
-
 }
 
 namespace page_visitors {
@@ -23,8 +21,6 @@ public:
     virtual void visit(const page::SlottedDataPage &data_page) = 0;
 
     virtual void visit(const page::MetadataPage &metadata_page) = 0;
-
-    virtual void visit(const page::RowMappingPage &row_mapping_page) = 0;
 };
 
 class FreePageCollector : public PageVisitor {
@@ -35,15 +31,10 @@ public:
 
     void visit(const page::MetadataPage &metadata_page) override;
 
-    void visit(const page::RowMappingPage &row_mapping_page) override;
-
     [[nodiscard]] std::vector<page::FreePageInfo> free_data_pages() const;
-
-    [[nodiscard]] std::vector<page::FreePageInfo> free_row_map_pages() const;
 
 protected:
     std::vector<page::FreePageInfo> _free_data_pages{};
-    std::vector<page::FreePageInfo> _free_row_map_pages{};
 };
 
 }

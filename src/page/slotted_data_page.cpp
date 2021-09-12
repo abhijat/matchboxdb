@@ -55,9 +55,6 @@ std::string page::SlottedDataPage::to_string() const {
         case page::PageType::Data:
             ss << " page type: data ";
             break;
-        case page::PageType::RowMap:
-            ss << " page type: row map ";
-            break;
         case PageType::Metadata:
             ss << " page type: metadata ";
             break;

@@ -9,7 +9,6 @@ std::unordered_map<page::PageType, std::vector<page::PageId>> page_scan_utils::P
     std::unordered_map<page::PageType, std::vector<page::PageId>> page_directory{
         {page::PageType::Metadata, {}},
         {page::PageType::Data, {}},
-        {page::PageType::RowMap, {}},
     };
 
     _table_stream.seekg(0, std::ios::beg);

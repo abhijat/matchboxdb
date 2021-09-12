@@ -5,7 +5,6 @@
 #include "streamutils.h"
 #include "../page/metadata_page.h"
 #include "../page/slotted_data_page.h"
-#include "../page/row_mapping_page.h"
 
 std::stringstream stream_utils::build_binary_stream() {
     return std::stringstream{std::ios::binary | std::ios::in | std::ios::out};
@@ -138,25 +137,6 @@ uint32_t stream_utils::size_of_kinds(const std::vector<metadata::Kind> &kinds) {
 page::MetadataPage stream_utils::read_nth_metadata_page(std::istream &is, uint32_t n) {
     is.seekg(0, std::ios::beg);
     return page::MetadataPage(read_page_from_stream(is));
-}
-
-page::SlottedDataPage stream_utils::read_nth_data_page(std::istream &is, uint32_t n) {
-    uint32_t offset{page::k_page_size};
-
-    offset += n * page::k_page_size;
-    is.seekg(offset, std::ios::beg);
-
-    return page::SlottedDataPage(read_page_from_stream(is));
-}
-
-page::RowMappingPage stream_utils::read_nth_row_mapping_page(std::istream &is, uint32_t n) {
-    is.seekg(0, std::ios::end);
-    uint32_t end_marker = is.tellg();
-
-    uint32_t offset = end_marker - (page::k_page_size * (n + 1));
-    is.seekg(offset, std::ios::beg);
-
-    return page::RowMappingPage(read_page_from_stream(is));
 }
 
 std::fstream stream_utils::open_db_file(const std::string &file_name) {

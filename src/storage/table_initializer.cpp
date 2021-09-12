@@ -1,11 +1,9 @@
 #include "table_initializer.h"
 #include "../page/metadata_page.h"
-#include "../page/page.h"
-#include "../sql_parser/create_statement.h"
 
 #include <fstream>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 initializers::TableInitializer::TableInitializer(const ast::CreateStatement &create_statement, uint32_t file_size) :
     _file_size(file_size), _metadata(create_statement.metadata()),
@@ -26,7 +24,7 @@ std::ofstream initializers::TableInitializer::initialize_file() {
 }
 
 std::ofstream &initializers::TableInitializer::write_metadata_page(std::ofstream &ofs) {
-    page::MetadataPage metadata_page{_table_name, _metadata.names, _metadata.types, 0, 0, 0, calculate_total_pages()};
+    page::MetadataPage metadata_page{_table_name, _metadata.names, _metadata.types, 0, 0, calculate_total_pages()};
     ofs.seekp(0, std::ios::beg);
     ofs.write(reinterpret_cast<const char *>(metadata_page.buffer().data()), page::k_page_size);
     return ofs;

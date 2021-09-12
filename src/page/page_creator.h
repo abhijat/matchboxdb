@@ -14,8 +14,6 @@ public:
 protected:
     PageId create_data_page(std::fstream &f);
 
-    PageId create_row_map_page(std::fstream &f);
-
 protected:
     std::string _table_name;
     page::MetadataPage *_metadata_page;

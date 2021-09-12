@@ -24,14 +24,9 @@ public:
         metadata_pages += 1;
     }
 
-    void visit(const page::RowMappingPage &row_mapping_page) override {
-        row_mapping_pages += 1;
-    }
-
     int pages_visited{};
     int data_pages{};
     int metadata_pages{};
-    int row_mapping_pages{};
 };
 
 TEST_F(ScannerTests, ScannerLooksAtAllMarkedPages) {
@@ -45,8 +40,6 @@ TEST_F(ScannerTests, ScannerLooksAtAllMarkedPages) {
         page_creator.create_page(page::PageType::Data);
         page_creator.create_page(page::PageType::Data);
         page_creator.create_page(page::PageType::Data);
-        page_creator.create_page(page::PageType::RowMap);
-        page_creator.create_page(page::PageType::RowMap);
 
         fs.seekp(0, std::ios::beg);
         stream_utils::write_page_to_stream(fs, metadata_page.buffer());
@@ -61,7 +54,6 @@ TEST_F(ScannerTests, ScannerLooksAtAllMarkedPages) {
     page_scanner.scan_pages();
 
     ASSERT_EQ(counting_page_visitor.metadata_pages, 0);
-    ASSERT_EQ(counting_page_visitor.row_mapping_pages, 2);
     ASSERT_EQ(counting_page_visitor.data_pages, 4);
-    ASSERT_EQ(counting_page_visitor.pages_visited, 6);
+    ASSERT_EQ(counting_page_visitor.pages_visited, 4);
 }

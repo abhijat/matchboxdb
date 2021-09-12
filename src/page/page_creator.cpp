@@ -25,13 +25,10 @@ page::PageId page::PageCreator::create_page(page::PageType page_type) {
 
     f.seekp(offset, std::ios::beg);
 
-    switch (page_type) {
-        case PageType::Data:
-            return create_data_page(f);
-        case PageType::RowMap:
-            return create_row_map_page(f);
-        default:
-            throw std::invalid_argument{"Unsupported page type"};
+    if (page_type == PageType::Data) {
+        return create_data_page(f);
+    } else {
+        throw std::invalid_argument{"Unsupported page type"};
     }
 }
 
@@ -40,13 +37,5 @@ page::PageId page::PageCreator::create_data_page(std::fstream &f) {
     page::SlottedDataPage slotted_data_page{page_id, page::k_page_size};
     stream_utils::write_page_to_stream(f, slotted_data_page.empty_page());
     _metadata_page->increment_marked_pages(PageType::Data);
-    return page_id;
-}
-
-page::PageId page::PageCreator::create_row_map_page(std::fstream &f) {
-    auto page_id = _metadata_page->next_page_id_for_table();
-    page::RowMappingPage row_mapping_page{page_id, page::k_page_size};
-    stream_utils::write_page_to_stream(f, row_mapping_page.empty_page());
-    _metadata_page->increment_marked_pages(PageType::RowMap);
     return page_id;
 }

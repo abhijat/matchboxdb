@@ -24,8 +24,6 @@ void page::Page::read_header() {
 page::PageType page::Page::read_page_type() {
     auto page_type_as_int = stream_utils::read_data_from_stream<uint32_t>(_stream);
     switch (page_type_as_int) {
-        case 0:
-            return PageType::RowMap;
         case 1:
             return PageType::Data;
         case 2:
@@ -64,9 +62,6 @@ void page::Page::write_header_to_stream() {
 
 void page::Page::write_page_type() {
     switch (_page_type) {
-        case PageType::RowMap:
-            stream_utils::write_data_to_stream<uint32_t>(_stream, 0);
-            break;
         case PageType::Data:
             stream_utils::write_data_to_stream<uint32_t>(_stream, 1);
             break;
@@ -138,9 +133,6 @@ std::ostream &page::operator<<(std::ostream &os, page::PageType page_type) {
         case PageType::Data:
             os << "[data]";
             break;
-        case PageType::RowMap:
-            os << "[rowmap]";
-            break;
         case PageType::Metadata:
             os << "[metadata]";
             break;
@@ -151,8 +143,6 @@ std::ostream &page::operator<<(std::ostream &os, page::PageType page_type) {
 page::PageType page::page_type_from_buffer(const stream_utils::ByteBuffer &buffer) {
     auto *p = reinterpret_cast<const uint32_t *>(buffer.data()) + 4;
     switch (*p) {
-        case 0:
-            return PageType::RowMap;
         case 1:
             return PageType::Data;
         case 2:
