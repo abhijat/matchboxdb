@@ -1,7 +1,6 @@
 #ifndef MATCHBOXDB_LOGGING_H
 #define MATCHBOXDB_LOGGING_H
 
-
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -22,11 +21,12 @@ void unpack_to_string(std::ostream &os, const T &t, P&... args) {
 
 template<typename... P>
 void info(P&... args) {
+    std::time_t t = std::time(nullptr);
+    std::tm tm = *std::localtime(&t);
+
     std::stringstream ss;
     unpack_to_string(ss, args...);
 
-    std::time_t t = std::time(nullptr);
-    std::tm tm = *std::localtime(&t);
     std::cout << std::put_time(&tm, "[%c %Z]") << " :: " << ss.str() << "\n";
 }
 
