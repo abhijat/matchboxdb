@@ -14,3 +14,7 @@ void presentation::ResultVisitor::operator()(const std::vector<tuple::TupleView>
 
     os << tuples.size() << " rows returned\n";
 }
+
+void presentation::ResultVisitor::operator()(const command_executor::EmptyResult &empty_result) {
+    os << "\n";
+}

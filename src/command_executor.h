@@ -21,9 +21,12 @@ class CreateStatement;
 class UpdateStatement;
 } // namespace ast
 
+
 namespace command_executor {
 
-using CommandExecutionResult = std::variant<uint32_t, std::vector<tuple::TupleView>>;
+struct EmptyResult {};
+
+using CommandExecutionResult = std::variant<uint32_t, std::vector<tuple::TupleView>, EmptyResult>;
 
 class CommandExecutor : public ast::StatementVisitor {
 public:

@@ -40,7 +40,7 @@ void command_executor::CommandExecutor::visit(const ast::CreateStatement &create
     initializers::TableInitializer table_initializer{create_statement, initializers::k_table_size_in_mb};
     table_initializer.initialize();
     _page_cache.add_new_table(create_statement.table_name().table_name());
-    _command_execution_result = 0;
+    _command_execution_result = EmptyResult{};
 }
 
 void command_executor::CommandExecutor::visit(const ast::UpdateStatement &update_statement) {
@@ -69,5 +69,5 @@ void command_executor::CommandExecutor::visit(const ast::DropStatement &drop_sta
     } else {
         std::cout << "Table does not exist: " << drop_statement.table_name();
     }
-    _command_execution_result = 0;
+    _command_execution_result = EmptyResult{};
 }

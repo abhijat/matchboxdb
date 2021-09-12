@@ -6,6 +6,10 @@
 #include <vector>
 #include "storage/tuple.h"
 
+namespace command_executor {
+class EmptyResult;
+}
+
 namespace presentation {
 struct ResultVisitor {
     explicit ResultVisitor(std::ostream &os);
@@ -13,6 +17,8 @@ struct ResultVisitor {
     void operator()(uint32_t n);
 
     void operator()(const std::vector<tuple::TupleView> &tuples);
+
+    void operator()(const command_executor::EmptyResult &empty_result);
 
     std::ostream &os;
 };

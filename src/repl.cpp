@@ -58,13 +58,16 @@ void repl(std::ostream &os, std::istream &is) {
             return;
         }
 
-        const auto &statement = parser::Parser{lexer::Lexer{line_read}}.parse();
-        auto result = executor.execute(*statement);
+        std::string line{line_read};
+        if (!line.empty()) {
+            const auto &statement = parser::Parser{lexer::Lexer{line_read}}.parse();
+            auto result = executor.execute(*statement);
 
-        std::visit(result_visitor, result);
+            std::visit(result_visitor, result);
 
-        linenoiseHistoryAdd(line_read);
-        linenoiseFree(line_read);
+            linenoiseHistoryAdd(line_read);
+            linenoiseFree(line_read);
+        }
     }
 }
 
