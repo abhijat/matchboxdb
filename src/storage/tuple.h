@@ -44,9 +44,11 @@ public:
     TupleView(metadata::Metadata metadata, tuple::Tuple tuple,
               std::optional<std::unordered_set<std::string>> columns);
 
-    metadata::DataType operator[](const std::string& key) const;
+    metadata::DataType operator[](const std::string &key) const;
 
     std::vector<metadata::DataType> values() const;
+
+    [[nodiscard]] std::string json(bool pretty = false) const;
 
 protected:
     metadata::Metadata _metadata;

@@ -144,3 +144,62 @@ std::vector<metadata::DataType> tuple::TupleView::values() const {
 
     return values;
 }
+
+std::string tuple::TupleView::json(bool pretty) const {
+    std::stringstream ss;
+    ss << "{";
+    if (pretty) {
+        ss << "\n";
+    }
+
+
+    auto names_size = _metadata.names.size();
+    auto column_count = _columns ? _columns->size() : names_size;
+
+    for (auto i = 0; i < names_size; ++i) {
+
+        auto name = _metadata.names[i];
+        auto value = _tuple.attributes()[i];
+        auto kind = _metadata.types[i];
+
+        if (_columns->contains(name)) {
+            if (pretty) {
+                ss << "  ";
+            }
+
+            ss << '"' << name << '"';
+            if (pretty) {
+                ss << ": ";
+            } else {
+                ss << ":";
+            }
+
+            switch (kind) {
+                case metadata::Kind::String:
+                    ss << '"' << std::get<std::string>(value) << '"';
+                    break;
+                case metadata::Kind::UnsignedInt:
+                    ss << std::get<uint32_t>(value);
+                    break;
+                case metadata::Kind::Boolean:
+                    ss << std::boolalpha << std::get<bool>(value);
+                    break;
+            }
+
+            if (i < column_count - 1) {
+                ss << ',';
+            }
+
+            if (pretty) {
+                ss << "\n";
+            }
+        }
+    }
+
+    if (pretty) {
+        ss << "\n";
+    }
+
+    ss << "}";
+    return ss.str();
+}

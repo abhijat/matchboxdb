@@ -9,7 +9,7 @@ void presentation::ResultVisitor::operator()(uint32_t n) {
 
 void presentation::ResultVisitor::operator()(const std::vector<tuple::TupleView> &tuples) {
     for (const auto &t: tuples) {
-        os << t << "\n";
+        os << t.json() << ",\n";
     }
 
     os << tuples.size() << " rows returned\n";

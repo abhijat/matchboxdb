@@ -9,19 +9,19 @@
 
 namespace log {
 
-template<typename T, typename... P>
+template<typename T>
 void unpack_to_string(std::ostream &os, const T &t) {
     os << t;
 }
 
 template<typename T, typename... P>
-void unpack_to_string(std::ostream &os, const T &t, P... args) {
+void unpack_to_string(std::ostream &os, const T &t, P&... args) {
     os << t << " ";
     unpack_to_string(os, args...);
 }
 
 template<typename... P>
-void info(P... args) {
+void info(P&... args) {
     std::stringstream ss;
     unpack_to_string(ss, args...);
 
