@@ -44,6 +44,7 @@ enum class Kind {
     ColumnKindBoolean,
     String,
     Drop,
+    Describe,
 };
 
 std::ostream &operator<<(std::ostream &os, Kind kind);
@@ -68,6 +69,7 @@ static std::map<std::string, Kind> k_keywords{
     {"BOOLEAN",      Kind::ColumnKindBoolean},
     {"SET",          Kind::Set},
     {"DROP",         Kind::Drop},
+    {"DESCRIBE",     Kind::Describe},
 };
 
 class Token {

@@ -24,7 +24,7 @@ TEST(Lexer, BasicTokens) {
 
 TEST(Lexer, Identifiers) {
     std::string input{
-        "SELECT name FROM CREATE TABLE person; UPDATE person WHERE name_123 DELETE AND x OR y true false DROP"};
+        "SELECT name FROM CREATE TABLE person; UPDATE person WHERE name_123 DELETE AND x OR y true false DROP DESCRIBE"};
     std::vector<std::pair<token::Kind, std::string>> expected{
         {token::Kind::Select,     "SELECT"},
         {token::Kind::Identifier, "name"},
@@ -45,6 +45,7 @@ TEST(Lexer, Identifiers) {
         {token::Kind::True,       "true"},
         {token::Kind::False,      "false"},
         {token::Kind::Drop,       "DROP"},
+        {token::Kind::Describe,   "DESCRIBE"},
     };
 
     lexer::Lexer l{input};

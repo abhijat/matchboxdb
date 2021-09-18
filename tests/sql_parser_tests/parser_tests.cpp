@@ -10,6 +10,7 @@
 #include "../../src/sql_parser/insert_statement.h"
 #include "../../src/sql_parser/delete_statement.h"
 #include "../../src/sql_parser/drop_statement.h"
+#include "../../src/sql_parser/describe_statement.h"
 #include "../test_utilities.h"
 
 void assert_int_literal(const ast::Expression *expression, int64_t value) {
@@ -205,4 +206,11 @@ TEST(Parser, DropStatement) {
     ASSERT_NE(delete_statement, nullptr);
 
     ASSERT_EQ(delete_statement->table_name(), "person");
+}
+
+TEST(Parser, DescribeStatement) {
+    auto statement = testutils::parse(R"(DESCRIBE TABLE person)");
+    const auto describe_statement = dynamic_cast<const ast::DescribeStatement *>(statement.get());
+    ASSERT_NE(describe_statement, nullptr);
+    ASSERT_EQ(describe_statement->table()->table_name(), "person");
 }

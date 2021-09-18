@@ -14,6 +14,7 @@
 #include "string_literal.h"
 #include "delete_statement.h"
 #include "drop_statement.h"
+#include "describe_statement.h"
 
 #include <utility>
 
@@ -87,6 +88,8 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_statement() {
             return parse_delete_statement();
         case token::Kind::Drop:
             return parse_drop_statement();
+        case token::Kind::Describe:
+            return parse_describe_statement();
         default:
             return parse_expression_statement();
     }
@@ -439,4 +442,14 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_drop_statement() {
     }
 
     return std::make_unique<ast::DropStatement>(std::move(*table));
+}
+
+std::unique_ptr<ast::Statement> parser::Parser::parse_describe_statement() {
+    expect_peek(token::Kind::Table);
+
+    next_token();
+
+    auto table = parse_table_name();
+
+    return std::make_unique<ast::DescribeStatement>(table);
 }

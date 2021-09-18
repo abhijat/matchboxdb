@@ -157,6 +157,7 @@ std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
         slot_id += 1;
     }
 
+    // reverse the offsets, so we do not have to jump backwards when seeking
     std::reverse(offsets.begin(), offsets.end());
 
     for (const auto &offset: offsets) {
@@ -172,6 +173,9 @@ std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
 
         tuple_buffers.emplace_back(std::vector<unsigned char>{buf, buf + tuple_size});
     }
+
+    // reverse the tuples, so that the slot ids match the tuples
+    std::reverse(tuple_buffers.begin(), tuple_buffers.end());
 
     std::vector<page::TupleWithSlotId> tuple_with_slot_id(slot_ids.size());
 

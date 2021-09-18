@@ -6,16 +6,17 @@
 #include "actions/insert_action.h"
 #include "actions/select_action.h"
 #include "actions/update_action.h"
+#include "logging.h"
 #include "page/page_cache.h"
 #include "sql_parser/create_statement.h"
 #include "sql_parser/delete_statement.h"
+#include "sql_parser/describe_statement.h"
 #include "sql_parser/drop_statement.h"
 #include "sql_parser/insert_statement.h"
 #include "sql_parser/select_statement.h"
 #include "sql_parser/update_statement.h"
 #include "storage/table_initializer.h"
 #include "storage/utils.h"
-#include "logging.h"
 
 command_executor::CommandExecutor::CommandExecutor(page_cache::PageCache &page_cache)
     : _page_cache(page_cache) {
@@ -70,4 +71,8 @@ void command_executor::CommandExecutor::visit(const ast::DropStatement &drop_sta
         std::cout << "Table does not exist: " << drop_statement.table_name();
     }
     _command_execution_result = EmptyResult{};
+}
+
+void command_executor::CommandExecutor::visit(const ast::DescribeStatement &describe_statement) {
+    log::info("executing describe statement: ", describe_statement);
 }

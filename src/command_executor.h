@@ -9,22 +9,13 @@ class PageCache;
 }
 
 namespace ast {
-
 class Statement;
-
-class InsertStatement;
-
-class DeleteStatement;
-
-class CreateStatement;
-
-class UpdateStatement;
-} // namespace ast
-
+}
 
 namespace command_executor {
 
-struct EmptyResult {};
+struct EmptyResult {
+};
 
 using CommandExecutionResult = std::variant<uint32_t, std::vector<tuple::TupleView>, EmptyResult>;
 
@@ -45,6 +36,8 @@ public:
     void visit(const ast::SelectStatement &select_statement) override;
 
     void visit(const ast::DropStatement &drop_statement) override;
+
+    void visit(const ast::DescribeStatement &describe_statement) override;
 
 private:
     page_cache::PageCache &_page_cache;

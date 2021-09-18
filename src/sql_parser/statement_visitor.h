@@ -19,6 +19,8 @@ class SelectStatement;
 
 class DropStatement;
 
+class DescribeStatement;
+
 class StatementVisitor {
 public:
     virtual void visit(const ast::InsertStatement &insert_statement) = 0;
@@ -32,6 +34,8 @@ public:
     virtual void visit(const ast::SelectStatement &select_statement) = 0;
 
     virtual void visit(const ast::DropStatement &drop_statement) = 0;
+
+    virtual void visit(const ast::DescribeStatement &describe_statement) = 0;
 };
 
 }

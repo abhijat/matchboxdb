@@ -4,6 +4,7 @@
 #include "../page/page_cache.h"
 #include "../sql_parser/expression.h"
 #include "../tuple_filter.h"
+#include "../logging.h"
 
 actions::DeleteAction::DeleteAction(page_cache::PageCache &page_cache, const ast::DeleteStatement &delete_statement)
     : _page_cache(page_cache), _delete_statement(delete_statement) {
@@ -24,6 +25,7 @@ uint32_t actions::DeleteAction::apply_delete() {
         for (auto &&tuple_with_slot: data_page->enumerate_tuples()) {
             auto tuple = tuple::Tuple{tuple_with_slot.byte_buffer, metadata};
             if (tuple_filter::matches(tuple, metadata, _where)) {
+                log::info("deleting matched row: ", tuple);
                 data_page->delete_tuple_at_slot_id(tuple_with_slot.slot_id);
                 _page_cache.mark_page_dirty(table_name, data_page);
                 deleted_count += 1;
