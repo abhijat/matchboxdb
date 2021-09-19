@@ -20,6 +20,8 @@ struct ResultVisitor {
 
     void operator()(const command_executor::EmptyResult &empty_result);
 
+    void operator()(const std::string &s);
+
     std::ostream &os;
 };
 }

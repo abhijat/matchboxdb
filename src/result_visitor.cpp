@@ -18,3 +18,7 @@ void presentation::ResultVisitor::operator()(const std::vector<tuple::TupleView>
 void presentation::ResultVisitor::operator()(const command_executor::EmptyResult &empty_result) {
     os << "\n";
 }
+
+void presentation::ResultVisitor::operator()(const std::string &s) {
+    os << "\n";
+}

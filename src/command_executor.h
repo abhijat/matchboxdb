@@ -17,7 +17,7 @@ namespace command_executor {
 struct EmptyResult {
 };
 
-using CommandExecutionResult = std::variant<uint32_t, std::vector<tuple::TupleView>, EmptyResult>;
+using CommandExecutionResult = std::variant<uint32_t, std::vector<tuple::TupleView>, EmptyResult, std::string>;
 
 class CommandExecutor : public ast::StatementVisitor {
 public:

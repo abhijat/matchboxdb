@@ -58,6 +58,7 @@ page_cache::PageCache::load_page_from_disk(page::PageId page_id, const std::stri
     std::ifstream i{table_file_name, std::ios::binary};
 
     if (!i) {
+        log::info("failed to open table file:", table_file_name, "for table", table_name);
         // TODO - table does not exist error
         throw std::ios::failure("failed to open table file");
     }
@@ -254,6 +255,14 @@ page_cache::PageCache::scan_and_build_page_cache(uint32_t max_size, const std::s
     );
     log::info("found tables: [", found_tables, "]");
     return PageCache{max_size, tables};
+}
+
+std::vector<std::string> page_cache::PageCache::table_names() {
+    std::vector<std::string> table_names{_table_file_names.size()};
+    std::transform(_table_file_names.cbegin(), _table_file_names.cend(), table_names.begin(), [](const auto &a) {
+        return a.first;
+    });
+    return table_names;
 }
 
 std::string

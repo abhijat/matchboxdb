@@ -1,5 +1,6 @@
 #include "table_initializer.h"
 #include "../page/metadata_page.h"
+#include "utils.h"
 
 #include <fstream>
 #include <iostream>
@@ -9,7 +10,7 @@ initializers::TableInitializer::TableInitializer(const ast::CreateStatement &cre
     _file_size(file_size), _metadata(create_statement.metadata()),
     _table_name(create_statement.table_name().table_name()) {
     // TODO this and the file_name_from_table_name - should use the same logic
-    _file_name = _table_name + ".mbx";
+    _file_name = storage_utils::file_name_from_table_name(_table_name);
 }
 
 std::ofstream initializers::TableInitializer::initialize_file() {

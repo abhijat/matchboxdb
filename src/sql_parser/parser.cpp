@@ -449,7 +449,9 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_describe_statement() {
 
     next_token();
 
-    auto table = parse_table_name();
-
-    return std::make_unique<ast::DescribeStatement>(table);
+    if (current_token_is(token::Kind::Semicolon) || current_token_is(token::Kind::EndOfInput)) {
+        return std::make_unique<ast::DescribeStatement>(std::nullopt);
+    } else {
+        return std::make_unique<ast::DescribeStatement>(parse_table_name());
+    }
 }

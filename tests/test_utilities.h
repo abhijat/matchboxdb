@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include "../src/sql_parser/statement.h"
 #include "../src/command_executor.h"
+#include "../src/sql_parser/field_definition.h"
 
 namespace testutils {
 
@@ -13,6 +14,12 @@ const std::string k_file_name{"employee.mbx"};
 const uint32_t k_table_size_mb{8};
 
 void create_test_table();
+
+void create_test_table(const std::string &table_name,
+                       const std::vector<ast::FieldDefinition> &field_definitions,
+                       uint32_t table_size);
+
+void cleanup_test_table(const std::string &table_name);
 
 void cleanup_test_table();
 

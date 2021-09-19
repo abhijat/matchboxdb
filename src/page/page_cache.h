@@ -37,6 +37,8 @@ public:
 
     void add_new_table(const std::string &table_name);
 
+    std::vector<std::string> table_names();
+
 protected:
     void scan_tables();
 

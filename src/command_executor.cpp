@@ -17,6 +17,7 @@
 #include "sql_parser/update_statement.h"
 #include "storage/table_initializer.h"
 #include "storage/utils.h"
+#include "actions/describe_action.h"
 
 command_executor::CommandExecutor::CommandExecutor(page_cache::PageCache &page_cache)
     : _page_cache(page_cache) {
@@ -75,4 +76,5 @@ void command_executor::CommandExecutor::visit(const ast::DropStatement &drop_sta
 
 void command_executor::CommandExecutor::visit(const ast::DescribeStatement &describe_statement) {
     log::info("executing describe statement: ", describe_statement);
+    _command_execution_result = actions::DescribeAction{_page_cache, describe_statement}.describe();
 }
