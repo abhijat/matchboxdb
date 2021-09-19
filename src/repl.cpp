@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 
 #include "command_executor.h"
 #include "page/page_cache.h"
@@ -7,6 +8,7 @@
 #include "sql_parser/statement.h"
 
 #include "dependencies/linenoise/linenoise.h"
+#include "page/defragger.h"
 
 
 void tab_completion(const char *input, linenoiseCompletions *completions) {
@@ -48,6 +50,10 @@ void repl(std::ostream &os, std::istream &is) {
 
     presentation::ResultVisitor result_visitor{os};
 
+    page::PageDefragger page_defragger{cache};
+
+    std::thread page_defrag_thread{std::ref(page_defragger)};
+
     while (true) {
         auto line_read = linenoise(">> ");
 
@@ -55,7 +61,7 @@ void repl(std::ostream &os, std::istream &is) {
             linenoiseHistorySave(".matchboxdb_history");
 
             os << "Bye!\n";
-            return;
+            break;
         }
 
         std::string line{line_read};
@@ -69,6 +75,9 @@ void repl(std::ostream &os, std::istream &is) {
             linenoiseFree(line_read);
         }
     }
+
+    page_defragger.request_stop();
+    page_defrag_thread.join();
 }
 
 int main() {

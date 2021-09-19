@@ -228,6 +228,8 @@ void page_cache::PageCache::mark_page_dirty(const std::string &table_name, page:
     } else {
         _dirty_pages[table_name].emplace(page);
     }
+
+    page->update_version();
 }
 
 metadata::Metadata page_cache::PageCache::metadata_for_table(const std::string &table_name) {

@@ -12,6 +12,8 @@ public:
 
     SlottedDataPage(uint32_t page_id, uint32_t page_size);
 
+    SlottedDataPage(const SlottedDataPage &slotted_data_page);
+
     uint32_t store_tuple(const tuple::Tuple &tuple);
 
     std::vector<unsigned char> read_tuple_from_slot(uint32_t slot_id);
@@ -44,6 +46,8 @@ public:
      *  Slot ids are changed and free space should increase after running.
      */
     uint32_t defrag_page(const metadata::Metadata &metadata);
+
+    void overwrite_with(const SlottedDataPage& slotted_data_page);
 
 protected:
     /**

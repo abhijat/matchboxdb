@@ -103,6 +103,15 @@ page::Page::Page(page::Page &&p) noexcept {
     _free_space = p._free_space;
 }
 
+uint32_t page::Page::version() const {
+    return _version;
+}
+
+void page::Page::update_version() {
+    std::lock_guard<std::mutex> guard{_mutex};
+    _version += 1;
+}
+
 page::Record page::Record::read_from_stream(std::stringstream &s) {
     auto row = stream_utils::read_data_from_stream<uint32_t>(s);
     auto page = stream_utils::read_data_from_stream<uint32_t>(s);

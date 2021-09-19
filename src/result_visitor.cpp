@@ -20,5 +20,5 @@ void presentation::ResultVisitor::operator()(const command_executor::EmptyResult
 }
 
 void presentation::ResultVisitor::operator()(const std::string &s) {
-    os << "\n";
+    os << s << "\n";
 }

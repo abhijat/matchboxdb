@@ -9,6 +9,9 @@ page::SlottedDataPage::SlottedDataPage(const std::vector<unsigned char> &buffer)
 }
 
 uint32_t page::SlottedDataPage::store_tuple(const tuple::Tuple &tuple) {
+
+    std::lock_guard<std::mutex> guard{_mutex};
+
     log::info("storing tuple", tuple);
 
     uint32_t effective_tuple_width = tuple.size() + sizeof(uint32_t);
@@ -175,6 +178,8 @@ std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
 }
 
 void page::SlottedDataPage::delete_tuple_at_slot_id(uint32_t slot_id) {
+    std::lock_guard<std::mutex> guard{_mutex};
+
     uint32_t offset = header_size() + (slot_id * sizeof(uint32_t));
     _stream.seekp(offset, std::ios::beg);
 
@@ -248,4 +253,31 @@ stream_utils::ByteBuffer page::SlottedDataPage::load_tuple_buffer(uint32_t offse
     }
 
     return std::vector<unsigned char>{buf, buf + tuple_size};
+}
+
+page::SlottedDataPage::SlottedDataPage(const page::SlottedDataPage &slotted_data_page)
+    : Page(
+    slotted_data_page.page_id(),
+    slotted_data_page.next_page_id(),
+    slotted_data_page.prev_page_id(),
+    PageType::Data,
+    slotted_data_page.page_size(),
+    slotted_data_page.free_space()
+) {
+    _slot_end_marker = slotted_data_page.slot_end_marker();
+    _tuple_begin_marker = slotted_data_page.tuple_begin_marker();
+    _free_space = slotted_data_page.free_space();
+    _stream << slotted_data_page._stream.rdbuf();
+    _buffer = slotted_data_page._buffer;
+    _version = slotted_data_page._version;
+}
+
+void page::SlottedDataPage::overwrite_with(const page::SlottedDataPage &slotted_data_page) {
+    std::lock_guard<std::mutex> guard{_mutex};
+    _slot_end_marker = slotted_data_page.slot_end_marker();
+    _tuple_begin_marker = slotted_data_page.tuple_begin_marker();
+    _free_space = slotted_data_page.free_space();
+    _stream << slotted_data_page._stream.rdbuf();
+    _buffer = slotted_data_page._buffer;
+    _version = slotted_data_page._version;
 }

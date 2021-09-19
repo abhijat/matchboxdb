@@ -114,7 +114,7 @@ add_executable(
         tests/test_utilities.cpp
         tests/test_utilities.h
         tests/tests.cpp
-        src/sql_parser/describe_statement.cpp src/sql_parser/describe_statement.h src/actions/describe_action.cpp src/actions/describe_action.h tests/command_execution/describe_statement_tests.cpp)
+        src/sql_parser/describe_statement.cpp src/sql_parser/describe_statement.h src/actions/describe_action.cpp src/actions/describe_action.h tests/command_execution/describe_statement_tests.cpp src/page/defragger.cpp src/page/defragger.h)
 
 target_link_libraries(alltests gtest gmock gtest_main)
 
@@ -209,4 +209,13 @@ add_executable(
         src/storage/utils.h
         src/tuple_filter.cpp
         src/tuple_filter.h
-        src/logging.h src/sql_parser/describe_statement.cpp src/sql_parser/describe_statement.h src/actions/describe_action.cpp src/actions/describe_action.h)
+        src/logging.h
+        src/sql_parser/describe_statement.cpp
+        src/sql_parser/describe_statement.h
+        src/actions/describe_action.cpp
+        src/actions/describe_action.h
+        src/page/defragger.cpp
+        src/page/defragger.h)
+
+find_package(Threads REQUIRED)
+target_link_libraries(repl PRIVATE Threads::Threads)

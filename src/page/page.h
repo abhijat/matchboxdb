@@ -8,6 +8,7 @@
 #include <sstream>
 #include <list>
 #include <unordered_map>
+#include <mutex>
 
 #include "../storage/streamutils.h"
 
@@ -74,6 +75,10 @@ public:
 
     uint32_t page_size() const;
 
+    uint32_t version() const;
+
+    void update_version();
+
     /**
      * Returns a buffer from the page, with the understanding that the buffer does not contain anything other than
      * the header fields. The remaining page is filled with null bytes. Useful when initializing the table file.
@@ -100,6 +105,10 @@ protected:
     PageType _page_type;
     uint32_t _page_size{};
     uint32_t _free_space{};
+
+    std::mutex _mutex{};
+
+    uint32_t _version{};
 };
 
 PageType page_type_from_buffer(const stream_utils::ByteBuffer &buffer);
