@@ -6,10 +6,13 @@ tuple::Tuple make_test_tuple() {
     return tuple::Tuple{{std::string{"abhijat"}, uint32_t{38}, true}};
 }
 
+metadata::Metadata make_metadata() {
+    return {{"name",                 "age",                       "is_employed"},
+            {metadata::Kind::String, metadata::Kind::UnsignedInt, metadata::Kind::Boolean}};
+}
+
 tuple::Tuple make_tuple_from_buffer(const stream_utils::ByteBuffer &buf) {
-    metadata::Metadata m{{"name",                 "age",                       "is_employed"},
-                         {metadata::Kind::String, metadata::Kind::UnsignedInt, metadata::Kind::Boolean}};
-    return tuple::Tuple{buf, m};
+    return tuple::Tuple{buf, make_metadata()};
 }
 
 page::SlottedDataPage make_empty_page(uint32_t page_size = page::k_page_size) {
@@ -75,4 +78,21 @@ TEST(SlottedDataPageTests, DeleteTupleDoesNotChangeSize) {
 TEST(SlottedDataPageTests, FailWhenDeletedSlotIdOverrunsSlotMarker) {
     auto p = make_empty_page();
     EXPECT_THROW(p.delete_tuple_at_slot_id(100), std::out_of_range);
+}
+
+TEST(SlottedDataPageTests, DefragPage) {
+    auto p = make_empty_page();
+    p.store_tuple(tuple::Tuple{{std::string{"alpha"}, uint32_t{38}, true}});
+    p.store_tuple(tuple::Tuple{{std::string{"bravo"}, uint32_t{38}, true}});
+    p.store_tuple(tuple::Tuple{{std::string{"charlie"}, uint32_t{38}, true}});
+    p.store_tuple(tuple::Tuple{{std::string{"delta"}, uint32_t{38}, true}});
+    ASSERT_EQ(p.enumerate_tuples().size(), 4);
+
+    p.delete_tuple_at_slot_id(0);
+    p.delete_tuple_at_slot_id(2);
+
+    auto before = p.free_space();
+    auto saved = p.defrag_page(make_metadata());
+    auto after = p.free_space();
+    ASSERT_EQ(saved, after - before);
 }

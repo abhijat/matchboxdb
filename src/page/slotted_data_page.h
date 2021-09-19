@@ -34,7 +34,27 @@ public:
 
     std::vector<TupleWithSlotId> enumerate_tuples();
 
+    /**
+     * Soft deletes tuple at slot id, by replacing the offset at slot with tombstone marker 0
+     */
     void delete_tuple_at_slot_id(uint32_t slot_id);
+
+    /**
+     *  Removes deleted tuples from the page, by re-writing un-deleted tuples over deleted tuples.
+     *  Slot ids are changed and free space should increase after running.
+     */
+    uint32_t defrag_page(const metadata::Metadata &metadata);
+
+protected:
+    /**
+     * Resets the tuple start and slot end markers, in preparation for a defrag.
+     * Also resets free space.
+     */
+    void reset_markers();
+
+    std::vector<stream_utils::ByteBuffer> load_tuple_buffers(const std::vector<uint32_t>& offsets);
+
+    stream_utils::ByteBuffer load_tuple_buffer(uint32_t offset);
 
 protected:
 

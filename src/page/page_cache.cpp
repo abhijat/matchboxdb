@@ -1,16 +1,16 @@
 #include "page_cache.h"
 
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <utility>
+
 #include "../logging.h"
 #include "../storage/utils.h"
 #include "page.h"
 #include "page_creator.h"
 #include "page_scanner.h"
 #include "slotted_data_page.h"
-
-#include <fstream>
-#include <iostream>
-#include <numeric>
-#include <utility>
 
 page_cache::PageCache::PageCache(uint32_t max_size, const std::vector<std::string> &tables)
     : _max_size{max_size} {

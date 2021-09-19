@@ -134,8 +134,6 @@ uint32_t page::SlottedDataPage::tuple_begin_marker() const {
 std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
     log::info("enumerating tuples...");
 
-    std::vector<stream_utils::ByteBuffer> tuple_buffers{};
-
     std::vector<uint32_t> offsets{};
     std::vector<uint32_t> slot_ids{};
 
@@ -160,19 +158,7 @@ std::vector<page::TupleWithSlotId> page::SlottedDataPage::enumerate_tuples() {
     // reverse the offsets, so we do not have to jump backwards when seeking
     std::reverse(offsets.begin(), offsets.end());
 
-    for (const auto &offset: offsets) {
-        _stream.seekg(offset, std::ios::beg);
-
-        auto tuple_size = stream_utils::read_data_from_stream<uint32_t>(_stream);
-
-        char buf[tuple_size];
-        _stream.read(buf, tuple_size);
-        if (!_stream) {
-            std::cout << "_stream.gcount() " << _stream.gcount() << "\n";
-        }
-
-        tuple_buffers.emplace_back(std::vector<unsigned char>{buf, buf + tuple_size});
-    }
+    auto tuple_buffers = load_tuple_buffers(offsets);
 
     // reverse the tuples, so that the slot ids match the tuples
     std::reverse(tuple_buffers.begin(), tuple_buffers.end());
@@ -207,4 +193,59 @@ void page::SlottedDataPage::delete_tuple_at_slot_id(uint32_t slot_id) {
     } else {
         stream_utils::write_data_to_stream<uint32_t>(_stream, 0);
     }
+}
+
+uint32_t page::SlottedDataPage::defrag_page(const metadata::Metadata &metadata) {
+    _stream.seekg(header_size(), std::ios::beg);
+
+    // pick out the offsets where non-deleted tuples are stored. deleted offsets are skipped, and will be overwritten
+    std::vector<uint32_t> offsets{};
+    while (_stream.tellg() != _slot_end_marker) {
+        auto offset = stream_utils::read_data_from_stream<uint32_t>(_stream);
+        if (offset != 0) {
+            offsets.push_back(offset);
+        }
+    }
+
+    auto tuple_buffers = load_tuple_buffers(offsets);
+
+    // store the original free space for saved space calculation,
+    // then reset the page so that appears empty to store_tuple.
+    uint32_t original_free_space = free_space();
+    reset_markers();
+
+    // Use the store_tuple api to start storing non deleted tuples from the beginning.
+    // store_tuple should take care of updating internal page state.
+    for (const auto &tuple_buffer: tuple_buffers) {
+        store_tuple(tuple::Tuple{tuple_buffer, metadata});
+    }
+
+    return free_space() - original_free_space;
+}
+
+void page::SlottedDataPage::reset_markers() {
+    _slot_end_marker = header_size();
+    _tuple_begin_marker = _page_size;
+    _free_space = _tuple_begin_marker - _slot_end_marker;
+}
+
+std::vector<stream_utils::ByteBuffer> page::SlottedDataPage::load_tuple_buffers(const std::vector<uint32_t> &offsets) {
+    std::vector<stream_utils::ByteBuffer> tuple_buffers{offsets.size()};
+    std::transform(offsets.cbegin(), offsets.cend(), tuple_buffers.begin(),
+                   [&](const auto &offset) { return load_tuple_buffer(offset); });
+    return tuple_buffers;
+}
+
+stream_utils::ByteBuffer page::SlottedDataPage::load_tuple_buffer(uint32_t offset) {
+    _stream.seekg(offset, std::ios::beg);
+    auto tuple_size = stream_utils::read_data_from_stream<uint32_t>(_stream);
+
+    char buf[tuple_size];
+    _stream.read(buf, tuple_size);
+    if (!_stream) {
+        log::info("failed to read stream when trying to read tuple at offset", offset);
+        throw std::ios::failure{"failed to read stream when trying to read tuple at offset " + std::to_string(offset)};
+    }
+
+    return std::vector<unsigned char>{buf, buf + tuple_size};
 }
