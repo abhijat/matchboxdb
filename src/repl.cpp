@@ -77,6 +77,8 @@ void repl(std::ostream &os, std::istream &is) {
 
                 linenoiseHistoryAdd(line_read);
                 linenoiseFree(line_read);
+            } catch (const parser::UnexpectedToken &error) {
+                os << "ParserError: " << error.what() << "\n";
             } catch (const parser::ParserError &error) {
                 os << "ParseError: " << error.what() << "\n";
             } catch (const errors::TableDoesNotExist &error) {
