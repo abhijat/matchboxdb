@@ -85,6 +85,8 @@ public:
      */
     virtual stream_utils::ByteBuffer empty_page() = 0;
 
+    std::mutex &mutex();
+
 protected:
     void write_header_to_stream();
 

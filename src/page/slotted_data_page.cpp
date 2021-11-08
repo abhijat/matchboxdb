@@ -236,6 +236,9 @@ void page::SlottedDataPage::reset_markers() {
 
 std::vector<stream_utils::ByteBuffer> page::SlottedDataPage::load_tuple_buffers(const std::vector<uint32_t> &offsets) {
     std::vector<stream_utils::ByteBuffer> tuple_buffers{offsets.size()};
+    std::for_each(offsets.cbegin(),  offsets.cend(), [](auto offset) {
+        log::info("offset: ", offset);
+    });
     std::transform(offsets.cbegin(), offsets.cend(), tuple_buffers.begin(),
                    [&](const auto &offset) { return load_tuple_buffer(offset); });
     return tuple_buffers;
@@ -273,7 +276,6 @@ page::SlottedDataPage::SlottedDataPage(const page::SlottedDataPage &slotted_data
 }
 
 void page::SlottedDataPage::overwrite_with(const page::SlottedDataPage &slotted_data_page) {
-    std::lock_guard<std::mutex> guard{_mutex};
     _slot_end_marker = slotted_data_page.slot_end_marker();
     _tuple_begin_marker = slotted_data_page.tuple_begin_marker();
     _free_space = slotted_data_page.free_space();

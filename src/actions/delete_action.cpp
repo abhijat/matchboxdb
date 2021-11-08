@@ -27,7 +27,7 @@ uint32_t actions::DeleteAction::apply_delete() {
             if (tuple_filter::matches(tuple, metadata, _where)) {
                 log::info("deleting matched row: ", tuple);
                 data_page->delete_tuple_at_slot_id(tuple_with_slot.slot_id);
-                _page_cache.mark_page_dirty(table_name, data_page);
+                _page_cache.mark_page_dirty(table_name, data_page, true);
                 deleted_count += 1;
             }
         }

@@ -7,6 +7,7 @@
 
 #include "../logging.h"
 #include "../storage/utils.h"
+#include "defragger.h"
 #include "page.h"
 #include "page_creator.h"
 #include "page_scanner.h"
@@ -136,8 +137,8 @@ page_cache::PageCache::get_page_for_data_size(const std::string &table_name, uin
     auto *data_page = dynamic_cast<page::SlottedDataPage *>(get_page_id(data_page_id, table_name,
                                                                         page::PageType::Data));
 
-    mark_page_dirty(table_name, data_page);
-    mark_page_dirty(table_name, metadata_page);
+    mark_page_dirty(table_name, data_page, false);
+    mark_page_dirty(table_name, metadata_page, false);
 
     if (page_created) {
         _free_data_pages[table_name].emplace_back(data_page_id, data_page->free_space());
@@ -150,6 +151,11 @@ uint32_t page_cache::PageCache::next_row_id_for_table(const std::string &table_n
 }
 
 void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
+    if (_dirty_pages.empty() || !_dirty_pages.contains(table_name)) {
+        log::info("skipping dirty page write, no entries");
+        return;
+    }
+
     std::fstream ofs{storage_utils::file_name_from_table_name(table_name),
                      std::ios::binary | std::ios::in | std::ios::out};
     if (!ofs) {
@@ -221,7 +227,7 @@ page_cache::PageCache::enumerate_pages(const std::string &table_name, page::Page
     return pages;
 }
 
-void page_cache::PageCache::mark_page_dirty(const std::string &table_name, page::Page *page) {
+void page_cache::PageCache::mark_page_dirty(const std::string &table_name, page::Page *page, bool add_to_defrag_list) {
     auto pos = _dirty_pages.find(table_name);
     if (pos == _dirty_pages.end()) {
         _dirty_pages[table_name] = {page};
@@ -229,7 +235,19 @@ void page_cache::PageCache::mark_page_dirty(const std::string &table_name, page:
         _dirty_pages[table_name].emplace(page);
     }
 
-    page->update_version();
+    // this will hang if the page mutex is already claimed.
+    if (add_to_defrag_list) {
+        page->update_version();
+    }
+
+    if (_page_defragger && add_to_defrag_list) {
+        const auto *slotted_data_page = dynamic_cast<const page::SlottedDataPage *>(page);
+
+        // defrag is not supported for non-data pages yet
+        if (slotted_data_page) {
+            (*_page_defragger)->add_page_to_defrag_list(slotted_data_page, table_name);
+        }
+    }
 }
 
 metadata::Metadata page_cache::PageCache::metadata_for_table(const std::string &table_name) {
@@ -265,6 +283,10 @@ std::vector<std::string> page_cache::PageCache::table_names() {
         return a.first;
     });
     return table_names;
+}
+
+void page_cache::PageCache::enable_page_defrag(page::PageDefragger *page_defragger) {
+    _page_defragger = page_defragger;
 }
 
 std::string

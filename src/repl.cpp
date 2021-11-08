@@ -52,6 +52,7 @@ void repl(std::ostream &os, std::istream &is) {
 
     page::PageDefragger page_defragger{cache};
 
+    cache.enable_page_defrag(&page_defragger);
     std::thread page_defrag_thread{std::ref(page_defragger)};
 
     while (true) {

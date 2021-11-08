@@ -11,6 +11,10 @@
 #include "page.h"
 #include "slotted_data_page.h"
 
+namespace page {
+class PageDefragger;
+}
+
 namespace page_cache {
 
 class PageCache {
@@ -31,13 +35,15 @@ public:
 
     void write_dirty_pages(const std::string &table_name);
 
-    std::vector<page::Page*> enumerate_pages(const std::string &table_name, page::PageType page_type);
+    std::vector<page::Page *> enumerate_pages(const std::string &table_name, page::PageType page_type);
 
-    void mark_page_dirty(const std::string &table_name, page::Page *page);
+    void mark_page_dirty(const std::string &table_name, page::Page *page, bool add_to_defrag_list);
 
     void add_new_table(const std::string &table_name);
 
     std::vector<std::string> table_names();
+
+    void enable_page_defrag(page::PageDefragger *page_defragger);
 
 protected:
     void scan_tables();
@@ -69,6 +75,8 @@ protected:
 
     std::optional<page::PageId>
     get_page_id_for_size(const std::string &table_name, uint32_t data_size, page::PageType page_type);
+
+    std::optional<page::PageDefragger*> _page_defragger{};
 };
 
 std::string generate_cache_key(page::PageId page_id, const std::string &table_name, page::PageType page_type);

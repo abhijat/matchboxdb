@@ -31,7 +31,7 @@ uint32_t actions::UpdateAction::update() {
                 //  we can put the tuple at the same slot if the size is the same
                 //  if the new tuple is smaller, it can result in gaps in the page
                 data_page->delete_tuple_at_slot_id(tuple_and_slot.slot_id);
-                _page_cache.mark_page_dirty(table_name, data_page);
+                _page_cache.mark_page_dirty(table_name, data_page, false);
                 store_updated_tuple(table_name, metadata, data_page, tuple);
                 updated_pages += 1;
             }

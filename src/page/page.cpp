@@ -112,6 +112,10 @@ void page::Page::update_version() {
     _version += 1;
 }
 
+std::mutex &page::Page::mutex() {
+    return _mutex;
+}
+
 page::Record page::Record::read_from_stream(std::stringstream &s) {
     auto row = stream_utils::read_data_from_stream<uint32_t>(s);
     auto page = stream_utils::read_data_from_stream<uint32_t>(s);
