@@ -10,6 +10,30 @@ This project implements a full-featured database system. It contains the followi
 
 No third party libraries are used for any of these features unless noted otherwise. The functionality is all written from scratch.
 
+### Project structure
+
+The following code structure is high level, it does not go into individual classes but tries to describe code units. 
+It rougly corresponds to file tree:
+
+* src: contains code
+  * actions: contains database command action objects. each object wraps and performs a db action
+  * dependencies: third party embedded libs, currently only linenoise
+  * page: all code related to page abstractions
+    * defragger: compacts data pages which have deleted entries to save space
+    * metadata page: stores meta info about a table, one metadata page is maintained per table. it has table name, schema etc
+    * page: the parent class for metadata and slotted_data page, provides common functionalities
+    * page_cache: the central manager class to avoid disk io. all page loading happens from here. it is an LRU cache which caches pages read from disk and writes them back to disk. other areas of code use pointers handed out from here
+    * page creator, scanner and visitors: utilities to make working with pages easier
+    * slotted data page: the core of the storage, contains tuples of data and provides api to read and write these
+  * sql_parser: a full sql parser which implements Pratt Parsing
+    * node: the parent class for all parser constructs
+    * statements: various sql statements which contain elements such as table name, clauses etc
+    * parser: the main parser class, implements pratt parsing, maintains token and state, propagates errors
+    * token: contains the low level token and constants that parser needs
+  * storage: code for managing low level file I/O, table creation etc.
+  * others: errors, logging, the repl and command executor
+* tests: contains test cases
+
 ### Third party libraries
 
 Two third party libraries are used
