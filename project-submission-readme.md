@@ -76,37 +76,39 @@ The SQL support is case sensitive. Semicolon to end statements is optional. Newl
 
 ### Rubrics satisfied:
 
+I have tried to list the satisfied rubrics with the files where the constructs are present, a couple are so generic that they are present in the entire codebase.
+
 * The project demonstrates an understanding of C++ functions and control structures.
   * control structures are used throughout the code base
 * The project reads data from a file and process the data, or the program writes data to a file.
-  * the storage system reads from and to binary files. Each table that the user creates is saved as binary file split into pages. 
+  * the storage system reads from and to binary files. Each table that the user creates is saved as binary file split into pages. src/storage/streamutils.cpp 
   * IO is done by using a system of offsets into pages. 
-* The project accepts user input and processes the input.
-  * a repl is provided to read user input, parse it and execute the parsed commands on the db page cache
-* The project uses Object Oriented Programming techniques
+* The project accepts user input and processes the input. 
+  * a repl is provided to read user input, parse it and execute the parsed commands on the db page cache src/repl.cpp
+* The project uses Object Oriented Programming techniques: src/page/slotted_data_page.cpp
   * in multiple places OOP techniques are used, for example the sql parser uses a top level node which is inherited into various structures such as statements, identifiers and fields
   * pages are divided into two types, a metadata page and a slotted data page. they inherit from a common page class.
-* Classes use appropriate access specifiers for class members.
+* Classes use appropriate access specifiers for class members: src/page/slotted_data_page.cpp
   * all classes expose public methods and use protected access modifier for elements which should be read by child classes
-* Class constructors utilize member initialization lists.
+* Class constructors utilize member initialization lists: src/page/slotted_data_page.cpp
   * all constructors use the list based initialization
 * Classes abstract implementation details from their interfaces.
   * the parent classes expose pure virtual methods for which concrete behavior is supplied by derived classes. Eg see the node class
   * visitor pattern is used for traversing class hierarchy for evaluating nodes, printing them to json etc
-* Templates generalize functions in the project.
+* Templates generalize functions in the project: src/logging.h
   * templates are used in multiple places where appropriate. in particular `logging.h` uses variading templates to enable a very flexible logging interface
 * The project makes use of references in function declarations.
   * references are used in most places in code. as concrete example src/command_executor.cpp takes references to commands to be run.
-* The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate.
+* The project uses scope / Resource Acquisition Is Initialization (RAII) where appropriate: src/logging.h
   * in several places scoped lock guards are used to protect access which automatically release access once they go out of scope, eg see src/logging.h:27
 * The project uses move semantics to move data, instead of copying it, where possible.
   * move semantics are used whereever possible. as concrete example src/page/page.cpp:95 - page stream and buffer are moved out in the move constructor.
-* The project uses smart pointers instead of raw pointers.
+* The project uses smart pointers instead of raw pointers: src/sql_parser/parser.cpp:198
   * the parser and page use unique_ptr everywhere for polymorphic implementation.
-* The project uses multithreading.
+* The project uses multithreading: src/repl.cpp:58
   * a separate thread is started on repl launch for page defragmentation, this thread runs in background and compacts data pages from which a tuple has been deleted: src/page/defragger.[h/cpp]
   * it uses lock free versioning system to avoid blocking for long periods on expensive operation: src/page/defragger.cpp:30
-* A mutex or lock is used in the project.
+* A mutex or lock is used in the project
   * each data page has a mutex which is locked using scoped guard before changing the page: src/page/slotted_data_page.cpp:181 - scoped guards are also used for logging
 
 
