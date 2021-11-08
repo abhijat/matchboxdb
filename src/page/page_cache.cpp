@@ -12,6 +12,7 @@
 #include "page_creator.h"
 #include "page_scanner.h"
 #include "slotted_data_page.h"
+#include "../errors.h"
 
 page_cache::PageCache::PageCache(uint32_t max_size, const std::vector<std::string> &tables)
     : _max_size{max_size} {
@@ -61,7 +62,7 @@ page_cache::PageCache::load_page_from_disk(page::PageId page_id, const std::stri
     if (!i) {
         log::info("failed to open table file:", table_file_name, "for table", table_name);
         // TODO - table does not exist error
-        throw std::ios::failure("failed to open table file");
+        throw errors::TableDoesNotExist{table_name};
     }
 
     i.seekg(page::k_page_size * page_id, std::ios::beg);
@@ -104,7 +105,7 @@ void page_cache::PageCache::scan_tables() {
 void page_cache::PageCache::scan_table_file(const std::string &table_name, const std::string &file_name) {
     std::ifstream ifs{file_name, std::ios::binary};
     if (!ifs) {
-        throw std::ios::failure{"failed to read table file"};
+        throw errors::TableDoesNotExist{table_name};
     }
     stream_utils::ByteBuffer buffer(page::k_page_size);
 
@@ -159,7 +160,7 @@ void page_cache::PageCache::write_dirty_pages(const std::string &table_name) {
     std::fstream ofs{storage_utils::file_name_from_table_name(table_name),
                      std::ios::binary | std::ios::in | std::ios::out};
     if (!ofs) {
-        throw std::ios::failure{"failed to read table file"};
+        throw errors::TableDoesNotExist{table_name};
     }
 
     for (const auto &page_ptr: _dirty_pages.at(table_name)) {

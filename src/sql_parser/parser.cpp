@@ -15,6 +15,7 @@
 #include "delete_statement.h"
 #include "drop_statement.h"
 #include "describe_statement.h"
+#include "parse_errors.h"
 
 #include <utility>
 
@@ -125,7 +126,7 @@ std::vector<std::unique_ptr<ast::Expression>> parser::Parser::parse_expression_l
     std::vector<std::unique_ptr<ast::Expression>> expressions{};
     auto expression = parse_expression(Precedence::Lowest);
     if (!expression) {
-        throw std::invalid_argument{"bad input: " + _current_token.literal()};
+        throw parser::ParserError{"bad input: " + _current_token.literal()};
     }
 
     expressions.push_back(std::move(*expression));
@@ -140,7 +141,7 @@ std::vector<std::unique_ptr<ast::Expression>> parser::Parser::parse_expression_l
 
         expression = parse_expression(Precedence::Lowest);
         if (!expression) {
-            throw std::invalid_argument{"bad input: " + _current_token.literal()};
+            throw parser::ParserError{"bad input: " + _current_token.literal()};
         }
 
         expressions.push_back(std::move(*expression));
@@ -249,9 +250,7 @@ bool parser::Parser::expect_peek(token::Kind kind) {
         return true;
     } else {
         peek_error(kind);
-        std::stringstream ss;
-        ss << "Expected token " << kind << ", found token " << _peek_token.kind();
-        throw std::invalid_argument{ss.str()};
+        throw parser::UnexpectedToken::unexpected_token(kind, _peek_token.kind());
         return false;
     }
 }
@@ -273,12 +272,12 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_create_statement() {
     auto table = parse_table_name();
 
     if (!table) {
-        throw std::invalid_argument{"bad table name"};
+        throw parser::ParserError{"bad table name"};
     }
 
     // move up to the (
     if (!expect_peek(token::Kind::LParen)) {
-        throw std::invalid_argument{"no lparen after table name"};
+        throw parser::ParserError{"no lparen after table name"};
     }
 
     // move over to the field definitions, extract fields
@@ -286,7 +285,7 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_create_statement() {
     auto field_definitions = parse_field_definitions();
 
     if (!expect_peek(token::Kind::RParen)) {
-        throw std::invalid_argument{"no rparen after fields"};
+        throw parser::ParserError{"no rparen after fields"};
     }
 
     return std::make_unique<ast::CreateStatement>(*table, field_definitions);
@@ -300,7 +299,7 @@ std::vector<ast::FieldDefinition> parser::Parser::parse_field_definitions() {
     auto field_definition = parse_field_definition();
 
     if (!field_definition) {
-        throw std::invalid_argument{"bad field definition: " + _current_token.literal()};
+        throw parser::ParserError{"bad field definition: " + _current_token.literal()};
     }
 
     field_definitions.push_back(*field_definition);
@@ -315,7 +314,7 @@ std::vector<ast::FieldDefinition> parser::Parser::parse_field_definitions() {
         field_definition = parse_field_definition();
 
         if (!field_definition) {
-            throw std::invalid_argument{"bad field definition: " + _current_token.literal()};
+            throw parser::ParserError{"bad field definition: " + _current_token.literal()};
         }
 
         field_definitions.push_back(*field_definition);
@@ -338,7 +337,7 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_update_statement() {
 
     auto table = parse_table_name();
     if (!table) {
-        throw std::invalid_argument{"bad table: " + _current_token.literal()};
+        throw parser::ParserError{"bad table: " + _current_token.literal()};
     }
 
     expect_peek(token::Kind::Set);
@@ -380,7 +379,7 @@ std::pair<ast::Identifier, std::unique_ptr<ast::Expression>> parser::Parser::par
     next_token();
     auto expression = parse_expression(Precedence::Lowest);
     if (!expression) {
-        throw std::invalid_argument{"bad expression: " + _current_token.literal()};
+        throw parser::ParserError{"bad expression: " + _current_token.literal()};
     }
 
     return {identifier, std::move(*expression)};
@@ -391,7 +390,7 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_insert_statement() {
     next_token();
     auto table = parse_table_name();
     if (!table) {
-        throw std::invalid_argument{"Failed to parse table name"};
+        throw parser::ParserError{"Failed to parse table name"};
     }
 
     expect_peek(token::Kind::Values);
@@ -417,7 +416,7 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_delete_statement() {
     next_token();
     auto table = parse_table_name();
     if (!table) {
-        throw std::invalid_argument{"bad table name: " + _current_token.literal()};
+        throw parser::ParserError{"bad table name: " + _current_token.literal()};
     }
 
     std::optional<std::unique_ptr<ast::Expression>> where{};
@@ -438,7 +437,7 @@ std::unique_ptr<ast::Statement> parser::Parser::parse_drop_statement() {
 
     auto table = parse_table_name();
     if (!table) {
-        throw std::invalid_argument{"bad table name: " + _current_token.literal()};
+        throw parser::ParserError{"bad table name: " + _current_token.literal()};
     }
 
     return std::make_unique<ast::DropStatement>(std::move(*table));

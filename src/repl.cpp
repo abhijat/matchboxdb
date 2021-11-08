@@ -9,6 +9,8 @@
 
 #include "dependencies/linenoise/linenoise.h"
 #include "page/defragger.h"
+#include "sql_parser/parse_errors.h"
+#include "errors.h"
 
 
 void tab_completion(const char *input, linenoiseCompletions *completions) {
@@ -67,13 +69,19 @@ void repl(std::ostream &os, std::istream &is) {
 
         std::string line{line_read};
         if (!line.empty()) {
-            const auto &statement = parser::Parser{lexer::Lexer{line_read}}.parse();
-            auto result = executor.execute(*statement);
+            try {
+                const auto &statement = parser::Parser{lexer::Lexer{line_read}}.parse();
+                auto result = executor.execute(*statement);
 
-            std::visit(result_visitor, result);
+                std::visit(result_visitor, result);
 
-            linenoiseHistoryAdd(line_read);
-            linenoiseFree(line_read);
+                linenoiseHistoryAdd(line_read);
+                linenoiseFree(line_read);
+            } catch (const parser::ParserError &error) {
+                os << "ParseError: " << error.what() << "\n";
+            } catch (const errors::TableDoesNotExist &error) {
+                os << "IO Error: " << error.what() << "\n";
+            }
         }
     }
 
